@@ -6,10 +6,14 @@ public class Game : MonoBehaviour
 
 		public bool isDebug = true; //TODO on build, change to false
 
+		private GameObject Button;
+
 		// Use this for initialization
 		void Start ()
 		{
 	
+				Button = GameObject.Find ("ToggleDebugButton");
+				
 		}
 	
 		// Update is called once per frame
@@ -24,6 +28,8 @@ public class Game : MonoBehaviour
 				isDebug = !isDebug;
 				
 				Debug.Log ("Debug now: " + isDebug.ToString ());
+		
+				//TODO: change toggle button text (add/remove * to 
 		
 		}
 		
