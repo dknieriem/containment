@@ -8,7 +8,7 @@ public class InputHandler : MonoBehaviour
 
 		Camera mainCamera;
 
-		Terrain terrain;
+		TerrainInfo terrainInfo;
 		
 		// Use this for initialization
 		void Start ()
@@ -17,8 +17,8 @@ public class InputHandler : MonoBehaviour
 				mainCamera = GameObject.Find ("Main Camera").GetComponent<Camera> ();
 				Debug.Log ("Camera name: " + mainCamera.name);
 				
-				terrain = GameObject.Find ("Terrain").GetComponent<Terrain> ();
-	
+				terrainInfo = gameObject.GetComponentInChildren<TerrainInfo> ();//GameObject.Find ("Terrain").GetComponent<Terrain> ();
+				Debug.Log ("Terrain name: " + terrainInfo.name);
 		}
 	
 		// Update is called once per frame
@@ -52,12 +52,12 @@ public class InputHandler : MonoBehaviour
 				
 				//TODO: stop camera from showing past edge of terrain
 				
-				if (newCameraPos.x > terrain.t_size [0]) {
-						newCameraPos.x = (float)terrain.t_size [0];
+				if (newCameraPos.x > terrainInfo.t_size [0] - 1) {
+						newCameraPos.x = (float)terrainInfo.t_size [0];
 				}
 		
-				if (newCameraPos.y > terrain.t_size [1]) {
-						newCameraPos.y = (float)terrain.t_size [1];
+				if (newCameraPos.y > terrainInfo.t_size [1] - 1) {
+						newCameraPos.y = (float)terrainInfo.t_size [1];
 				}
 				
 				mainCamera.transform.position = newCameraPos;

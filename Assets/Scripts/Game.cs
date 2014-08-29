@@ -6,13 +6,13 @@ public class Game : MonoBehaviour
 
 		public bool isDebug = true; //TODO on build, change to false
 
-		private GameObject Button;
+		//private GameObject Button;
 
 		// Use this for initialization
 		void Start ()
 		{
 	
-				Button = GameObject.Find ("ToggleDebugButton");
+				//Button = GameObject.Find ("ToggleDebugButton");
 				
 		}
 	
