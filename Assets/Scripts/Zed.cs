@@ -12,7 +12,9 @@ public class Zed : MonoBehaviour
 		
 		public Vector3 InterestLocation;
 		
-		Game game;
+		public float countdownToForgettingInterest;
+		
+		public Game game;
 		
 		public void SetTransition (Transition t)
 		{
@@ -21,6 +23,8 @@ public class Zed : MonoBehaviour
 	
 		public void Start ()
 		{
+		
+				Debug.Log ("Zed start");
 		
 				InterestLocation = new Vector3 (-1, -1, 0);
 		
@@ -57,7 +61,7 @@ public class Zed : MonoBehaviour
 				walk.AddTransition (Transition.GetInterestTransition, StateID.MoveToInterestStateID);
 		
 				MoveToInterestState move = new MoveToInterestState ();
-				move.AddTransition (Transition.LoseInterestTransition, StateID.MoveToInterestStateID);
+				move.AddTransition (Transition.LoseInterestTransition, StateID.IdleStateID);
 				move.AddTransition (Transition.InterestInRangeTransition, StateID.AttackInterestStateID);
 		
 		

@@ -6,9 +6,19 @@ public class InputHandler : MonoBehaviour
 
 		public float CameraPixelsPerSecond = 5.0f; 
 
+		public Transform SoundPrefab;
+
 		Camera mainCamera;
 
 		TerrainInfo terrainInfo;
+		
+		Game game;
+		
+		string currentSetFollowed;
+	
+		int currentZedMemberFollowed;
+	
+		int currentGroupMemberFollowed;
 		
 		// Use this for initialization
 		void Start ()
@@ -19,11 +29,29 @@ public class InputHandler : MonoBehaviour
 				
 				terrainInfo = gameObject.GetComponentInChildren<TerrainInfo> ();//GameObject.Find ("Terrain").GetComponent<Terrain> ();
 				Debug.Log ("Terrain name: " + terrainInfo.name);
+				
+				game = gameObject.GetComponent<Game> ();
 		}
 	
 		// Update is called once per frame
 		void Update ()
 		{
+		
+				if (Input.GetButtonDown ("Previous Zed")) {
+						ChangeCamTarget ("Zeds", -1);
+				}
+	
+				if (Input.GetButtonDown ("Next Zed")) {
+						ChangeCamTarget ("Zeds", +1);
+				}
+	
+				if (Input.GetButtonDown ("Action 1")) {
+						getClick ("Action 1");
+				}
+				
+				if (Input.GetButtonDown ("Action 2")) {
+						getClick ("Action 2");
+				}
 	
 				MoveCamera ();
 	
@@ -63,4 +91,69 @@ public class InputHandler : MonoBehaviour
 				mainCamera.transform.position = newCameraPos;
 		}
 	
+		public void ChangeCamTarget (string groupName, int delta)
+		{
+		
+				currentSetFollowed = groupName;
+		
+				if (groupName == "Zeds") {
+			
+						currentZedMemberFollowed = (currentZedMemberFollowed + delta) % game.gameZeds.Length;
+			
+						if (currentZedMemberFollowed < 0) 
+								currentZedMemberFollowed += game.gameZeds.Length;
+			
+				}
+		
+				/*		if (groupName == "Characters") {
+			
+						currentGroupMemberFollowed = (currentGroupMemberFollowed + delta) % gameZeds.Length;
+			
+						if (currentGroupMemberFollowed < 0) 
+								currentGroupMemberFollowed += gameZeds.Length;
+			
+				}
+		*/
+		
+				MoveCamToTarget ();
+		
+		}
+	
+		public void MoveCamToTarget ()
+		{
+		
+				if (currentSetFollowed == "Zeds") {
+			
+						Zed target = game.gameZeds [currentZedMemberFollowed];
+			
+						Vector3 newCamPos = new Vector3 (target.transform.position.x, target.transform.position.y, mainCamera.transform.position.z);
+			
+						mainCamera.transform.position = newCamPos;
+			
+				}
+		
+		
+		}
+		
+		void getClick (string action)
+		{
+		
+				Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
+				RaycastHit hit;
+				//Debug.Log (ray.origin.ToString()+", "+((ray.direction - Camera.main.transform.position) * 10).ToString());
+		
+				Debug.Log (action + ", " + ray.origin.ToString ());
+		
+				Vector3 newSoundPosition = new Vector3 (ray.origin.x, ray.origin.y, 0);
+				
+				GameObject newSound = Instantiate (SoundPrefab, newSoundPosition, Quaternion.identity) as GameObject;
+								
+				Debug.Log (GameObject.Find ("Sounds"));
+								
+				//newSound.transform.parent = GameObject.Find ("Sounds");
+								
+				//newSound.name = "Sound " + Time.frameCount;
+
+		
+		}
 }

@@ -6,11 +6,17 @@ public class Game : MonoBehaviour
 
 		public bool isDebug = true; //TODO on build, change to false
 
+		public Zed[] gameZeds;
+		
+		public TerrainInfo terrain;
+
 		//private GameObject Button;
 
 		// Use this for initialization
 		void Start ()
 		{
+	
+				terrain = gameObject.GetComponentInChildren<TerrainInfo> ();
 	
 				//Button = GameObject.Find ("ToggleDebugButton");
 				
@@ -21,6 +27,8 @@ public class Game : MonoBehaviour
 		{
 	
 		}
+
+		
 		
 		void ToggleDebug ()
 		{

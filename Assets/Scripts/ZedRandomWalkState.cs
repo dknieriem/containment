@@ -15,6 +15,12 @@ public class RandomWalkState : FSMState
 		
 				Zed npcZed = npc.GetComponent<Zed> ();
 		
+				if (npcZed.InterestLocation.x == -1 && npcZed.InterestLocation.y == -1) {
+						npcZed.InterestLocation.x = Random.Range (0, npcZed.game.terrain.t_size [0] - 1);
+						npcZed.InterestLocation.y = Random.Range (0, npcZed.game.terrain.t_size [1] - 1);
+			
+				}
+		
 				// If any "sound" is within hearing range
 				//1. linq find all sound objects within range X
 				Sound[] sounds = game.GetComponentsInChildren<Sound> ();
@@ -41,6 +47,7 @@ public class RandomWalkState : FSMState
 						npcZed.InterestLocation = target.transform.position;
 			
 						//5. set transition to get interest
+						npcZed.countdownToForgettingInterest = 10.0f;
 						npcZed.SetTransition (Transition.GetInterestTransition);
 			
 						return;

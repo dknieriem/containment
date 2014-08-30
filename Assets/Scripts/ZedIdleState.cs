@@ -41,6 +41,7 @@ public class IdleState : FSMState
 						npcZed.InterestLocation = target.transform.position;
 			
 						//5. set transition to get interest
+						npcZed.countdownToForgettingInterest = 10.0f;
 						npcZed.SetTransition (Transition.GetInterestTransition);
 			
 						return;
