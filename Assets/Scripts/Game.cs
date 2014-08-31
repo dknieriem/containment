@@ -10,6 +10,10 @@ public class Game : MonoBehaviour
 		
 		public TerrainInfo terrain;
 
+		public AudioClip[] zedSounds;
+		
+		public AudioClip mapClick;
+
 		//private GameObject Button;
 
 		// Use this for initialization
@@ -28,7 +32,12 @@ public class Game : MonoBehaviour
 	
 		}
 
+		void FixedUpdate ()
+		{
 		
+				gameZeds = gameObject.GetComponentsInChildren<Zed> ();
+		
+		}
 		
 		void ToggleDebug ()
 		{

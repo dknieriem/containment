@@ -6,7 +6,7 @@ public class InputHandler : MonoBehaviour
 
 		public float CameraPixelsPerSecond = 5.0f; 
 
-		public Transform SoundPrefab;
+		public GameObject SoundPrefab;
 
 		Camera mainCamera;
 
@@ -139,21 +139,27 @@ public class InputHandler : MonoBehaviour
 		{
 		
 				Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
-				RaycastHit hit;
+
 				//Debug.Log (ray.origin.ToString()+", "+((ray.direction - Camera.main.transform.position) * 10).ToString());
 		
 				Debug.Log (action + ", " + ray.origin.ToString ());
 		
 				Vector3 newSoundPosition = new Vector3 (ray.origin.x, ray.origin.y, 0);
 				
-				GameObject newSound = Instantiate (SoundPrefab, newSoundPosition, Quaternion.identity) as GameObject;
+				GameObject newSound = (GameObject)Instantiate (SoundPrefab, newSoundPosition, Quaternion.identity);
 								
-				Debug.Log (GameObject.Find ("Sounds"));
-								
-				//newSound.transform.parent = GameObject.Find ("Sounds");
-								
-				//newSound.name = "Sound " + Time.frameCount;
-
-		
+				Sound newSoundObj = newSound.GetComponent<Sound> ();
+							
+				newSoundObj.Amplitude = Random.Range (10, 20);
+				newSoundObj.Duration = Random.Range (2, 20);
+							
+				//Debug.Log (GameObject.Find ("Sounds"));
+														
+				newSound.GetComponent<AudioSource> ().clip = game.GetComponent<Game> ().mapClick;
+				newSound.GetComponent<AudioSource> ().Play ();
+				newSound.name = "Sound " + Time.frameCount;
+				
+				newSound.transform.parent = GameObject.Find ("Sounds").transform;
+				
 		}
 }

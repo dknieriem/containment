@@ -264,7 +264,7 @@ public class FSMSystem
 		public void PerformTransition (Transition trans)
 		{
 	
-				Debug.Log ("Performing Transition " + trans.ToString ());
+				//Debug.Log ("Performing Transition " + trans.ToString ());
 				// Check for NullTransition before changing the current state
 				if (trans == Transition.NullTransition) {
 						Debug.LogError ("FSM ERROR: NullTransition is not allowed for a real transition");

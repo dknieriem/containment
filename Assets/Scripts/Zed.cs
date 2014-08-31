@@ -16,6 +16,8 @@ public class Zed : MonoBehaviour
 		
 		public Game game;
 		
+		public float countdownToNextSound;
+		
 		public void SetTransition (Transition t)
 		{
 				fsm.PerformTransition (t);
@@ -27,6 +29,8 @@ public class Zed : MonoBehaviour
 				Debug.Log ("Zed start");
 		
 				InterestLocation = new Vector3 (-1, -1, 0);
+				
+				countdownToNextSound = 10.0f;
 		
 				game = GameObject.Find ("Game").GetComponent<Game> ();
 		
@@ -37,7 +41,7 @@ public class Zed : MonoBehaviour
 		// Update is called once per frame
 		void Update ()
 		{
-	
+		
 		}
 		
 		void FixedUpdate ()
