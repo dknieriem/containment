@@ -21,7 +21,7 @@ public class RandomWalkState : FSMState
 				
 				IEnumerable<Sound> npcSounds = npc.GetComponents<Sound> ();
 		
-				IEnumerable<Sound> targets = sounds.Where (s => Vector3.Distance (s.transform.position, npc.transform.position) < 25).Except (npcSounds);
+				IEnumerable<Sound> targets = sounds.Where (s => Vector3.Distance (s.transform.position, npc.transform.position) < s.Radius).Except (npcSounds);
 				
 				//Debug.Log ("Target sounds: " + targets.Count ());
 		
@@ -41,16 +41,17 @@ public class RandomWalkState : FSMState
 			
 						//4. set npc target location to sound location
 						npcZed.InterestLocation = target.transform.position;
+						npcZed.InterestMagnitude = target.Magnitude (Vector3.Distance (target.transform.position, npc.transform.position));
 			
 						//5. set transition to get interest
-						npcZed.countdownToForgettingInterest = Random.Range (10, 25);
+						npcZed.CountdownToForgettingInterest = Random.Range (10, 25);
 						npcZed.SetTransition (Transition.GetInterestTransition);
 			
 						return;
 				}
 		
 		
-				if (npcZed.countdownToForgettingInterest <= 0) {
+				if (npcZed.CountdownToForgettingInterest <= 0) {
 		
 						//randomly decide to idle, with probability p
 						int f = UnityEngine.Random.Range (0, 100);
@@ -60,7 +61,7 @@ public class RandomWalkState : FSMState
 				
 								npcZed.SetTransition (Transition.WalkToIdleTransition);
 						
-								npcZed.countdownToForgettingInterest = Random.Range (10, 25);
+								npcZed.CountdownToForgettingInterest = Random.Range (10, 25);
 						}
 		
 				}
@@ -84,15 +85,13 @@ public class RandomWalkState : FSMState
 			
 				} 
 				
-				npcZed.countdownToForgettingInterest -= Time.deltaTime;
-		
-				UpdateSound (game, npc);
-			
+				npcZed.CountdownToForgettingInterest -= Time.deltaTime;
+				
 				Vector3 dirVector = npcZed.InterestLocation - npc.transform.position;
 			
 				//Debug.Log (dirVector.x + ", " + dirVector.y);
 			
-				float velocity = Mathf.Min (npcZed.maxVelocity, dirVector.magnitude);
+				float velocity = Mathf.Min (npcZed.MaxVelocity, dirVector.magnitude);
 			
 				dirVector.Normalize ();
 			
@@ -108,36 +107,7 @@ public class RandomWalkState : FSMState
 						
 				// Apply the Velocity
 				npc.rigidbody2D.velocity = dirVector * velocity * Time.deltaTime;
-			
-								
+					
 		}
-
-		public void UpdateSound (GameObject game, GameObject npc)
-		{
-				Zed npcZed = npc.GetComponent<Zed> ();
-	
-				npcZed.countdownToNextSound -= Time.deltaTime;
-	
-				if (npcZed.countdownToNextSound <= 0) { //play another sound
 		
-						if (npc.GetComponent<Sound> ()) { //no sound playing currently, not sure why this would still be here!
-								UnityEngine.Object.Destroy (npc.GetComponent<Sound> ());
-						}
-		
-						Sound newSound = npc.AddComponent<Sound> ();
-		
-						newSound.Amplitude = 1.0f;
-						newSound.Duration = 2.0f;
-		
-						int whichSound = Random.Range (0, game.GetComponent<Game> ().zedSounds.Length);
-		
-						npcZed.GetComponent<AudioSource> ().clip = game.GetComponent<Game> ().zedSounds [whichSound];
-						npcZed.GetComponent<AudioSource> ().Play ();
-						npcZed.countdownToNextSound = Random.Range (10, 25);
-		
-				}
-	
-		}
-
-			
 } // RandomWalkState

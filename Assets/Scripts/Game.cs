@@ -1,18 +1,21 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public class Game : MonoBehaviour
 {
 
-		public bool isDebug = true; //TODO on build, change to false
+		public bool IsDebug = true; //TODO on build, change to false
 
-		public Zed[] gameZeds;
-		
-		public TerrainInfo terrain;
+		public Zed[] GameZeds;
 
-		public AudioClip[] zedSounds;
+		public Sound[] GameSounds;
+						
+		public TerrainInfo Terrain;
+
+		public AudioClip[] ZedSounds;
 		
-		public AudioClip mapClick;
+		public AudioClip MapClick;
 
 		//private GameObject Button;
 
@@ -20,10 +23,21 @@ public class Game : MonoBehaviour
 		void Start ()
 		{
 	
-				terrain = gameObject.GetComponentInChildren<TerrainInfo> ();
+				Terrain = gameObject.GetComponentInChildren<TerrainInfo> ();
 	
 				//Button = GameObject.Find ("ToggleDebugButton");
 				
+				GameZeds = gameObject.GetComponentsInChildren<Zed> ();
+				
+				//Debug.Log ("Zeds: " + GameZeds.Length);
+				
+				foreach (Zed zed in GameZeds) {
+				
+						GameObject zedObj = zed.gameObject;
+				
+						zedObj.transform.position.Set ((float)Random.Range (0, Terrain.Dimensions [0]), (float)Random.Range (0, Terrain.Dimensions [1]), 0); 
+					
+				}
 		}
 	
 		// Update is called once per frame
@@ -35,18 +49,28 @@ public class Game : MonoBehaviour
 		void FixedUpdate ()
 		{
 		
-				gameZeds = gameObject.GetComponentsInChildren<Zed> ();
+				GameZeds = gameObject.GetComponentsInChildren<Zed> ();
+				
+				GameSounds = gameObject.GetComponentsInChildren<Sound> ();
+				
+				//Debug.Log ("Sounds: " + GameSounds.Length);
 		
 		}
 		
 		void ToggleDebug ()
 		{
 		
-				isDebug = !isDebug;
+				IsDebug = !IsDebug;
 				
-				Debug.Log ("Debug now: " + isDebug.ToString ());
+				Debug.Log ("Debug now: " + IsDebug.ToString ());
 		
 				//TODO: change toggle button text (add/remove * to 
+				Text buttonText = GameObject.Find ("ToggleDebugButton").GetComponentInChildren<Text> ();
+				
+				if (IsDebug)
+						buttonText.text = "Toggle Debug Off";
+				else
+						buttonText.text = "Toggle Debug On";
 		
 		}
 		

@@ -5,6 +5,7 @@ public class Sound : MonoBehaviour
 {
 
 		public float Amplitude = 1.0f;
+		public float Radius = 5.0f;
 		public float Duration = 2.0f;
 
 
@@ -28,6 +29,7 @@ public class Sound : MonoBehaviour
 						} else {
 						
 								Destroy (this);
+								
 						}
 						
 				}
@@ -35,9 +37,11 @@ public class Sound : MonoBehaviour
 	
 		public float Magnitude (float distance)
 		{
-	
-				return Amplitude / (distance * distance * 4);
-	
+				if (distance > Radius || Radius <= 0) {
+						return 0;
+				} else {
+						return Amplitude * Radius * Radius / distance / distance;
+				}
 	
 		}
 }

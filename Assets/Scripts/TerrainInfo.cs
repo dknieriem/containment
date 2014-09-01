@@ -4,16 +4,17 @@ using System.Collections;
 public class TerrainInfo : MonoBehaviour
 {
 
-		public int[] t_size;
+		public int[] Dimensions;
 
 		// Use this for initialization
 		void Start ()
 		{
-	
-				t_size = new int[2];
-				t_size [0] = 32;
-				t_size [1] = 32;
-	
+		
+				Dimensions = new int[2];
+			
+				Dimensions [0] = 32;
+				Dimensions [1] = 32;
+		
 		}
 	
 		// Update is called once per frame

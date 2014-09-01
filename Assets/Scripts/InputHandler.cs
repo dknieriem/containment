@@ -14,6 +14,8 @@ public class InputHandler : MonoBehaviour
 		
 		Game game;
 		
+		
+		
 		string currentSetFollowed;
 	
 		int currentZedMemberFollowed;
@@ -80,12 +82,12 @@ public class InputHandler : MonoBehaviour
 				
 				//TODO: stop camera from showing past edge of terrain
 				
-				if (newCameraPos.x > terrainInfo.t_size [0] - 1) {
-						newCameraPos.x = (float)terrainInfo.t_size [0];
+				if (newCameraPos.x > terrainInfo.Dimensions [0] - 1) {
+						newCameraPos.x = (float)terrainInfo.Dimensions [0];
 				}
 		
-				if (newCameraPos.y > terrainInfo.t_size [1] - 1) {
-						newCameraPos.y = (float)terrainInfo.t_size [1];
+				if (newCameraPos.y > terrainInfo.Dimensions [1] - 1) {
+						newCameraPos.y = (float)terrainInfo.Dimensions [1];
 				}
 				
 				mainCamera.transform.position = newCameraPos;
@@ -98,10 +100,10 @@ public class InputHandler : MonoBehaviour
 		
 				if (groupName == "Zeds") {
 			
-						currentZedMemberFollowed = (currentZedMemberFollowed + delta) % game.gameZeds.Length;
+						currentZedMemberFollowed = (currentZedMemberFollowed + delta) % game.GameZeds.Length;
 			
 						if (currentZedMemberFollowed < 0) 
-								currentZedMemberFollowed += game.gameZeds.Length;
+								currentZedMemberFollowed += game.GameZeds.Length;
 			
 				}
 		
@@ -124,7 +126,7 @@ public class InputHandler : MonoBehaviour
 		
 				if (currentSetFollowed == "Zeds") {
 			
-						Zed target = game.gameZeds [currentZedMemberFollowed];
+						Zed target = game.GameZeds [currentZedMemberFollowed];
 			
 						Vector3 newCamPos = new Vector3 (target.transform.position.x, target.transform.position.y, mainCamera.transform.position.z);
 			
@@ -144,22 +146,25 @@ public class InputHandler : MonoBehaviour
 		
 				Debug.Log (action + ", " + ray.origin.ToString ());
 		
-				Vector3 newSoundPosition = new Vector3 (ray.origin.x, ray.origin.y, 0);
+				if (ray.origin.x > 0 && ray.origin.y > 0 && ray.origin.x < terrainInfo.Dimensions [0] && ray.origin.y < terrainInfo.Dimensions [1]) {
+		
+						Vector3 newSoundPosition = new Vector3 (ray.origin.x, ray.origin.y, 0);
 				
-				GameObject newSound = (GameObject)Instantiate (SoundPrefab, newSoundPosition, Quaternion.identity);
+						GameObject newSound = (GameObject)Instantiate (SoundPrefab, newSoundPosition, Quaternion.identity);
 								
-				Sound newSoundObj = newSound.GetComponent<Sound> ();
+						Sound newSoundObj = newSound.GetComponent<Sound> ();
 							
-				newSoundObj.Amplitude = Random.Range (10, 20);
-				newSoundObj.Duration = Random.Range (2, 20);
+						newSoundObj.Amplitude = Random.Range (10, 20);
+						newSoundObj.Duration = Random.Range (1, 5);
+						newSoundObj.Radius = Random.Range (1, 10);
 							
-				//Debug.Log (GameObject.Find ("Sounds"));
+						//Debug.Log (GameObject.Find ("Sounds"));
 														
-				newSound.GetComponent<AudioSource> ().clip = game.GetComponent<Game> ().mapClick;
-				newSound.GetComponent<AudioSource> ().Play ();
-				newSound.name = "Sound " + Time.frameCount;
+						newSound.GetComponent<AudioSource> ().clip = game.GetComponent<Game> ().MapClick;
+						newSound.GetComponent<AudioSource> ().Play ();
+						newSound.name = "Sound " + Time.frameCount;
 				
-				newSound.transform.parent = GameObject.Find ("Sounds").transform;
-				
+						newSound.transform.parent = GameObject.Find ("Sounds").transform;
+				}
 		}
 }

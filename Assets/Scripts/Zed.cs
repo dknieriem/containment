@@ -6,17 +6,25 @@ public class Zed : MonoBehaviour
 
 		public int HitPoints = 100;
 
-		public float maxVelocity = 1.0f;
+		public float MaxVelocity = 1.0f;
 
 		private FSMSystem fsm;
 		
 		public Vector3 InterestLocation;
 		
-		public float countdownToForgettingInterest;
+		public float InterestMagnitude;
 		
-		public Game game;
+		public float CountdownToForgettingInterest;
 		
-		public float countdownToNextSound;
+		public Game Game;
+		
+		public TerrainInfo Terrain;
+		
+		LineRenderer line;
+		
+		public float CountdownToNextSound;
+		
+		private int stepsToNextLogicUpdate = 10;
 		
 		public void SetTransition (Transition t)
 		{
@@ -26,13 +34,23 @@ public class Zed : MonoBehaviour
 		public void Start ()
 		{
 		
-				Debug.Log ("Zed start");
+				//DEBUG: Debug.Log ("Zed start");
+				
+				Game = GameObject.Find ("Game").GetComponent<Game> ();
+					
+				Terrain = Game.GetComponentInChildren<TerrainInfo> ();//Ter.GetComponent<TerrainInfo> (); //GameObject.Find ("Terrain")
+		
+				line = gameObject.GetComponent<LineRenderer> ();
 		
 				InterestLocation = new Vector3 (-1, -1, 0);
 				
-				countdownToNextSound = 10.0f;
-		
-				game = GameObject.Find ("Game").GetComponent<Game> ();
+				//DEBUG: Debug.Log ("Old Pos: " + transform.position);
+				
+				transform.position = new Vector3 (Random.Range (0, Terrain.Dimensions [0]), Random.Range (0, Terrain.Dimensions [1]), 0);
+				
+				//DEBUG: Debug.Log ("New Pos: " + transform.position);
+				
+				CountdownToNextSound = 10.0f;
 		
 				MakeFSM ();	
 		
@@ -47,8 +65,86 @@ public class Zed : MonoBehaviour
 		void FixedUpdate ()
 		{
 		
-				fsm.CurrentState.Reason (game.gameObject, gameObject);
-				fsm.CurrentState.Act (game.gameObject, gameObject);
+				UpdateSound ();
+				
+				stepsToNextLogicUpdate--;
+		
+				if (stepsToNextLogicUpdate == 0) {
+		
+						fsm.CurrentState.Reason (Game.gameObject, gameObject);
+						stepsToNextLogicUpdate = 10;
+				
+				}
+				
+				fsm.CurrentState.Act (Game.gameObject, gameObject);
+				
+				line.SetPosition (0, gameObject.transform.position);
+				
+				if (InterestLocation.x != -1 && InterestLocation.y != -1)
+						line.SetPosition (1, InterestLocation);
+				else
+						line.SetPosition (1, gameObject.transform.position);
+		
+		}
+		
+		public void UpdateSound ()
+		{
+		
+				CountdownToNextSound -= Time.deltaTime;
+		
+				if (CountdownToNextSound <= 0) { //play another sound
+			
+						if (gameObject.GetComponent<Sound> ()) { //no sound playing currently, not sure why this would still be here!
+								Object.Destroy (gameObject.GetComponent<Sound> ());
+						}
+			
+						Sound newSound = gameObject.AddComponent<Sound> ();
+			
+						switch (fsm.CurrentStateID) {
+						case StateID.IdleStateID:
+				
+								newSound.Amplitude = 0.5f;
+								newSound.Duration = 1.0f;
+								newSound.Radius = 2.0f;
+				
+								CountdownToNextSound = Random.Range (25, 60);
+				
+								break;
+						case StateID.RandomWalkStateID:
+				
+								newSound.Amplitude = 1.0f;
+								newSound.Duration = 2.0f;
+								newSound.Radius = 2.0f;
+				
+								CountdownToNextSound = Random.Range (10, 15);
+				
+								break;
+						case StateID.MoveToInterestStateID:
+			
+								newSound.Amplitude = 1.0f;
+								newSound.Duration = 1.0f;
+								newSound.Radius = 2.0f;
+				
+								CountdownToNextSound = Random.Range (5, 10);
+				
+								break;
+						case StateID.AttackInterestStateID:
+				
+								break;
+				
+				
+						} //end switch(currentstateID)
+			
+						int whichSound = Random.Range (0, Game.ZedSounds.Length - 1);
+			
+						gameObject.GetComponent<AudioSource> ().clip = Game.ZedSounds [whichSound];
+						gameObject.GetComponent<AudioSource> ().Play ();
+			
+			
+				}//end if(countdown < 0)
+		
+		
+		
 		
 		}
 		
