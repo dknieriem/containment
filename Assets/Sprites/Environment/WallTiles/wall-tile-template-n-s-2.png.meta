@@ -1,8 +1,8 @@
 fileFormatVersion: 2
-guid: 8dd585ec5c392e64392bf1d15c949d11
+guid: 2c0afaed88561e04fb41e9572e535f86
 TextureImporter:
   fileIDToRecycleName:
-    21300000: wall-tile-template-n-s
+    21300000: wall-tile-template-n-s-2
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -26,16 +26,16 @@ TextureImporter:
   maxTextureSize: 1024
   textureSettings:
     filterMode: 0
-    aniso: -1
+    aniso: 1
     mipBias: -1
-    wrapMode: -1
+    wrapMode: 1
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
   spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
-  alignment: 0
+  alignment: 6
   spritePivot: {x: .5, y: .5}
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spritePixelsToUnits: 32

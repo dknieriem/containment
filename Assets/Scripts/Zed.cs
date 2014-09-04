@@ -8,6 +8,8 @@ public class Zed : MonoBehaviour
 
 		public float MaxVelocity = 1.0f;
 
+		public float Inertia = 8.0f; //dimensionless. 0 = a leaf on the wind. 1 = a kitten. 10 = a person. 
+
 		private FSMSystem fsm;
 		
 		public Vector3 InterestLocation;
@@ -15,6 +17,8 @@ public class Zed : MonoBehaviour
 		public float InterestMagnitude;
 		
 		public float CountdownToForgettingInterest;
+		
+		
 		
 		public Game Game;
 		
@@ -25,6 +29,8 @@ public class Zed : MonoBehaviour
 		public float CountdownToNextSound;
 		
 		private int stepsToNextLogicUpdate = 10;
+		
+		private float countdownToInflictDamage = 0.0f;
 		
 		public void SetTransition (Transition t)
 		{
@@ -170,5 +176,18 @@ public class Zed : MonoBehaviour
 				fsm.AddState (walk);
 				fsm.AddState (move);
 		}	
-	
+		void OnCollisionStay2D (Collision2D collision)
+		{
+				countdownToInflictDamage -= Time.deltaTime;
+				if (countdownToInflictDamage <= 0) {
+						countdownToInflictDamage = 1.0f;
+						GameObject other = collision.gameObject;
+						Wall otherWall = other.GetComponent<Wall> ();
+						if (otherWall != null) {
+								float velocity = collision.relativeVelocity.magnitude;
+								float damage = velocity * Inertia;
+								otherWall.SendMessage ("Damage", damage);
+						}
+				}
+		}
 }
