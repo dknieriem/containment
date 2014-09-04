@@ -37,7 +37,7 @@ public class MoveToInterestState : FSMState
 						//3. find largest magnitude
 						Sound target = targets2.First ();
 			
-						Debug.Log ("New Target sound: " + target.transform.position + " with magnitude " + target.Magnitude (Vector3.Distance (target.transform.position, npc.transform.position)) + " over old mag " + npcZed.InterestMagnitude);
+						//Debug.Log ("New Target sound: " + target.transform.position + " with magnitude " + target.Magnitude (Vector3.Distance (target.transform.position, npc.transform.position)) + " over old mag " + npcZed.InterestMagnitude);
 			
 						//4. set npc target location to sound location
 						npcZed.InterestLocation = target.transform.position;
@@ -73,11 +73,11 @@ public class MoveToInterestState : FSMState
 		
 				if (Vector2.Distance (npc.transform.position, npcZed.InterestLocation) < 0.5) {
 			
-						npcZed.SetTransition (Transition.LoseInterestTransition);
-			
 						npcZed.InterestLocation = new Vector3 (-1, -1, 0);
 			
 						npc.rigidbody2D.velocity = Vector2.zero;
+						
+						npcZed.SetTransition (Transition.LoseInterestTransition);
 			
 						//Debug.Log ("MoveToInterest -> Idle (Distance < 0.5)");
 			

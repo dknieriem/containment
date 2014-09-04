@@ -58,10 +58,12 @@ public class RandomWalkState : FSMState
 						if (f <= 2) {
 						
 								npcZed.InterestLocation = new Vector3 (-1, -1, 0);
+								
+								npcZed.CountdownToForgettingInterest = Random.Range (10, 25);
 				
 								npcZed.SetTransition (Transition.WalkToIdleTransition);
 						
-								npcZed.CountdownToForgettingInterest = Random.Range (10, 25);
+
 						}
 		
 				}
@@ -75,11 +77,13 @@ public class RandomWalkState : FSMState
 		
 				if (Vector2.Distance (npc.transform.position, npcZed.InterestLocation) < 0.5) {
 			
-						npcZed.SetTransition (Transition.WalkToIdleTransition);
-			
+						npcZed.InterestLocation = new Vector3 (-1, -1, 0);
+						
 						npc.rigidbody2D.velocity = Vector2.zero;
 			
-						//		Debug.Log ("Moving -> Idle (Distance < 0.5)");
+						npcZed.SetTransition (Transition.WalkToIdleTransition);
+			
+						//Debug.Log ("Moving -> Idle (Distance < 0.5)");
 						
 						return;
 			

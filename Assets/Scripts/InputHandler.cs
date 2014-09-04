@@ -27,10 +27,10 @@ public class InputHandler : MonoBehaviour
 		{
 	
 				mainCamera = GameObject.Find ("Main Camera").GetComponent<Camera> ();
-				Debug.Log ("Camera name: " + mainCamera.name);
+				//Debug.Log ("Camera name: " + mainCamera.name);
 				
 				terrainInfo = gameObject.GetComponentInChildren<TerrainInfo> ();//GameObject.Find ("Terrain").GetComponent<Terrain> ();
-				Debug.Log ("Terrain name: " + terrainInfo.name);
+				//Debug.Log ("Terrain name: " + terrainInfo.name);
 				
 				game = gameObject.GetComponent<Game> ();
 		}

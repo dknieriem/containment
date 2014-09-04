@@ -60,7 +60,7 @@ public class IdleState : FSMState
 				
 						int f = UnityEngine.Random.Range (0, 100);
 						
-						if (f <= 3) {
+						if (f <= 1) {
 						
 								npcZed.InterestLocation.x = Random.Range (0, npcZed.Game.Terrain.Dimensions [0] - 1);
 								npcZed.InterestLocation.y = Random.Range (0, npcZed.Game.Terrain.Dimensions [1] - 1);
