@@ -83,11 +83,11 @@ public class InputHandler : MonoBehaviour
 				//TODO: stop camera from showing past edge of terrain
 				
 				if (newCameraPos.x > terrainInfo.Dimensions [0] - 1) {
-						newCameraPos.x = (float)terrainInfo.Dimensions [0];
+						newCameraPos.x = (float)terrainInfo.Dimensions [0] - 1;
 				}
 		
 				if (newCameraPos.y > terrainInfo.Dimensions [1] - 1) {
-						newCameraPos.y = (float)terrainInfo.Dimensions [1];
+						newCameraPos.y = (float)terrainInfo.Dimensions [1] - 1;
 				}
 				
 				mainCamera.transform.position = newCameraPos;

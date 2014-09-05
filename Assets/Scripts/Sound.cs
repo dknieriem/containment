@@ -40,7 +40,7 @@ public class Sound : MonoBehaviour
 				if (distance > Radius || Radius <= 0) {
 						return 0;
 				} else {
-						return Amplitude * Radius * Radius / distance / distance;
+						return Mathf.Clamp (Amplitude * Radius * Radius / distance / distance, 0.1f, 100.0f);
 				}
 	
 		}
