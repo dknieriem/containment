@@ -2,17 +2,16 @@ using UnityEngine;
 using System.Linq;
 using System.Collections.Generic;
 
-public class MoveToInterestState : FSMState
+public class InvestigateState : FSMState
 {	
 
-		public MoveToInterestState ()
+		public InvestigateState ()
 		{ 
-				stateID = StateID.MoveToInterestStateID;
+				stateID = StateID.InvestigateStateID;
 		}
 	
 		public override void Reason (GameObject game, GameObject npc)
 		{
-		
 				Zed npcZed = npc.GetComponent<Zed> ();
 				
 				//if interest in range, attack
@@ -32,20 +31,14 @@ public class MoveToInterestState : FSMState
 						return;
 				}
 		
-				
-						
 				//if no longer interested, return to idle
-						
 				if (npcZed.InterestMagnitude < 0.1f) { //(npcZed.CountdownToRandomChange <= 0) {
-				
 						npcZed.InterestLocation = new Vector3 (-1, -1, 0);		
 						npcZed.DirVector = new Vector3 (-1, -1, 0);	
-						npcZed.velocity = 0;
+						npcZed.Velocity = 0;
 						npcZed.CountdownToRandomChange = Random.Range (10, 25);
-				
-						npcZed.SetTransition (Transition.LoseInterestTransition);
+						npcZed.SetTransition (Transition.InvestigationEndedTransition);
 				}
-			
 		}
 	
 		public override void Act (GameObject game, GameObject npc)
@@ -53,50 +46,31 @@ public class MoveToInterestState : FSMState
 				//move toward the interest point
 				Zed npcZed = npc.GetComponent<Zed> ();
 		
-				/*if (Vector2.Distance (npc.transform.position, npcZed.InterestLocation) < 0.5) {
-			
+				if (Vector2.Distance (npc.transform.position, npcZed.InterestLocation) < 0.5) {
 						npcZed.InterestLocation = new Vector3 (-1, -1, 0);
-			
 						npcZed.DirVector = new Vector3 (-1, -1, 0);
-			
-						npc.rigidbody2D.velocity = Vector2.zero;
-						
-						npcZed.SetTransition (Transition.LoseInterestTransition);
-			
-						//Debug.Log ("MoveToInterest -> Idle (Distance < 0.5)");
-			
+						//npc.rigidbody2D.velocity = Vector2.zero;
+						npcZed.SetTransition (Transition.InvestigationEndedTransition);
+						//Debug.Log ("Investigate -> Idle (Distance < 0.5)");
 						return;
-			
-				} */
+				}
 				
-				//npcZed.CountdownToRandomChange -= Time.deltaTime;
-			
-				//Vector3 dirVector = npcZed.InterestLocation - npc.transform.position;
-			
-				//Debug.Log (dirVector.x + ", " + dirVector.y);
-				
-				//dirVector.Normalize ();
+				Vector3 dirVector = npcZed.InterestLocation - npc.transform.position;
+				Debug.Log (dirVector.x + ", " + dirVector.y);
+				dirVector.Normalize ();
 			
 				npcZed.InterestMagnitude *= (1 - 0.01f * Time.deltaTime);
+				npcZed.Velocity = Mathf.Clamp (npcZed.InterestMagnitude, Zed.MaxVelocity * 0.2f, Zed.MaxVelocity * 0.8f); //Mathf.Min (npcZed.MaxVelocity, dirVector.magnitude);
 			
-				npcZed.velocity = Mathf.Clamp (npcZed.InterestMagnitude, Zed.MaxVelocity * 0.2f, Zed.MaxVelocity); //Mathf.Min (npcZed.MaxVelocity, dirVector.magnitude);
-			
-	
-			
-				if (npcZed.velocity > 0) {
+				if (npcZed.Velocity > 0) {
 						float rotationAngle = Mathf.Atan2 (npcZed.DirVector.y, npcZed.DirVector.x) * Mathf.Rad2Deg;
-				
 						npcZed.transform.rotation = Quaternion.Euler (new Vector3 (0, 0, rotationAngle));
 				}
 			
-				npcZed.transform.position += npcZed.DirVector * npcZed.velocity * Time.deltaTime;
-			
-			
-				//Debug.Log ("Moving. Vel = " + velocity + ". Dir = " + direction + ".");
+				npcZed.transform.position += npcZed.DirVector * npcZed.Velocity * Time.deltaTime;
 			
 				// Apply the Velocity
 				//npc.rigidbody2D.velocity = npcZed.DirVector * velocity * Time.deltaTime;
-			
 		}
 			
-} // MoveToInterestState
+} // InvestigateState

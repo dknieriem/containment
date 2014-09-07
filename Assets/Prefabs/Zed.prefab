@@ -128,19 +128,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2cdd75de0b8142419bf23ea8347b57d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HitPoints: 100
   ZedsICanSee: []
   SoundsICanHear: []
-  Inertia: 8
-  InterestLocation: {x: 0, y: 0, z: 0}
-  DirVector: {x: 0, y: 0, z: 0}
-  velocity: 0
-  InterestMagnitude: 0
-  CountdownToRandomChange: 0
-  CurrentState: 
   Game: {fileID: 0}
   Terrain: {fileID: 0}
+  HitPoints: 100
+  Mass: 22
+  InterestLocation: {x: 0, y: 0, z: 0}
+  DirVector: {x: 0, y: 0, z: 0}
+  Velocity: 0
+  InterestMagnitude: 0
+  CountdownToRandomChange: 0
   CountdownToNextSound: 0
+  CurrentState: 
+  GUID: 
 --- !u!120 &12000000
 LineRenderer:
   m_ObjectHideFlags: 1

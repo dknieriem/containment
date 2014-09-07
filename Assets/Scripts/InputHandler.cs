@@ -100,10 +100,10 @@ public class InputHandler : MonoBehaviour
 		
 				if (groupName == "Zeds") {
 			
-						currentZedMemberFollowed = (currentZedMemberFollowed + delta) % game.GameZeds.Length;
+						currentZedMemberFollowed = (currentZedMemberFollowed + delta) % game.GameZeds.Count;
 			
 						if (currentZedMemberFollowed < 0) 
-								currentZedMemberFollowed += game.GameZeds.Length;
+								currentZedMemberFollowed += game.GameZeds.Count;
 			
 				}
 		

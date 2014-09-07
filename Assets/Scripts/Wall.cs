@@ -26,14 +26,10 @@ public class Wall : MonoBehaviour
 				}
 		}
 		
-		void Damage (float damage)
+		public void Damage (float damage)
 		{
-		
 				Health -= damage;
-			
 				//damageText.text = damage.ToString ().Substring (0, Mathf.Min (damage.ToString ().Length, 3));
-		
-		
 		}
 	
 }

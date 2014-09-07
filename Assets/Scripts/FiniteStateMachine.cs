@@ -52,12 +52,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 public enum Transition
 {
 		NullTransition = 0, // Use this transition to represent a non-existing transition in your system
-		IdleToWalkTransition, //randomly starts walking
-		WalkToIdleTransition, //randomly goes back to idling
-		GetInterestTransition, //interest added
-		LoseInterestTransition, //interest lost
+		PassiveToIdleTransition,
+		IdleToPassiveTransition,
+		IdleToRoamTransition, //randomly starts walking
+		RoamToIdleTransition, //randomly goes back to idling
+		InvestigateTransition, //Something distant
+		InvestigationEndedTransition, //interest lost
 		InterestInRangeTransition, //we've arrived
-		InterestOutOfRangeTransition //we've unarrived
+		ConfrontTransition, //something we're after
+		ControntationEndedTransition, //lost whatever we were confronting
+		HerdingTransition, //we're going along with these guys n gals
+		HerdingEndedTransition, //lost the group
 }
 
 /// <summary>
@@ -67,9 +72,12 @@ public enum Transition
 public enum StateID
 {
 		NullStateID = 0, // Use this ID to represent a non-existing State in your system	
+		PassiveStateID,
 		IdleStateID, //group not moving,
-		RandomWalkStateID, //group is meandering
-		MoveToInterestStateID,
+		RoamStateID, //group is meandering
+		InvestigateStateID,
+		HerdStateID,
+		ConfrontStateID,
 		AttackInterestStateID
 }
 
