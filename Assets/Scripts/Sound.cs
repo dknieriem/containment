@@ -44,4 +44,14 @@ public class Sound : MonoBehaviour
 				}
 	
 		}
+		
+		public float Magnitude (Vector3 objectPosition)
+		{
+				float distance = Vector3.Distance (objectPosition, transform.position);
+				if (distance > Radius || Radius <= 0) {
+						return 0;
+				} else {
+						return Mathf.Clamp (Amplitude * Radius * Radius / distance / distance, 0.1f, 100.0f);
+				}
+		}
 }

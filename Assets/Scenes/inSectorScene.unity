@@ -420,7 +420,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 108, y: 20}
+  m_SizeDelta: {x: 80, y: 20}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &173178146
 MonoBehaviour:
@@ -482,7 +482,7 @@ MonoBehaviour:
             Culture=neutral, PublicKeyToken=null
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: Toggle Debug
+          m_StringArgument: 
           m_BoolArgument: 0
         m_Enabled: 0
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
@@ -691,6 +691,7 @@ Transform:
   - {fileID: 790421415}
   - {fileID: 1332279577}
   - {fileID: 999548624}
+  - {fileID: 508921522}
   m_Father: {fileID: 0}
   m_RootOrder: 5
 --- !u!114 &212386798
@@ -1448,6 +1449,33 @@ Prefab:
   m_RootGameObject: {fileID: 988081397}
   m_IsPrefabParent: 0
   m_IsExploded: 1
+--- !u!1 &508921521
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 508921522}
+  m_Layer: 0
+  m_Name: Buildings
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &508921522
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 508921521}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 212386797}
+  m_RootOrder: 5
 --- !u!1001 &597236697
 Prefab:
   m_ObjectHideFlags: 0
@@ -5000,7 +5028,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Toggle Debug Off
+  m_Text: Debug On
 --- !u!222 &1938490096
 CanvasRenderer:
   m_ObjectHideFlags: 0

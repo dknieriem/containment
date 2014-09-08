@@ -19,11 +19,13 @@ public class Game : MonoBehaviour
 		{
 				Terrain = gameObject.GetComponentInChildren<TerrainInfo> ();
 	
-				GameZeds = new List<Zed> (10);
+				GameZeds = new List<Zed> (100);
 				GameObject ZedParentObj = GameObject.Find ("Zeds");
+				GameObject zedObj;
 				
-				for (int i = 0; i < 10; i++) {
-						GameObject zedObj = Instantiate (ZedPrefab) as GameObject;
+				
+				for (int i = 0; i < 100; i++) {
+						zedObj = (GameObject)Instantiate (ZedPrefab);
 						zedObj.transform.position.Set ((float)Random.Range (0, Terrain.Dimensions [0]), (float)Random.Range (0, Terrain.Dimensions [1]), 0); 
 						zedObj.transform.parent = ZedParentObj.transform;
 						Zed zed = zedObj.GetComponent<Zed> ();
@@ -41,6 +43,7 @@ public class Game : MonoBehaviour
 		void FixedUpdate ()
 		{
 				GameZeds = gameObject.GetComponentsInChildren<Zed> ().ToList ();
+				//Debug.Log ("Zeds: " + GameZeds.Count);
 				GameSounds = gameObject.GetComponentsInChildren<Sound> ();
 				
 		}
@@ -48,13 +51,13 @@ public class Game : MonoBehaviour
 		void ToggleDebug ()
 		{
 				IsDebug = !IsDebug;
-				Debug.Log ("Debug now: " + IsDebug.ToString ());
+				Debug.Log ("Debug now: " + IsDebug);
 				Text buttonText = GameObject.Find ("ToggleDebugButton").GetComponentInChildren<Text> ();
 				
 				if (IsDebug) {
-						buttonText.text = "Toggle Debug Off";
+						buttonText.text = "Debug On";
 				} else {
-						buttonText.text = "Toggle Debug On";
+						buttonText.text = "Debug Off";
 				}
 		}
 		

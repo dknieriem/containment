@@ -154,9 +154,9 @@ public class InputHandler : MonoBehaviour
 								
 						Sound newSoundObj = newSound.GetComponent<Sound> ();
 							
-						newSoundObj.Amplitude = Random.Range (10, 20);
+						newSoundObj.Amplitude = Random.Range (5, 20);
 						newSoundObj.Duration = Random.Range (1, 5);
-						newSoundObj.Radius = Random.Range (1, 10);
+						newSoundObj.Radius = Random.Range (1, 20);
 							
 						//Debug.Log (GameObject.Find ("Sounds"));
 														

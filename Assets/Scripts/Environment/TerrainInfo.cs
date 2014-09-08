@@ -10,8 +10,8 @@ public class TerrainInfo : MonoBehaviour
 		void Start ()
 		{
 				Dimensions = new int[2];
-				Dimensions [0] = 32;
-				Dimensions [1] = 32;
+				Dimensions [0] = 64;
+				Dimensions [1] = 64;
 				InstantiateTerrainTiles ();
 		}
 	
