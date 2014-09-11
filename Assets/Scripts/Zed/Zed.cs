@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Linq;
 using System.Collections.Generic;
 
@@ -34,7 +34,7 @@ public class Zed : MonoBehaviour
 		
 		//Private Attributes
 		private FSMSystem fsm;
-		private int stepsToNextLogicUpdate = 4; //10
+		//private int stepsToNextLogicUpdate = 4; //10
 		private float countdownToInflictDamage = 0.0f;
 		
 		//Sibling GameObjects	
@@ -309,7 +309,7 @@ public class Zed : MonoBehaviour
 				if (countdownToInflictDamage <= 0) {
 						countdownToInflictDamage = 1.0f;
 						GameObject other = collision.gameObject;
-						Wall otherWall = other.GetComponent<Wall> ();
+						WallSegment otherWall = other.GetComponent<WallSegment> ();
 						if (otherWall != null) {
 								float velocity = collision.relativeVelocity.magnitude;
 								float damage = velocity * Mass;

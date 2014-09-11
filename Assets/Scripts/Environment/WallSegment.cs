@@ -2,8 +2,18 @@
 using UnityEngine.UI;
 using System.Collections;
 
-public class Wall : MonoBehaviour
+public class WallSegment : MonoBehaviour
 {
+
+		public bool WallIsPartOfABuilding;
+		public Building MyBuilding;
+
+		public enum WallOrientation
+		{
+				NorthSouth = 0,
+				EastWest
+		
+		}
 
 		public float Health = 100.0f;
 	
@@ -22,6 +32,7 @@ public class Wall : MonoBehaviour
 		void FixedUpdate ()
 		{
 				if (Health <= 0.0f) {
+						MyBuilding.WallSegmentDestroyed (this);
 						Destroy (gameObject);	
 				}
 		}
