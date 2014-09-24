@@ -10,17 +10,10 @@ public class InputHandler : MonoBehaviour
 
 		Camera mainCamera;
 
-		TerrainInfo terrainInfo;
+		WorldInfo worldInfo;
 		
 		Game game;
 		
-		
-		
-		string currentSetFollowed;
-	
-		int currentZedMemberFollowed;
-	
-		int currentGroupMemberFollowed;
 		
 		// Use this for initialization
 		void Start ()
@@ -29,7 +22,7 @@ public class InputHandler : MonoBehaviour
 				mainCamera = GameObject.Find ("Main Camera").GetComponent<Camera> ();
 				//Debug.Log ("Camera name: " + mainCamera.name);
 				
-				terrainInfo = gameObject.GetComponentInChildren<TerrainInfo> ();//GameObject.Find ("Terrain").GetComponent<Terrain> ();
+				worldInfo = gameObject.GetComponentInChildren<WorldInfo> ();//GameObject.Find ("Terrain").GetComponent<Terrain> ();
 				//Debug.Log ("Terrain name: " + terrainInfo.name);
 				
 				game = gameObject.GetComponent<Game> ();
@@ -39,13 +32,13 @@ public class InputHandler : MonoBehaviour
 		void Update ()
 		{
 		
-				if (Input.GetButtonDown ("Previous Zed")) {
+				/*if (Input.GetButtonDown ("Previous Zed")) {
 						ChangeCamTarget ("Zeds", -1);
 				}
 	
 				if (Input.GetButtonDown ("Next Zed")) {
 						ChangeCamTarget ("Zeds", +1);
-				}
+				}*/
 	
 				if (Input.GetButtonDown ("Action 1")) {
 						getClick ("Action 1");
@@ -82,18 +75,18 @@ public class InputHandler : MonoBehaviour
 				
 				//TODO: stop camera from showing past edge of terrain
 				
-				if (newCameraPos.x > terrainInfo.Dimensions [0] - 1) {
-						newCameraPos.x = (float)terrainInfo.Dimensions [0] - 1;
+				if (newCameraPos.x > worldInfo.Dimensions [0] - 1) {
+						newCameraPos.x = (float)worldInfo.Dimensions [0] - 1;
 				}
 		
-				if (newCameraPos.y > terrainInfo.Dimensions [1] - 1) {
-						newCameraPos.y = (float)terrainInfo.Dimensions [1] - 1;
+				if (newCameraPos.y > worldInfo.Dimensions [1] - 1) {
+						newCameraPos.y = (float)worldInfo.Dimensions [1] - 1;
 				}
 				
 				mainCamera.transform.position = newCameraPos;
 		}
 	
-		public void ChangeCamTarget (string groupName, int delta)
+		/*public void ChangeCamTarget (string groupName, int delta)
 		{
 		
 				currentSetFollowed = groupName;
@@ -115,13 +108,13 @@ public class InputHandler : MonoBehaviour
 								currentGroupMemberFollowed += gameZeds.Length;
 			
 				}
-		*/
+		
 		
 				MoveCamToTarget ();
 		
-		}
+		}*/
 	
-		public void MoveCamToTarget ()
+		/*public void MoveCamToTarget ()
 		{
 		
 				if (currentSetFollowed == "Zeds") {
@@ -135,36 +128,16 @@ public class InputHandler : MonoBehaviour
 				}
 		
 		
-		}
+		}*/
 		
 		void getClick (string action)
 		{
-		
 				Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
-
 				//Debug.Log (ray.origin.ToString()+", "+((ray.direction - Camera.main.transform.position) * 10).ToString());
-		
 				Debug.Log (action + ", " + ray.origin.ToString ());
-		
-				if (ray.origin.x > 0 && ray.origin.y > 0 && ray.origin.x < terrainInfo.Dimensions [0] && ray.origin.y < terrainInfo.Dimensions [1]) {
-		
-						Vector3 newSoundPosition = new Vector3 (ray.origin.x, ray.origin.y, 0);
-				
-						GameObject newSound = (GameObject)Instantiate (SoundPrefab, newSoundPosition, Quaternion.identity);
-								
-						Sound newSoundObj = newSound.GetComponent<Sound> ();
-							
-						newSoundObj.Amplitude = Random.Range (5, 20);
-						newSoundObj.Duration = Random.Range (1, 5);
-						newSoundObj.Radius = Random.Range (1, 20);
-							
-						//Debug.Log (GameObject.Find ("Sounds"));
-														
-						newSound.GetComponent<AudioSource> ().clip = game.GetComponent<Game> ().MapClick;
-						newSound.GetComponent<AudioSource> ().Play ();
-						newSound.name = "Sound " + Time.frameCount;
-				
-						newSound.transform.parent = GameObject.Find ("Sounds").transform;
+				if (ray.origin.x > 0 && ray.origin.y > 0 && ray.origin.x < worldInfo.Dimensions [0] && ray.origin.y < worldInfo.Dimensions [1]) {			
+						Sector sectorClicked = worldInfo.getSectorAtPosition (ray.origin);
+						Debug.Log ("Clicked " + sectorClicked.LocationX + ", " + sectorClicked.LocationY);
 				}
 		}
 }
