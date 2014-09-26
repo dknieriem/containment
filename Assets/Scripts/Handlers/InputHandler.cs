@@ -1,30 +1,29 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class InputHandler : MonoBehaviour
 {
-
+	
 		public float CameraPixelsPerSecond = 5.0f; 
-
+	
 		public GameObject SoundPrefab;
-
+	
 		Camera mainCamera;
-
+	
 		WorldInfo worldInfo;
-		
+	
 		Game game;
-		
-		
+	
 		// Use this for initialization
 		void Start ()
 		{
-	
+		
 				mainCamera = GameObject.Find ("Main Camera").GetComponent<Camera> ();
 				//Debug.Log ("Camera name: " + mainCamera.name);
-				
+		
 				worldInfo = gameObject.GetComponentInChildren<WorldInfo> ();//GameObject.Find ("Terrain").GetComponent<Terrain> ();
 				//Debug.Log ("Terrain name: " + terrainInfo.name);
-				
+		
 				game = gameObject.GetComponent<Game> ();
 		}
 	
@@ -39,42 +38,42 @@ public class InputHandler : MonoBehaviour
 				if (Input.GetButtonDown ("Next Zed")) {
 						ChangeCamTarget ("Zeds", +1);
 				}*/
-	
+		
 				if (Input.GetButtonDown ("Action 1")) {
 						getClick ("Action 1");
 				}
-				
+		
 				if (Input.GetButtonDown ("Action 2")) {
 						getClick ("Action 2");
 				}
-	
+		
 				MoveCamera ();
-	
+		
 		}
 	
 		void MoveCamera ()
 		{
-	
+		
 				Vector3 newCameraPos = new Vector3 (mainCamera.transform.position.x, mainCamera.transform.position.y, mainCamera.transform.position.z);
-	
+		
 				float xDelta = Input.GetAxis ("Horizontal") * Time.deltaTime * CameraPixelsPerSecond;
 				float yDelta = Input.GetAxis ("Vertical") * Time.deltaTime * CameraPixelsPerSecond;
-
+		
 				newCameraPos.x += xDelta;
 				newCameraPos.y += yDelta;
-				
+		
 				//mainCamera.transform.Translate (Vector3.up * yDelta);
-				
+		
 				if (newCameraPos.x < 0) {
 						newCameraPos.x = 0.0f;
 				}
-				
+		
 				if (newCameraPos.y < 0) {
 						newCameraPos.y = 0.0f;
 				}
-				
+		
 				//TODO: stop camera from showing past edge of terrain
-				
+		
 				if (newCameraPos.x > worldInfo.Dimensions [0] - 1) {
 						newCameraPos.x = (float)worldInfo.Dimensions [0] - 1;
 				}
@@ -82,7 +81,7 @@ public class InputHandler : MonoBehaviour
 				if (newCameraPos.y > worldInfo.Dimensions [1] - 1) {
 						newCameraPos.y = (float)worldInfo.Dimensions [1] - 1;
 				}
-				
+		
 				mainCamera.transform.position = newCameraPos;
 		}
 	
@@ -129,15 +128,17 @@ public class InputHandler : MonoBehaviour
 		
 		
 		}*/
-		
+	
 		void getClick (string action)
 		{
 				Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
 				//Debug.Log (ray.origin.ToString()+", "+((ray.direction - Camera.main.transform.position) * 10).ToString());
 				Debug.Log (action + ", " + ray.origin.ToString ());
 				if (ray.origin.x > 0 && ray.origin.y > 0 && ray.origin.x < worldInfo.Dimensions [0] && ray.origin.y < worldInfo.Dimensions [1]) {			
-						Sector sectorClicked = worldInfo.getSectorAtPosition (ray.origin);
+						Sector sectorClicked = worldInfo.GetSectorAtPosition (ray.origin);
 						Debug.Log ("Clicked " + sectorClicked.LocationX + ", " + sectorClicked.LocationY);
 				}
 		}
+		
+		
 }

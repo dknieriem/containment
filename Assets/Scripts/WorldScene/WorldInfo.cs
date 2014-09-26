@@ -66,7 +66,7 @@ public class WorldInfo : MonoBehaviour
 				Debug.Log (CurrentDate);
 		}
 
-		public Sector getSectorAtPosition (Vector3 origin)
+		public Sector GetSectorAtPosition (Vector3 origin)
 		{
 				if (origin.x < 0 || origin.y < 0 || origin.x > Dimensions [0] || origin.y > Dimensions [1]) {
 						throw new System.ArgumentOutOfRangeException ("Vector3 origin", "Not in valid range: x = [0," + Dimensions [0] + "], y = [0," + Dimensions [1] + "]");
@@ -78,4 +78,14 @@ public class WorldInfo : MonoBehaviour
 				return WorldSectors [x, y];	
 		}
 		
+		public Sector GetSectorFromScreenPos (Vector3 screenPos)
+		{
+				Ray ray = Camera.main.ScreenPointToRay (screenPos);
+				if (ray.origin.x > 0 && ray.origin.y > 0 && ray.origin.x < Dimensions [0] && ray.origin.y < Dimensions [1]) {			
+						return GetSectorAtPosition (ray.origin);
+				} 
+				
+				return null;
+		}
+
 }
