@@ -43,7 +43,10 @@ MonoBehaviour:
   LocationX: 0
   LocationY: 0
   ZedCount: 0
+  ZedProbabilityMigrate: []
   GroupCount: 
+  IsVisited: 0
+  IsVisible: 0
 --- !u!212 &21200000
 SpriteRenderer:
   m_ObjectHideFlags: 1
@@ -64,7 +67,7 @@ SpriteRenderer:
   m_ScaleInLightmap: 1
   m_SortingLayerID: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: fe9361519a888144884d7fadace7f95c, type: 3}
+  m_Sprite: {fileID: 21300000, guid: a1d21fe3f654ed048b93c7b898f1e36d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1001 &100100000
 Prefab:

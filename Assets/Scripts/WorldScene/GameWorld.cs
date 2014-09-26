@@ -7,6 +7,9 @@ public class GameWorld : MonoBehaviour
 {
 
 		public bool IsDebug = true; //TODO on build, change to false
+		
+		public bool IsPlaying = true; 
+		
 		public WorldInfo World;
 		public AudioClip MapClick;
 		
@@ -25,6 +28,19 @@ public class GameWorld : MonoBehaviour
 	
 		void FixedUpdate ()
 		{
+		
+		}
+	
+		void TogglePause ()
+		{
+		
+				IsPlaying = !IsPlaying;
+		
+				if (IsPlaying) {
+						Debug.Log ("Unpaused");
+				} else {
+						Debug.Log ("Paused");
+				}
 		
 		}
 	

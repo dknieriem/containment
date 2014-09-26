@@ -10,6 +10,8 @@ public class UIHandler : MonoBehaviour
 		RectTransform SectorInfoPanel;
 		Text SectorName;
 		Text SectorCoords;
+		Text SectorZeds;
+		
 		Vector3 SectorInfoPanelDimensions;
 		public Vector3 InfoPanelCursorOffset = new Vector3 (10, 0, 0);
 		
@@ -23,6 +25,7 @@ public class UIHandler : MonoBehaviour
 				SectorInfoPanelDimensions = new Vector3 (SectorInfoPanel.rect.width, - SectorInfoPanel.rect.height, 0);
 				SectorName = GameObject.Find ("SectorName").GetComponent<Text> ();
 				SectorCoords = GameObject.Find ("SectorLocation").GetComponent<Text> ();
+				SectorZeds = GameObject.Find ("SectorZeds").GetComponent<Text> ();
 		}
 	
 		void Update ()
@@ -35,6 +38,7 @@ public class UIHandler : MonoBehaviour
 								SectorInfoPanel.gameObject.SetActive (true);
 								SectorInfoPanel.position = Input.mousePosition + (SectorInfoPanelDimensions / 2) + InfoPanelCursorOffset;
 								SectorCoords.text = "(" + CursorSector.LocationX + "," + CursorSector.LocationY + ")";		
+								SectorZeds.text = "Zeds: " + CursorSector.ZedCount;
 						}
 				} else {
 						SectorInfoPanel.gameObject.SetActive (false);
