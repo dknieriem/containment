@@ -52,6 +52,9 @@ public class Sector : MonoBehaviour
 		// Use this for initialization
 		void Start ()
 		{
+				Game = GameObject.Find ("Game").GetComponent<GameWorld> ();
+				World = GameObject.Find ("World").GetComponent<WorldInfo> ();
+						
 				GroupCount = new int[WorldInfo.NumGroups];
 				for (int i = 0; i < WorldInfo.NumGroups; i++) {
 						GroupCount [i] = 0;
@@ -59,19 +62,38 @@ public class Sector : MonoBehaviour
 				
 				myRegions = new GameObject[SectorRegionNames.Length];
 				mySprites = new SpriteRenderer[SectorRegionNames.Length];
-				for (int i = 0; i < SectorRegionNames.Length; i++) {
+				
+				
+				/*for (int i = 0; i < SectorRegionNames.Length; i++) {
 						myRegions [i] = new GameObject (SectorRegionNames [i] + " Sprite");
 						myRegions [i].AddComponent<SpriteRenderer> ();
 						myRegions [i].transform.parent = transform;
+						myRegions [i].transform.localPosition = new Vector3 ((float)((i % 3) - 1) / 3, (float)((i - 1) / 3) / 3, -1.0f);
 						
 						mySprites [i] = myRegions [i].GetComponent<SpriteRenderer> ();
+						mySprites [i].sprite = Game.Sprites.RandomSprite ();
+						//mySprites [i].sortingLayerID = 2;
+				}*/
+				
+				for (int x = 0; x < 3; x++) {
+						for (int y = 0; y < 3; y++) {
+				
+								int i = x + y * 3;
+				
+								myRegions [i] = new GameObject (SectorRegionNames [i] + " Sprite");
+								myRegions [i].AddComponent<SpriteRenderer> ();
+								myRegions [i].transform.parent = transform;
+								myRegions [i].transform.localPosition = new Vector3 ((float)(x - 1) / 3, (float)(y - 1) / 3, 9.0f);
+				
+								mySprites [i] = myRegions [i].GetComponent<SpriteRenderer> ();
+								mySprites [i].sprite = Game.Sprites.RandomSprite ();
+				
+						}
+				
 				}
 				
 				mapMask = gameObject.GetComponent<SpriteRenderer> ();
 				
-				Game = GameObject.Find ("Game").GetComponent<GameWorld> ();
-				
-				World = GameObject.Find ("World").GetComponent<WorldInfo> ();
 				
 				ZedCount = Random.Range (0, 100);
 				
@@ -106,10 +128,13 @@ public class Sector : MonoBehaviour
 		void FixedUpdate ()
 		{
 				if (IsVisible || Game.IsDebug) {
-						mapMask.color = new Color (1.0f, 1.0f, 1.0f);
+						mapMask.enabled = false;
+						//mapMask.color = new Color (1.0f, 1.0f, 1.0f);
 				} else if (IsVisited) {
+						mapMask.enabled = true;
 						mapMask.color = new Color (0.7f, 0.7f, 1.0f);
 				} else {
+						mapMask.enabled = true;
 						mapMask.color = new Color (0.0f, 0.0f, 0.0f);
 		
 				}

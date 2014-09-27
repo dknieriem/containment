@@ -12,11 +12,13 @@ public class GameWorld : MonoBehaviour
 		
 		public WorldInfo World;
 		public AudioClip MapClick;
+		public SpriteManager Sprites;
 		
 		// Use this for initialization
 		void Start ()
 		{
 				World = gameObject.GetComponentInChildren<WorldInfo> ();
+				Sprites = gameObject.GetComponent<SpriteManager> ();
 				
 		}
 	

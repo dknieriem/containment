@@ -395,6 +395,7 @@ GameObject:
   - 114: {fileID: 212386798}
   - 114: {fileID: 212386796}
   - 114: {fileID: 212386799}
+  - 114: {fileID: 212386800}
   m_Layer: 0
   m_Name: Game
   m_TagString: Untagged
@@ -455,6 +456,19 @@ MonoBehaviour:
   IsPlaying: 1
   World: {fileID: 790421416}
   MapClick: {fileID: 8300000, guid: 49fab3db4d899b14ca89f16b98f7f4bb, type: 3}
+  Sprites: {fileID: 0}
+--- !u!114 &212386800
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 212386795}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ddbcd0e7ea4bcf4189f61b5242be823, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SpriteNames: []
 --- !u!1 &322021457
 GameObject:
   m_ObjectHideFlags: 0
