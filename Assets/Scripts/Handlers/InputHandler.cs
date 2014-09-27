@@ -12,7 +12,9 @@ public class InputHandler : MonoBehaviour
 	
 		WorldInfo worldInfo;
 	
-		Game game;
+		GameWorld Game;
+		
+		UIHandler UI;
 	
 		// Use this for initialization
 		void Start ()
@@ -24,7 +26,9 @@ public class InputHandler : MonoBehaviour
 				worldInfo = gameObject.GetComponentInChildren<WorldInfo> ();//GameObject.Find ("Terrain").GetComponent<Terrain> ();
 				//Debug.Log ("Terrain name: " + terrainInfo.name);
 		
-				game = gameObject.GetComponent<Game> ();
+				Game = gameObject.GetComponent<GameWorld> ();
+				
+				UI = gameObject.GetComponent<UIHandler> ();
 		}
 	
 		// Update is called once per frame
@@ -45,6 +49,10 @@ public class InputHandler : MonoBehaviour
 		
 				if (Input.GetButtonDown ("Action 2")) {
 						getClick ("Action 2");
+				}
+				
+				if (Input.GetKeyDown ("i")) {
+						UI.ToggleSectorInfoPanel ();
 				}
 		
 				MoveCamera ();

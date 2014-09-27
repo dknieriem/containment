@@ -25,7 +25,7 @@ public class GroupInfoScript : MonoBehaviour
 		
 		void FixedUpdate ()
 		{
-				HomeSectorLocationText.text = "(" + Group.HomeSectorLocation.x + "," + Group.HomeSectorLocation.y + ")";
+				HomeSectorLocationText.text = "(" + Group.HomeSectorLocation [0] + "," + Group.HomeSectorLocation [1] + ")";
 				GroupMembersText.text = "" + Group.TotalGroupMembers; 		
 		}
 }

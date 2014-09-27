@@ -84,12 +84,6 @@ public class Sector : MonoBehaviour
 				ZedCount = Random.Range (0, 100);
 				ZedProbabilityMigrate = new float[4];			
 				
-				if (Random.Range (0, 100) == 1) {
-						PlayerGroupCount = Random.Range (1, 5);
-						IsVisited = true;
-						IsVisible = true;
-				}
-				
 				NeighboringSectors = new Sector[4];
 				
 				if (LocationX > 0) {

@@ -8,9 +8,8 @@ public class UIHandler : MonoBehaviour
 		Text CurrentDate;
 	
 		GameObject PlayerGroupInfoPanel;
-	
 		bool PlayerGroupInfoPanelEnabled = false;
-		
+		GameObject SectorInfoPanel;
 		bool SectorInfoPanelEnabled = true;
 		// Use this for initialization
 		void Start ()
@@ -22,6 +21,8 @@ public class UIHandler : MonoBehaviour
 			
 				PlayerGroupInfoPanel = GameObject.Find ("PlayerGroupInfoPanel");
 				PlayerGroupInfoPanel.SetActive (false);
+		
+				SectorInfoPanel = GameObject.Find ("SectorInfoPanel");
 		}
 	
 		void Update ()
@@ -33,10 +34,10 @@ public class UIHandler : MonoBehaviour
 		{
 				CurrentDate.text = World.CurrentDate.ToString ();
 				
-				if (Game.IsDebug || (World.GetSectorFromScreenPos (Input.mousePosition) == null)) {
-						SectorInfoPanelEnabled = false;
+				if ((Game.IsDebug || SectorInfoPanelEnabled) && World.GetSectorFromScreenPos (Input.mousePosition) != null) {
+						SectorInfoPanel.SetActive (true);
 				} else {
-						SectorInfoPanelEnabled = false;
+						SectorInfoPanel.SetActive (false);
 				}
 		}
 		
@@ -49,5 +50,10 @@ public class UIHandler : MonoBehaviour
 				} else {
 						PlayerGroupInfoPanel.SetActive (false);
 				}
+		}
+		
+		public void ToggleSectorInfoPanel ()
+		{		
+				SectorInfoPanelEnabled = !SectorInfoPanelEnabled;
 		}
 }
