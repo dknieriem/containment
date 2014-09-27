@@ -8,7 +8,7 @@ public class WorldInfo : MonoBehaviour
 		public GameObject SectorPrefab;
 		public Sector[,] WorldSectors;
 		public int[] Dimensions;
-		public static int NumGroups;
+		public static int NumGroups = 0;
 		public DateTime CurrentDate;
 		// Use this for initialization
 		
@@ -17,6 +17,7 @@ public class WorldInfo : MonoBehaviour
 		public static float NextHourCountdown;
 		void Start ()
 		{
+				Debug.Log ("Starting: WorldInfo");
 				Dimensions = new int[2];
 				Dimensions [0] = 64;
 				Dimensions [1] = 64;
@@ -51,7 +52,7 @@ public class WorldInfo : MonoBehaviour
 						for (int j = 0; j < Dimensions[1]; j++) {
 								GameObject Sector = Instantiate (SectorPrefab) as GameObject;
 								Sector.transform.parent = transform;
-								Sector.transform.position = new Vector3 (i, j, 2);
+								Sector.transform.position = new Vector3 (i + 0.5f, j + 0.5f, 2);
 								WorldSectors [i, j] = Sector.GetComponent<Sector> ();
 								WorldSectors [i, j].LocationX = i;
 								WorldSectors [i, j].LocationY = j;

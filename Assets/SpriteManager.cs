@@ -13,14 +13,14 @@ public class SpriteManager : MonoBehaviour
 		// Use this for initialization
 		void Start ()
 		{
-	
+				Debug.Log ("Starting: SpriteManager");
 				Sprite[] allSprites = Resources.LoadAll<Sprite> ("Sprites/Environment/SectorTiles");
 				SpriteNames = new string[allSprites.Length];
 	
 				for (int i = 0; i < SpriteNames.Length; i++) {
 						SpriteNames [i] = allSprites [i].name;
 						SpriteDatabase.Add (SpriteNames [i], allSprites [i]);
-						Debug.Log (i + ": " + SpriteNames [i]);
+						//Debug.Log (i + ": " + SpriteNames [i]);
 				}
 		}
 	

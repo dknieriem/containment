@@ -17,6 +17,7 @@ public class GameWorld : MonoBehaviour
 		// Use this for initialization
 		void Start ()
 		{
+				Debug.Log ("Starting: GameWorld");
 				World = gameObject.GetComponentInChildren<WorldInfo> ();
 				Sprites = gameObject.GetComponent<SpriteManager> ();
 				

@@ -20,33 +20,23 @@ public class Sector : MonoBehaviour
 				"South Central",
 				"South East"
 		};
-
-		WorldInfo World;
 		
 		GameWorld Game;
-	
+		WorldInfo World;
 		Sector[] NeighboringSectors;
 
 		public int LocationX, LocationY;
-		
 		public int ZedCount;
-		
-		public float[] ZedProbabilityMigrate;
-		
 		public int[] GroupCount;
-
+		public int PlayerGroupCount;
+		public float[] ZedProbabilityMigrate;
 		public bool IsVisited = false;
-		
 		public bool IsVisible = false;
-		
 		GameObject[] myRegions;
-		
 		SpriteRenderer[] mySprites;
-		
 		SpriteRenderer mapMask;
 		
 		public static float SecondsPerUpdate = 10.0f;
-		
 		public static float NextUpdateCountdown;
 		
 		// Use this for initialization
@@ -84,20 +74,21 @@ public class Sector : MonoBehaviour
 								myRegions [i].AddComponent<SpriteRenderer> ();
 								myRegions [i].transform.parent = transform;
 								myRegions [i].transform.localPosition = new Vector3 ((float)(x - 1) / 3, (float)(y - 1) / 3, 9.0f);
-				
 								mySprites [i] = myRegions [i].GetComponent<SpriteRenderer> ();
 								mySprites [i].sprite = Game.Sprites.RandomSprite ();
-				
 						}
-				
 				}
 				
 				mapMask = gameObject.GetComponent<SpriteRenderer> ();
-				
-				
+								
 				ZedCount = Random.Range (0, 100);
-				
 				ZedProbabilityMigrate = new float[4];			
+				
+				if (Random.Range (0, 100) == 1) {
+						PlayerGroupCount = Random.Range (1, 5);
+						IsVisited = true;
+						IsVisible = true;
+				}
 				
 				NeighboringSectors = new Sector[4];
 				
@@ -127,6 +118,15 @@ public class Sector : MonoBehaviour
 		
 		void FixedUpdate ()
 		{
+		
+				if (PlayerGroupCount > 0) {
+						IsVisible = true;
+						IsVisited = true;
+				}
+		
+				if (PlayerGroupCount <= 0) {
+						IsVisible = false;
+				}
 				if (IsVisible || Game.IsDebug) {
 						mapMask.enabled = false;
 						//mapMask.color = new Color (1.0f, 1.0f, 1.0f);
