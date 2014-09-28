@@ -7,7 +7,7 @@ public class GroupInfoScript : MonoBehaviour
 		PlayerGroup Group;
 		Text HomeSectorLocationText;
 		Text GroupMembersText;
-		
+		Text GroupMemberNamesText;
 		// Use this for initialization
 		void Start ()
 		{
@@ -15,6 +15,7 @@ public class GroupInfoScript : MonoBehaviour
 				Group = GameObject.Find ("PlayerGroup").GetComponent<PlayerGroup> ();
 				HomeSectorLocationText = GameObject.Find ("PlayerGroupHomeLocation").GetComponent<Text> ();
 				GroupMembersText = GameObject.Find ("PlayerGroupTotalCount").GetComponent<Text> ();
+				GroupMemberNamesText = GameObject.Find ("PlayerGroupMemberNames").GetComponent<Text> ();
 		}
 	
 		// Update is called once per frame
@@ -26,6 +27,12 @@ public class GroupInfoScript : MonoBehaviour
 		void FixedUpdate ()
 		{
 				HomeSectorLocationText.text = "(" + Group.HomeSectorLocation [0] + "," + Group.HomeSectorLocation [1] + ")";
-				GroupMembersText.text = "" + Group.TotalGroupMembers; 		
+				GroupMembersText.text = "Members: " + Group.TotalGroupMembers; 		
+				GroupMemberNamesText.text = "";
+				for (int i = 0; i < Group.GroupMemberNames.Count; i++) {
+						int[] location = (int[])Group.GroupMemberLocations [i];
+						GroupMemberNamesText.text += Group.GroupMemberNames [i] + "\t(" + location [0] + "," + location [1] + ")\n";
+				
+				}
 		}
 }

@@ -21,6 +21,10 @@ public class WorldInfo : MonoBehaviour
 				Dimensions = new int[2];
 				Dimensions [0] = 64;
 				Dimensions [1] = 64;
+				
+				WorldBuilder Builder = new WorldBuilder (Dimensions);
+				Builder.BuildWorld ();
+				
 				InstantiateSectors ();
 				
 				NumGroups = 4;

@@ -108,42 +108,42 @@ TextureImporter:
     21300206: grass-se
     21300208: road-diag-sw
     21300210: road-diag-ne
-    21300212: micropolis_snes_736
-    21300214: micropolis_snes_737
-    21300216: micropolis_snes_738
-    21300218: micropolis_snes_739
-    21300220: micropolis_snes_740
-    21300222: micropolis_snes_745
-    21300224: micropolis_snes_746
-    21300226: micropolis_snes_747
-    21300228: micropolis_snes_754
-    21300230: micropolis_snes_755
-    21300232: micropolis_snes_756
+    21300212: res-zone-1-1
+    21300214: res-zone-1-2
+    21300216: res-zone-1-3
+    21300218: house-small-1
+    21300220: house-small-2
+    21300222: comm-zone-1-1
+    21300224: comm-zone-1-2
+    21300226: comm-zone-1-3
+    21300228: ind-zone-1-1
+    21300230: ind-zone-1-2
+    21300232: ind-zone-1-3
     21300234: micropolis_snes_758
     21300236: micropolis_snes_759
     21300238: road-ns-tee-e
     21300240: road-ns-tee-w
-    21300242: micropolis_snes_768
-    21300244: micropolis_snes_769
-    21300246: micropolis_snes_770
-    21300248: micropolis_snes_771
-    21300250: micropolis_snes_772
-    21300252: micropolis_snes_777
-    21300254: micropolis_snes_778
-    21300256: micropolis_snes_779
-    21300258: micropolis_snes_786
-    21300260: micropolis_snes_787
-    21300262: micropolis_snes_788
+    21300242: res-zone-2-1
+    21300244: res-zone-2-2
+    21300246: res-zone-2-3
+    21300248: house-small-3
+    21300250: house-small-4
+    21300252: comm-zone-2-1
+    21300254: comm-zone-2-2
+    21300256: comm-zone-2-3
+    21300258: ind-zone-2-1
+    21300260: ind-zone-2-2
+    21300262: ind-zone-2-3
     21300264: micropolis_snes_790
-    21300266: micropolis_snes_800
-    21300268: micropolis_snes_801
-    21300270: micropolis_snes_802
-    21300272: micropolis_snes_809
-    21300274: micropolis_snes_810
-    21300276: micropolis_snes_811
-    21300278: micropolis_snes_818
-    21300280: micropolis_snes_819
-    21300282: micropolis_snes_820
+    21300266: res-zone-3-1
+    21300268: res-zone-3-2
+    21300270: res-zone-3-3
+    21300272: comm-zone-3-1
+    21300274: comm-zone-3-2
+    21300276: comm-zone-3-3
+    21300278: ind-zone-3-1
+    21300280: ind-zone-3-2
+    21300282: ind-zone-3-3
     21300284: road-corner-ne
     21300286: road-ew-tee-s
     21300288: road-corner-nw
@@ -1423,7 +1423,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: micropolis_snes_736
+    - name: res-zone-1-1
       rect:
         serializedVersion: 2
         x: 0
@@ -1433,7 +1433,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: micropolis_snes_737
+    - name: res-zone-1-2
       rect:
         serializedVersion: 2
         x: 8
@@ -1443,7 +1443,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: micropolis_snes_738
+    - name: res-zone-1-3
       rect:
         serializedVersion: 2
         x: 16
@@ -1453,7 +1453,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: micropolis_snes_739
+    - name: house-small-1
       rect:
         serializedVersion: 2
         x: 24
@@ -1463,7 +1463,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: micropolis_snes_740
+    - name: house-small-2
       rect:
         serializedVersion: 2
         x: 32
@@ -1473,7 +1473,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: micropolis_snes_745
+    - name: comm-zone-1-1
       rect:
         serializedVersion: 2
         x: 72
@@ -1483,7 +1483,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: micropolis_snes_746
+    - name: comm-zone-1-2
       rect:
         serializedVersion: 2
         x: 80
@@ -1493,7 +1493,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: micropolis_snes_747
+    - name: comm-zone-1-3
       rect:
         serializedVersion: 2
         x: 88
@@ -1503,7 +1503,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: micropolis_snes_754
+    - name: ind-zone-1-1
       rect:
         serializedVersion: 2
         x: 144
@@ -1513,7 +1513,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: micropolis_snes_755
+    - name: ind-zone-1-2
       rect:
         serializedVersion: 2
         x: 152
@@ -1523,7 +1523,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: micropolis_snes_756
+    - name: ind-zone-1-3
       rect:
         serializedVersion: 2
         x: 160
@@ -1573,7 +1573,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: micropolis_snes_768
+    - name: res-zone-2-1
       rect:
         serializedVersion: 2
         x: 0
@@ -1583,7 +1583,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: micropolis_snes_769
+    - name: res-zone-2-2
       rect:
         serializedVersion: 2
         x: 8
@@ -1593,7 +1593,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: micropolis_snes_770
+    - name: res-zone-2-3
       rect:
         serializedVersion: 2
         x: 16
@@ -1603,7 +1603,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: micropolis_snes_771
+    - name: house-small-3
       rect:
         serializedVersion: 2
         x: 24
@@ -1613,7 +1613,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: micropolis_snes_772
+    - name: house-small-4
       rect:
         serializedVersion: 2
         x: 32
@@ -1623,7 +1623,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: micropolis_snes_777
+    - name: comm-zone-2-1
       rect:
         serializedVersion: 2
         x: 72
@@ -1633,7 +1633,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: micropolis_snes_778
+    - name: comm-zone-2-2
       rect:
         serializedVersion: 2
         x: 80
@@ -1643,7 +1643,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: micropolis_snes_779
+    - name: comm-zone-2-3
       rect:
         serializedVersion: 2
         x: 88
@@ -1653,7 +1653,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: micropolis_snes_786
+    - name: ind-zone-2-1
       rect:
         serializedVersion: 2
         x: 144
@@ -1663,7 +1663,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: micropolis_snes_787
+    - name: ind-zone-2-2
       rect:
         serializedVersion: 2
         x: 152
@@ -1673,7 +1673,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: micropolis_snes_788
+    - name: ind-zone-2-3
       rect:
         serializedVersion: 2
         x: 160
@@ -1693,7 +1693,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: micropolis_snes_800
+    - name: res-zone-3-1
       rect:
         serializedVersion: 2
         x: 0
@@ -1703,7 +1703,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: micropolis_snes_801
+    - name: res-zone-3-2
       rect:
         serializedVersion: 2
         x: 8
@@ -1713,7 +1713,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: micropolis_snes_802
+    - name: res-zone-3-3
       rect:
         serializedVersion: 2
         x: 16
@@ -1723,7 +1723,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: micropolis_snes_809
+    - name: comm-zone-3-1
       rect:
         serializedVersion: 2
         x: 72
@@ -1733,7 +1733,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: micropolis_snes_810
+    - name: comm-zone-3-2
       rect:
         serializedVersion: 2
         x: 80
@@ -1743,7 +1743,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: micropolis_snes_811
+    - name: comm-zone-3-3
       rect:
         serializedVersion: 2
         x: 88
@@ -1753,7 +1753,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: micropolis_snes_818
+    - name: ind-zone-3-1
       rect:
         serializedVersion: 2
         x: 144
@@ -1763,7 +1763,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: micropolis_snes_819
+    - name: ind-zone-3-2
       rect:
         serializedVersion: 2
         x: 152
@@ -1773,7 +1773,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: micropolis_snes_820
+    - name: ind-zone-3-3
       rect:
         serializedVersion: 2
         x: 160

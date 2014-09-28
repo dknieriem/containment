@@ -38,7 +38,7 @@ public class SectorInfoScript : MonoBehaviour
 						SectorInfoPanel.position = Input.mousePosition + (SectorInfoPanelDimensions / 2) + InfoPanelCursorOffset;
 						SectorCoords.text = "(" + CursorSector.LocationX + "," + CursorSector.LocationY + ")";		
 						SectorZeds.text = "Zeds: " + CursorSector.ZedCount;
-						SectorPlayerGroupCount.text = "Group Members: " + CursorSector.PlayerGroupCount;
+						SectorPlayerGroupCount.text = "Group: " + CursorSector.PlayerGroupCount;
 				}
 		}
 }

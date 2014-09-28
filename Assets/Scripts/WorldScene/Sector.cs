@@ -4,6 +4,18 @@ using System.Collections;
 public class Sector : MonoBehaviour
 {
 
+		public enum SectorType
+		{
+				Water,
+				Grass,
+				Forest,
+				Residential,
+				Commercial,
+				Industrial,
+				Seaport,
+				Airport}
+		;
+
 		public static int North = 0,
 				East = 1,
 				South = 2,
@@ -25,6 +37,7 @@ public class Sector : MonoBehaviour
 		WorldInfo World;
 		Sector[] NeighboringSectors;
 
+		public SectorType SecType;
 		public int LocationX, LocationY;
 		public int ZedCount;
 		public int[] GroupCount;
@@ -35,6 +48,7 @@ public class Sector : MonoBehaviour
 		GameObject[] myRegions;
 		SpriteRenderer[] mySprites;
 		SpriteRenderer mapMask;
+		
 		
 		public static float SecondsPerUpdate = 10.0f;
 		public static float NextUpdateCountdown;
@@ -161,20 +175,22 @@ public class Sector : MonoBehaviour
 								numMigrating [West]++;
 						}
 				}
-				
-				ZedCount = ZedCount - numMigrating [North] - numMigrating [East] - numMigrating [South] - numMigrating [West]; 
-				
+								
 				if (NeighboringSectors [North] != null) {
 						NeighboringSectors [North].ZedCount += numMigrating [North];
+						ZedCount = ZedCount - numMigrating [North];
 				}
 				if (NeighboringSectors [East] != null) {
 						NeighboringSectors [East].ZedCount += numMigrating [East];
+						ZedCount = ZedCount - numMigrating [East]; 
 				}
 				if (NeighboringSectors [South] != null) {
 						NeighboringSectors [South].ZedCount += numMigrating [South];
+						ZedCount = ZedCount - numMigrating [South]; 
 				}
 				if (NeighboringSectors [West] != null) {
 						NeighboringSectors [West].ZedCount += numMigrating [West];
+						ZedCount = ZedCount - numMigrating [West]; 
 				}
 				
 		}
