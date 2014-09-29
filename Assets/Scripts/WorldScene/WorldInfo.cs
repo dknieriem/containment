@@ -8,30 +8,16 @@ public class WorldInfo : MonoBehaviour
 		public GameObject SectorPrefab;
 		public Sector[,] WorldSectors;
 		public int[] Dimensions;
-		public static int NumGroups = 0;
+		public int NumGroups = 0;
 		public DateTime CurrentDate;
 		// Use this for initialization
-		
-		public static float SecondsPerHour = 10.0f;
-		
-		public static float NextHourCountdown;
+				
+
+	 
 		void Start ()
 		{
 				Debug.Log ("Starting: WorldInfo");
-				Dimensions = new int[2];
-				Dimensions [0] = 64;
-				Dimensions [1] = 64;
-				
-				WorldBuilder Builder = new WorldBuilder (Dimensions);
-				Builder.BuildWorld ();
-				
-				InstantiateSectors ();
-				
-				NumGroups = 4;
-				
-				CurrentDate = new DateTime (1999, 10, 5, 14, 0, 0);
-				
-				NextHourCountdown = SecondsPerHour;
+								
 		}
 	
 		// Update is called once per frame
@@ -42,30 +28,10 @@ public class WorldInfo : MonoBehaviour
 		
 		void FixedUpdate ()
 		{
-				NextHourCountdown -= Time.fixedDeltaTime;
-				if (NextHourCountdown < 0) {
-						DoNextUpdate ();
-						NextHourCountdown = SecondsPerHour;		
-				}
-		}
-	
-		void InstantiateSectors ()
-		{
-				WorldSectors = new Sector[Dimensions [0], Dimensions [1]];
-				for (int i = 0; i < Dimensions[0]; i++) {
-						for (int j = 0; j < Dimensions[1]; j++) {
-								GameObject Sector = Instantiate (SectorPrefab) as GameObject;
-								Sector.transform.parent = transform;
-								Sector.transform.position = new Vector3 (i + 0.5f, j + 0.5f, 2);
-								WorldSectors [i, j] = Sector.GetComponent<Sector> ();
-								WorldSectors [i, j].LocationX = i;
-								WorldSectors [i, j].LocationY = j;
-								Sector.name = "Sector [" + i + ", " + j + "]";
-						}
-				}
+		
 		}
 
-		void DoNextUpdate ()
+		public void DoNextUpdate ()
 		{
 				CurrentDate = CurrentDate.AddHours (1);
 				Debug.Log (CurrentDate);

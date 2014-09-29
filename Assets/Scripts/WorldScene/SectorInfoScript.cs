@@ -5,11 +5,11 @@ using System.Collections;
 public class SectorInfoScript : MonoBehaviour
 {
 
-		GameWorld Game;
+		//GameWorld Game;
 		WorldInfo World;
 		RectTransform SectorInfoPanel;
 		Sector CursorSector;
-		Text SectorName;
+		//Text SectorName;
 		Text SectorCoords;
 		Text SectorZeds;
 		Text SectorPlayerGroupCount;
@@ -20,11 +20,11 @@ public class SectorInfoScript : MonoBehaviour
 		void Start ()
 		{
 				Debug.Log ("Starting: SectorInfoScript");
-				Game = GameObject.Find ("Game").GetComponent<GameWorld> ();
+				//Game = GameObject.Find ("Game").GetComponent<GameWorld> ();
 				World = GameObject.Find ("World").GetComponent<WorldInfo> ();
 				SectorInfoPanel = GameObject.Find ("SectorInfoPanel").GetComponent<RectTransform> ();
 				SectorInfoPanelDimensions = new Vector3 (SectorInfoPanel.rect.width, - SectorInfoPanel.rect.height, 0);
-				SectorName = GameObject.Find ("SectorName").GetComponent<Text> ();
+				//SectorName = GameObject.Find ("SectorName").GetComponent<Text> ();
 				SectorCoords = GameObject.Find ("SectorLocation").GetComponent<Text> ();
 				SectorZeds = GameObject.Find ("SectorZeds").GetComponent<Text> ();
 				SectorPlayerGroupCount = GameObject.Find ("SectorPlayerGroupCount").GetComponent<Text> ();

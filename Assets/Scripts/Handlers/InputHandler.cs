@@ -12,7 +12,7 @@ public class InputHandler : MonoBehaviour
 	
 		WorldInfo worldInfo;
 	
-		GameWorld Game;
+		//GameWorld Game;
 		
 		UIHandler UI;
 	
@@ -26,7 +26,7 @@ public class InputHandler : MonoBehaviour
 				worldInfo = gameObject.GetComponentInChildren<WorldInfo> ();//GameObject.Find ("Terrain").GetComponent<Terrain> ();
 				//Debug.Log ("Terrain name: " + terrainInfo.name);
 		
-				Game = gameObject.GetComponent<GameWorld> ();
+				//Game = gameObject.GetComponent<GameWorld> ();
 				
 				UI = gameObject.GetComponent<UIHandler> ();
 		}

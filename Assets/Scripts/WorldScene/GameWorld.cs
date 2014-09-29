@@ -10,17 +10,26 @@ public class GameWorld : MonoBehaviour
 		
 		public bool IsPlaying = true; 
 		
+		public WorldBuilder Builder;
 		public WorldInfo World;
 		public AudioClip MapClick;
 		public SpriteManager Sprites;
 		
+		public static float SecondsPerHour = 10.0f;
+	
+		public static float NextHourCountdown;
+	
+		public GameObject DebugPanel;
 		// Use this for initialization
 		void Start ()
 		{
 				Debug.Log ("Starting: GameWorld");
 				World = gameObject.GetComponentInChildren<WorldInfo> ();
 				Sprites = gameObject.GetComponent<SpriteManager> ();
+				Builder = gameObject.GetComponent<WorldBuilder> ();
+				NextHourCountdown = SecondsPerHour;
 				
+				Builder.BuildWorld (new int[2] {64,64});
 		}
 	
 		// Update is called once per frame
@@ -31,10 +40,14 @@ public class GameWorld : MonoBehaviour
 	
 		void FixedUpdate ()
 		{
-		
+				NextHourCountdown -= Time.fixedDeltaTime;
+				if (NextHourCountdown < 0) {
+						World.DoNextUpdate ();
+						NextHourCountdown = SecondsPerHour;		
+				}
 		}
 	
-		void TogglePause ()
+		public void TogglePause ()
 		{
 		
 				IsPlaying = !IsPlaying;
@@ -47,7 +60,7 @@ public class GameWorld : MonoBehaviour
 		
 		}
 	
-		void ToggleDebug ()
+		public void ToggleDebug ()
 		{
 				IsDebug = !IsDebug;
 				Debug.Log ("Debug now: " + IsDebug);
@@ -55,8 +68,10 @@ public class GameWorld : MonoBehaviour
 		
 				if (IsDebug) {
 						buttonText.text = "Debug On";
+						DebugPanel.SetActive (true);
 				} else {
 						buttonText.text = "Debug Off";
+						DebugPanel.SetActive (false);
 				}
 		}
 	

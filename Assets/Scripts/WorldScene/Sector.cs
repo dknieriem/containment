@@ -6,14 +6,15 @@ public class Sector : MonoBehaviour
 
 		public enum SectorType
 		{
-				Water,
+				
 				Grass,
 				Forest,
 				Residential,
 				Commercial,
 				Industrial,
 				Seaport,
-				Airport}
+				Airport,
+				Water}
 		;
 
 		public static int North = 0,
@@ -35,8 +36,7 @@ public class Sector : MonoBehaviour
 		
 		GameWorld Game;
 		WorldInfo World;
-		Sector[] NeighboringSectors;
-
+		
 		public SectorType SecType;
 		public int LocationX, LocationY;
 		public int ZedCount;
@@ -45,6 +45,8 @@ public class Sector : MonoBehaviour
 		public float[] ZedProbabilityMigrate;
 		public bool IsVisited = false;
 		public bool IsVisible = false;
+		public Sector[] NeighboringSectors;
+		public SectorType[] NeighboringSectorTypes;
 		GameObject[] myRegions;
 		SpriteRenderer[] mySprites;
 		SpriteRenderer mapMask;
@@ -59,8 +61,8 @@ public class Sector : MonoBehaviour
 				Game = GameObject.Find ("Game").GetComponent<GameWorld> ();
 				World = GameObject.Find ("World").GetComponent<WorldInfo> ();
 						
-				GroupCount = new int[WorldInfo.NumGroups];
-				for (int i = 0; i < WorldInfo.NumGroups; i++) {
+				GroupCount = new int[World.NumGroups];
+				for (int i = 0; i < World.NumGroups; i++) {
 						GroupCount [i] = 0;
 				}
 				

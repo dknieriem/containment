@@ -6,9 +6,9 @@ using PerlinNoise;
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
 
-public class WorldBuilder
+public class WorldBuilder : MonoBehaviour
 {
-
+	
 		public int Distance (int one, int two)
 		{
 				int result = one - two;
@@ -55,38 +55,45 @@ public class WorldBuilder
 						return n1.CompareTo (n2) > 0;
 				}
 		}
-		
-		
+			
+			
 		public static int X = 0, Y = 1;
+		public GameObject SectorPrefab;
+		WorldInfo WorkingWith;
 		public int[] Dimensions;
 		public float[][] Noise;
-		Sector.SectorType[,] WorldSectorTypes;
-		bool[,] SectorIsWater;
+		public Sector.SectorType[,] WorldSectorTypes;
+		public bool[,] SectorIsWater;
 		public float WaterLevel = 0.1f;
 		public float CivLevel = 0.4f;
 
-		public WorldBuilder (int[] dimensionsIn)
+		void Start ()
 		{
+				WorkingWith = GameObject.Find ("World").GetComponent<WorldInfo> ();
 				Dimensions = new int[2];
-				Dimensions [0] = dimensionsIn [0];
-				Dimensions [1] = dimensionsIn [1];
-				
-				WorldSectorTypes = new Sector.SectorType[Dimensions [0], Dimensions [1]];
-				SectorIsWater = new bool[Dimensions [0], Dimensions [1]];
 		}
 
-		public void BuildWorld ()
-		{
+		public void BuildWorld (int[] dimensionsIn)
+		{		
+				Dimensions [0] = dimensionsIn [0];
+				Dimensions [1] = dimensionsIn [1];
+				WorkingWith.Dimensions = Dimensions;
+				
+		
+		
 				WorldSectorTypes = new Sector.SectorType[Dimensions [0], Dimensions [1]];
 				SectorIsWater = new bool[Dimensions [0], Dimensions [1]];
-		
+			
 				Noise = PerlinNoise.PerlinNoise.GeneratePerlinNoise (Dimensions [0], Dimensions [1], 4);
-		
-				SaveImageFromFloat (Noise, "perlinnoise.png");
-				
+				SaveImageFromFloat (Noise, "perlinnoise-" + System.DateTime.Now.ToFileTime () + ".png");
 				GenerateWater ();
+				SaveImageFromBool (SectorIsWater, "Perlinnoise-water-" + System.DateTime.Now.ToFileTime () + ".png");
 		
-				SaveImageFromBool (SectorIsWater, "Perlinnoise-water.png");
+				InstantiateSectors ();
+		
+				WorkingWith.NumGroups = 4;
+				WorkingWith.CurrentDate = new DateTime (1999, 10, 5, 14, 0, 0);
+		
 		
 				//TODO: MORE
 		}
@@ -112,7 +119,7 @@ public class WorldBuilder
 						}
 				}
 				byte[] bytes = tex.EncodeToPNG ();
-				System.IO.File.WriteAllBytes (Application.dataPath + filename, bytes);		
+				System.IO.File.WriteAllBytes (Application.persistentDataPath + "/" + filename, bytes);		
 		}
 		
 		public void GenerateWater ()
@@ -137,6 +144,7 @@ public class WorldBuilder
 				for (int i = 0; i < numWaterBodies; i++) {
 						Float2D firstSeed = SortedCandidates [0]; //pick a water sector
 						SectorIsWater [firstSeed.x, firstSeed.y] = true; //set it as water
+						WorldSectorTypes [firstSeed.x, firstSeed.y] = Sector.SectorType.Water;
 						numWaterSectorsToCreate--; //record that a water sector was made
 						
 						Candidates.Except (Candidates.Where (c => Distance (c.x, firstSeed.x) < Dimensions [0] / 4 && 
@@ -157,12 +165,27 @@ public class WorldBuilder
 				while (numWaterSectorsToCreate > 0) {
 						Float2D newSecWater = SortedCandidates [0];
 						SectorIsWater [newSecWater.x, newSecWater.y] = true;
+						WorldSectorTypes [newSecWater.x, newSecWater.y] = Sector.SectorType.Water;
 						numWaterSectorsToCreate--;
 						AddNeighbors (Candidates, newSecWater.x, newSecWater.y);
 						Candidates.Remove (newSecWater);
+						
 						SortedCandidates = Candidates.OrderByDescending (c => c.value).ToArray<Float2D> ();
-				}		
-
+						
+						foreach (Float2D candidate in SortedCandidates) {
+								int x = candidate.x;
+								int y = candidate.y;
+								if (x > 0 && x < Dimensions [0] - 1 && y > 0 && y < Dimensions [1] - 1) {
+										if (SectorIsWater [x - 1, y] && SectorIsWater [x + 1, y] && SectorIsWater [x, y - 1] && SectorIsWater [x, y + 1]) {
+												SectorIsWater [x, y] = true;
+												WorldSectorTypes [x, y] = Sector.SectorType.Water;
+												numWaterSectorsToCreate--;
+												Candidates.Remove (candidate);
+										}
+								}
+						}//end foreach
+						SortedCandidates = Candidates.OrderByDescending (c => c.value).ToArray<Float2D> ();
+				}//end while
 		}
 		
 		void AddNeighbors (Collection<Float2D> candidates, int x, int y)
@@ -178,6 +201,25 @@ public class WorldBuilder
 						candidates.Add (new Float2D (x, y + 1, Noise [x] [y + 1]));
 		
 		
+		}
+		
+		void InstantiateSectors ()
+		{
+				WorkingWith.WorldSectors = new Sector[Dimensions [0], Dimensions [1]];
+				for (int i = 0; i < Dimensions[0]; i++) {
+						for (int j = 0; j < Dimensions[1]; j++) {
+								GameObject Sector = Instantiate (SectorPrefab) as GameObject;
+								Sector.transform.parent = transform;
+								Sector.transform.position = new Vector3 (i + 0.5f, j + 0.5f, 2);
+								Sector sec = Sector.GetComponent<Sector> ();
+								
+								sec.LocationX = i;
+								sec.LocationY = j;
+								sec.SecType = WorldSectorTypes [i, j];
+								Sector.name = "Sector [" + i + ", " + j + "]";
+								WorkingWith.WorldSectors [i, j] = sec;
+						}
+				}
 		}
 }
 
