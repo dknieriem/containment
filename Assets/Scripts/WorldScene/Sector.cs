@@ -20,19 +20,23 @@ public class Sector : MonoBehaviour
 		public static int North = 0,
 				East = 1,
 				South = 2,
-				West = 3;
+				West = 3,
+				NorthEast = 4,
+				SouthEast = 5,
+				NorthWest = 6,
+				SouthWest = 7;
 				
 		public static string[] SectorRegionNames = {
+		"South West",
+		"South Central",
+		"South East",
+		"Central West",
+		"Central",
+		"Central East",
 				"North West",
 				"North Central",
 				"North East",
-				"Central West",
-				"Central",
-				"Central East",
-				"South West",
-				"South Central",
-				"South East"
-		};
+						};
 		
 		GameWorld Game;
 		WorldInfo World;
@@ -66,6 +70,8 @@ public class Sector : MonoBehaviour
 						GroupCount [i] = 0;
 				}
 				
+			
+				
 				myRegions = new GameObject[SectorRegionNames.Length];
 				mySprites = new SpriteRenderer[SectorRegionNames.Length];
 				
@@ -81,6 +87,50 @@ public class Sector : MonoBehaviour
 						//mySprites [i].sortingLayerID = 2;
 				}*/
 				
+				mapMask = gameObject.GetComponent<SpriteRenderer> ();
+														
+				ZedCount = Random.Range (0, 100);
+				ZedProbabilityMigrate = new float[4];			
+				
+				NeighboringSectors = new Sector[4];
+				NeighboringSectorTypes = new SectorType[8];
+				if (LocationX > 0) {
+						NeighboringSectors [West] = World.WorldSectors [LocationX - 1, LocationY];
+						NeighboringSectorTypes [West] = World.WorldSectors [LocationX - 1, LocationY].SecType;
+						ZedProbabilityMigrate [West] = 0.015f;
+						
+						if (LocationY > 0)
+								NeighboringSectorTypes [SouthWest] = World.WorldSectors [LocationX - 1, LocationY - 1].SecType;
+						if (LocationY < World.Dimensions [1] - 1)
+								NeighboringSectorTypes [NorthWest] = World.WorldSectors [LocationX - 1, LocationY + 1].SecType;
+				}
+				if (LocationX < World.Dimensions [0] - 1) {
+						NeighboringSectors [East] = World.WorldSectors [LocationX + 1, LocationY];
+						NeighboringSectorTypes [East] = World.WorldSectors [LocationX + 1, LocationY].SecType;
+						ZedProbabilityMigrate [East] = 0.015f;
+						
+						if (LocationY > 0)
+								NeighboringSectorTypes [SouthEast] = World.WorldSectors [LocationX + 1, LocationY - 1].SecType;
+						if (LocationY < World.Dimensions [1] - 1)
+								NeighboringSectorTypes [NorthEast] = World.WorldSectors [LocationX + 1, LocationY + 1].SecType;
+				}
+				if (LocationY > 0) {
+						NeighboringSectors [South] = World.WorldSectors [LocationX, LocationY - 1];
+						NeighboringSectorTypes [South] = World.WorldSectors [LocationX, LocationY - 1].SecType;
+						ZedProbabilityMigrate [South] = 0.015f;
+				}
+				if (LocationY < World.Dimensions [1] - 1) {
+						NeighboringSectors [North] = World.WorldSectors [LocationX, LocationY + 1];
+						NeighboringSectorTypes [North] = World.WorldSectors [LocationX, LocationY + 1].SecType;
+						ZedProbabilityMigrate [North] = 0.015f;
+				}
+				
+				GetRegionSprites ();
+				
+		}
+	
+		void GetRegionSprites ()
+		{
 				for (int x = 0; x < 3; x++) {
 						for (int y = 0; y < 3; y++) {
 				
@@ -91,32 +141,87 @@ public class Sector : MonoBehaviour
 								myRegions [i].transform.parent = transform;
 								myRegions [i].transform.localPosition = new Vector3 ((float)(x - 1) / 3, (float)(y - 1) / 3, 9.0f);
 								mySprites [i] = myRegions [i].GetComponent<SpriteRenderer> ();
-								mySprites [i].sprite = Game.Sprites.RandomSprite ();
 						}
 				}
 				
-				mapMask = gameObject.GetComponent<SpriteRenderer> ();
+				switch (SecType) {
+				
+				case SectorType.Water:
+						SetWaterTiles ();
+						break;
+				default:
+						SetNonWaterTiles ();
+						break;
+				}
+		
+		}
+				
 								
-				ZedCount = Random.Range (0, 100);
-				ZedProbabilityMigrate = new float[4];			
+		void SetWaterTiles ()
+		{			
+				for (int i = 0; i < 9; i++)
+						mySprites [i].sprite = Game.Sprites.ReturnSprite ("water-center");
+		
+				if (LocationY < World.Dimensions [1] - 1 && NeighboringSectorTypes [North] != SectorType.Water) {
+						mySprites [6].sprite = Game.Sprites.ReturnSprite ("water-nc");
+						mySprites [7].sprite = Game.Sprites.ReturnSprite ("water-nc");
+						mySprites [8].sprite = Game.Sprites.ReturnSprite ("water-nc");
+				}
+				if (LocationY > 0 && NeighboringSectorTypes [South] != SectorType.Water) {
+						mySprites [0].sprite = Game.Sprites.ReturnSprite ("water-sc");
+						mySprites [1].sprite = Game.Sprites.ReturnSprite ("water-sc");
+						mySprites [2].sprite = Game.Sprites.ReturnSprite ("water-sc");
+				}
+				if (LocationX < World.Dimensions [0] - 1 && NeighboringSectorTypes [East] != SectorType.Water) {			
+						mySprites [5].sprite = Game.Sprites.ReturnSprite ("water-ec");
+						
+						if (mySprites [2].sprite == Game.Sprites.ReturnSprite ("water-sc"))
+								mySprites [2].sprite = Game.Sprites.ReturnSprite ("ground");
+						else if (mySprites [2].sprite == Game.Sprites.ReturnSprite ("water-center"))
+								mySprites [2].sprite = Game.Sprites.ReturnSprite ("water-ec");				
 				
-				NeighboringSectors = new Sector[4];
+						if (mySprites [8].sprite == Game.Sprites.ReturnSprite ("water-nc"))
+								mySprites [8].sprite = Game.Sprites.ReturnSprite ("ground");
+						else if (mySprites [8].sprite == Game.Sprites.ReturnSprite ("water-center"))
+								mySprites [8].sprite = Game.Sprites.ReturnSprite ("water-ec");				
+				}
+				if (LocationX > 0 && NeighboringSectorTypes [West] != SectorType.Water) {
+						mySprites [3].sprite = Game.Sprites.ReturnSprite ("water-wc");
+						
+						if (mySprites [0].sprite == Game.Sprites.ReturnSprite ("water-sc"))
+								mySprites [0].sprite = Game.Sprites.ReturnSprite ("ground");
+						else if (mySprites [0].sprite == Game.Sprites.ReturnSprite ("water-center"))
+								mySprites [0].sprite = Game.Sprites.ReturnSprite ("water-wc");				
+			
+						if (mySprites [6].sprite == Game.Sprites.ReturnSprite ("water-nc"))
+								mySprites [6].sprite = Game.Sprites.ReturnSprite ("ground");
+						else if (mySprites [6].sprite == Game.Sprites.ReturnSprite ("water-center"))
+								mySprites [6].sprite = Game.Sprites.ReturnSprite ("water-wc");				
+						
+				}
 				
-				if (LocationX > 0) {
-						NeighboringSectors [West] = World.WorldSectors [LocationX - 1, LocationY];
-						ZedProbabilityMigrate [West] = 0.015f;
-				}
-				if (LocationX < World.Dimensions [0] - 1) {
-						NeighboringSectors [East] = World.WorldSectors [LocationX + 1, LocationY];
-						ZedProbabilityMigrate [East] = 0.015f;
-				}
-				if (LocationY > 0) {
-						NeighboringSectors [North] = World.WorldSectors [LocationX, LocationY - 1];
-						ZedProbabilityMigrate [North] = 0.015f;
-				}
-				if (LocationY < World.Dimensions [1] - 1) {
-						NeighboringSectors [South] = World.WorldSectors [LocationX, LocationY + 1];
-						ZedProbabilityMigrate [South] = 0.015f;
+				if (LocationX > 0 && LocationY > 0 && NeighboringSectorTypes [SouthWest] != SectorType.Water && mySprites [0].sprite == Game.Sprites.ReturnSprite ("water-center"))
+						mySprites [0].sprite = Game.Sprites.ReturnSprite ("water-sw");
+				
+				if (LocationX > 0 && LocationY < World.Dimensions [1] - 1 && NeighboringSectorTypes [NorthWest] != SectorType.Water && mySprites [6].sprite == Game.Sprites.ReturnSprite ("water-center"))
+						mySprites [6].sprite = Game.Sprites.ReturnSprite ("water-nw");
+		
+				if (LocationX < World.Dimensions [0] - 1 && LocationY > 0 && NeighboringSectorTypes [SouthEast] != SectorType.Water && mySprites [2].sprite == Game.Sprites.ReturnSprite ("water-center"))
+						mySprites [2].sprite = Game.Sprites.ReturnSprite ("water-se");
+		
+				if (LocationX < World.Dimensions [0] - 1 && LocationY < World.Dimensions [1] - 1 && NeighboringSectorTypes [NorthEast] != SectorType.Water && mySprites [8].sprite == Game.Sprites.ReturnSprite ("water-center"))
+						mySprites [8].sprite = Game.Sprites.ReturnSprite ("water-ne");
+		
+				//0,2,6,8:
+				
+				//NW - 0
+		
+		}
+		
+		void SetNonWaterTiles ()
+		{
+				for (int i = 0; i < 9; i++) {
+						mySprites [i].sprite = Game.Sprites.ReturnSprite ("grass-center");
 				}
 		}
 	
@@ -126,14 +231,17 @@ public class Sector : MonoBehaviour
 	
 		}
 		
+
 		void FixedUpdate ()
 		{
 		
+		
+			
 				if (PlayerGroupCount > 0) {
 						IsVisible = true;
 						IsVisited = true;
 				}
-		
+			
 				if (PlayerGroupCount <= 0) {
 						IsVisible = false;
 				}
@@ -146,8 +254,11 @@ public class Sector : MonoBehaviour
 				} else {
 						mapMask.enabled = true;
 						mapMask.color = new Color (0.0f, 0.0f, 0.0f);
-		
+				
 				}
+			
+
+		
 				if (Game.IsPlaying) {
 						NextUpdateCountdown -= Time.fixedDeltaTime;
 						if (NextUpdateCountdown < 0) {

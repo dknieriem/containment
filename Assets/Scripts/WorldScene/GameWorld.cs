@@ -25,11 +25,11 @@ public class GameWorld : MonoBehaviour
 		{
 				Debug.Log ("Starting: GameWorld");
 				World = gameObject.GetComponentInChildren<WorldInfo> ();
+				Debug.Log (World.name);
 				Sprites = gameObject.GetComponent<SpriteManager> ();
 				Builder = gameObject.GetComponent<WorldBuilder> ();
 				NextHourCountdown = SecondsPerHour;
-				
-				Builder.BuildWorld (new int[2] {64,64});
+				Builder.BuildWorld ();
 		}
 	
 		// Update is called once per frame

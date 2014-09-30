@@ -37,14 +37,17 @@ public class PlayerGroup : MonoBehaviour
 	
 		}
 	
-		void FixedUpdate ()
+		public void GroupMemberMoved ()
 		{
 				SectorGroupMembers = new int[World.Dimensions [0], World.Dimensions [1]];
-		
 				for (int i = 0; i < TotalGroupMembers; i++) {
 						int[] sectorToAdd = (int[])GroupMemberLocations [i];
 						SectorGroupMembers [sectorToAdd [0], sectorToAdd [1]] ++;
-				}
+				}	
+		}
+	
+		void FixedUpdate ()
+		{
 		}
 		
 		public void StartGroup (int numMembers, Sector homeSector)

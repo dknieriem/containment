@@ -13,6 +13,7 @@ public class SectorInfoScript : MonoBehaviour
 		Text SectorCoords;
 		Text SectorZeds;
 		Text SectorPlayerGroupCount;
+		Text SectorType;
 		Vector3 SectorInfoPanelDimensions;
 		public Vector3 InfoPanelCursorOffset = new Vector3 (10, 0, 0);
 
@@ -27,6 +28,7 @@ public class SectorInfoScript : MonoBehaviour
 				//SectorName = GameObject.Find ("SectorName").GetComponent<Text> ();
 				SectorCoords = GameObject.Find ("SectorLocation").GetComponent<Text> ();
 				SectorZeds = GameObject.Find ("SectorZeds").GetComponent<Text> ();
+				SectorType = GameObject.Find ("SectorType").GetComponent<Text> ();
 				SectorPlayerGroupCount = GameObject.Find ("SectorPlayerGroupCount").GetComponent<Text> ();
 		}
 	
@@ -39,6 +41,7 @@ public class SectorInfoScript : MonoBehaviour
 						SectorCoords.text = "(" + CursorSector.LocationX + "," + CursorSector.LocationY + ")";		
 						SectorZeds.text = "Zeds: " + CursorSector.ZedCount;
 						SectorPlayerGroupCount.text = "Group: " + CursorSector.PlayerGroupCount;
+						SectorType.text = CursorSector.SecType.ToString ();
 				}
 		}
 }

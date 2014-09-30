@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+using UnityEngine;
+
 using System;
 using System.Collections;
 using System.Linq;
@@ -59,9 +60,10 @@ public class WorldBuilder : MonoBehaviour
 			
 		public static int X = 0, Y = 1;
 		public GameObject SectorPrefab;
-		WorldInfo WorkingWith;
+		public WorldInfo WorkingWith;
 		public int[] Dimensions;
 		public float[][] Noise;
+		public float[,,] MapImage;
 		public Sector.SectorType[,] WorldSectorTypes;
 		public bool[,] SectorIsWater;
 		public float WaterLevel = 0.1f;
@@ -70,32 +72,50 @@ public class WorldBuilder : MonoBehaviour
 		void Start ()
 		{
 				WorkingWith = GameObject.Find ("World").GetComponent<WorldInfo> ();
-				Dimensions = new int[2];
 		}
 
-		public void BuildWorld (int[] dimensionsIn)
+		public void BuildWorld ()
 		{		
-				Dimensions [0] = dimensionsIn [0];
-				Dimensions [1] = dimensionsIn [1];
+
+				Debug.Log ("Working With: " + WorkingWith.name);
 				WorkingWith.Dimensions = Dimensions;
 				
-		
-		
 				WorldSectorTypes = new Sector.SectorType[Dimensions [0], Dimensions [1]];
 				SectorIsWater = new bool[Dimensions [0], Dimensions [1]];
 			
 				Noise = PerlinNoise.PerlinNoise.GeneratePerlinNoise (Dimensions [0], Dimensions [1], 4);
-				SaveImageFromFloat (Noise, "perlinnoise-" + System.DateTime.Now.ToFileTime () + ".png");
 				GenerateWater ();
-				SaveImageFromBool (SectorIsWater, "Perlinnoise-water-" + System.DateTime.Now.ToFileTime () + ".png");
-		
+			
+				SaveImages ();
+				
+				RemoveExistingSectors ();
 				InstantiateSectors ();
-		
 				WorkingWith.NumGroups = 4;
 				WorkingWith.CurrentDate = new DateTime (1999, 10, 5, 14, 0, 0);
-		
-		
 				//TODO: MORE
+						
+						
+		}
+		
+		void SaveImages ()
+		{
+				MapImage = new float[Dimensions [0], Dimensions [1], 3];		
+				for (int x = 0; x < Dimensions[0]; x++) {
+						for (int y = 0; y < Dimensions[1]; y++) {
+				
+								if (SectorIsWater [x, y]) {
+										MapImage [x, y, 0] = Noise [x] [y];
+										MapImage [x, y, 1] = Noise [x] [y];
+										MapImage [x, y, 2] = 1.0f;
+								} else {
+										MapImage [x, y, 0] = Noise [x] [y];
+										MapImage [x, y, 1] = Noise [x] [y];
+										MapImage [x, y, 2] = Noise [x] [y];
+								}
+						}
+				}
+				
+				SaveImageFromFloat3 (MapImage, "perlinnoise-" + System.DateTime.Now.ToFileTime () + ".png");
 		}
 		
 		void SaveImageFromBool (bool[,] data, string filename)
@@ -121,6 +141,21 @@ public class WorldBuilder : MonoBehaviour
 				byte[] bytes = tex.EncodeToPNG ();
 				System.IO.File.WriteAllBytes (Application.persistentDataPath + "/" + filename, bytes);		
 		}
+		void SaveImageFromFloat3 (float[,,] data, string filename)
+		{
+				UnityEngine.Texture2D tex = new Texture2D (Dimensions [0], Dimensions [1]);
+				for (int x = 0; x < Dimensions[0]; x++) {
+						for (int y = 0; y < Dimensions[1]; y++) {
+								tex.SetPixel (x, y, new Color (data [x, y, 0], data [x, y, 1], data [x, y, 2]));
+						}
+				}
+				tex.Apply ();
+				GameObject.Find ("DebugControlPanel").GetComponent<DebugInfoScript> ().GetNewMapImage (tex);
+				
+				byte[] bytes = tex.EncodeToPNG ();
+				System.IO.File.WriteAllBytes (Application.persistentDataPath + "/" + filename, bytes);		
+		}
+		
 		
 		public void GenerateWater ()
 		{
@@ -129,9 +164,9 @@ public class WorldBuilder : MonoBehaviour
 				}
 				
 				int numWaterSectorsToCreate = Mathf.FloorToInt (Dimensions [0] * Dimensions [1] * WaterLevel);
-				int numWaterBodies = UnityEngine.Random.Range (1, 3);
+				int numWaterBodies = UnityEngine.Random.Range (1, 4);
 		
-				Collection<Float2D> Candidates = new Collection<Float2D> ();
+				List<Float2D> Candidates = new List<Float2D> ();
 				for (int x = 0; x < Dimensions[0]; x++) {
 						for (int y = 0; y < Dimensions[1]; y++) {
 								Candidates.Add (new Float2D (x, y, Noise [x] [y]));
@@ -146,12 +181,14 @@ public class WorldBuilder : MonoBehaviour
 						SectorIsWater [firstSeed.x, firstSeed.y] = true; //set it as water
 						WorldSectorTypes [firstSeed.x, firstSeed.y] = Sector.SectorType.Water;
 						numWaterSectorsToCreate--; //record that a water sector was made
-						
-						Candidates.Except (Candidates.Where (c => Distance (c.x, firstSeed.x) < Dimensions [0] / 4 && 
-								Distance (c.y, firstSeed.y) < Dimensions [1] / 4)); //remove nearby sectors from the seeding process
+						//Collection<Float2D> Exceptions = Candidates.Where (c => Distance (c.x, firstSeed.x) < Dimensions [0] / 4 && 
+						//		Distance (c.y, firstSeed.y) < Dimensions [1] / 4);
+						Candidates = Candidates.Where (c => Distance (c.x, firstSeed.x) > Dimensions [0] / 4 && 
+								Distance (c.y, firstSeed.y) > Dimensions [1] / 4).ToList<Float2D> ();//.Except (Exceptions); //remove nearby sectors from the seeding process
+						SortedCandidates = Candidates.OrderByDescending (c => c.value).ToArray<Float2D> ();
 				}
 				
-				Candidates = new Collection<Float2D> ();
+				Candidates = new List<Float2D> ();
 				for (int x = 0; x < Dimensions[0]; x++) {
 						for (int y = 0; y < Dimensions[1]; y++) {
 								if (SectorIsWater [x, y]) {
@@ -188,7 +225,7 @@ public class WorldBuilder : MonoBehaviour
 				}//end while
 		}
 		
-		void AddNeighbors (Collection<Float2D> candidates, int x, int y)
+		void AddNeighbors (List<Float2D> candidates, int x, int y)
 		{
 		
 				if (x > 0 && !SectorIsWater [x - 1, y])
@@ -203,13 +240,23 @@ public class WorldBuilder : MonoBehaviour
 		
 		}
 		
+		void RemoveExistingSectors ()
+		{
+		
+		}
 		void InstantiateSectors ()
 		{
+		
+				ICollection<Sector> ExistingSectors = WorkingWith.GetComponentsInChildren<Sector> ();
+				Debug.Log ("About to destroy " + ExistingSectors.Count);
+				foreach (Sector sector in ExistingSectors) {
+						Destroy (sector.gameObject);
+				}
 				WorkingWith.WorldSectors = new Sector[Dimensions [0], Dimensions [1]];
 				for (int i = 0; i < Dimensions[0]; i++) {
 						for (int j = 0; j < Dimensions[1]; j++) {
 								GameObject Sector = Instantiate (SectorPrefab) as GameObject;
-								Sector.transform.parent = transform;
+								Sector.transform.parent = WorkingWith.transform;
 								Sector.transform.position = new Vector3 (i + 0.5f, j + 0.5f, 2);
 								Sector sec = Sector.GetComponent<Sector> ();
 								
