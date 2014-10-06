@@ -29,9 +29,9 @@ public class GroupInfoScript : MonoBehaviour
 				HomeSectorLocationText.text = "(" + Group.HomeSectorLocation [0] + "," + Group.HomeSectorLocation [1] + ")";
 				GroupMembersText.text = "Members: " + Group.TotalGroupMembers; 		
 				GroupMemberNamesText.text = "";
-				for (int i = 0; i < Group.GroupMemberNames.Count; i++) {
-						int[] location = (int[])Group.GroupMemberLocations [i];
-						GroupMemberNamesText.text += Group.GroupMemberNames [i] + "\t(" + location [0] + "," + location [1] + ")\n";
+				foreach (PlayerGroup.Person p in Group.GroupMembers) {
+						int[] location = {p.LocationX, p.LocationY};
+						GroupMemberNamesText.text += p.FirstName + " " + p.LastName + "\t(" + location [0] + "," + location [1] + ")\n";
 				
 				}
 		}
