@@ -10,30 +10,22 @@ public class WorldInfo : MonoBehaviour
 		public int[] Dimensions;
 		public int NumGroups = 0;
 		public DateTime CurrentDate;
-		// Use this for initialization
-				
-
+		public PlayerGroup PlayerGroup;
 	 
 		void Start ()
 		{
 				Debug.Log ("Starting: WorldInfo");
-								
-		}
-	
-		// Update is called once per frame
-		void Update ()
-		{
-		
-		}
-		
-		void FixedUpdate ()
-		{
-		
 		}
 
 		public void DoNextUpdate ()
 		{
 				CurrentDate = CurrentDate.AddHours (1);
+				foreach (Sector s in WorldSectors) {
+						s.DoNextUpdate ();
+				}
+				
+				PlayerGroup.DoNextUpdate ();
+				
 				Debug.Log (CurrentDate);
 		}
 

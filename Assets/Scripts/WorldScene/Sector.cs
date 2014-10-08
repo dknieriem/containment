@@ -38,9 +38,6 @@ public class Sector : MonoBehaviour
 				"North East",
 						};
 		
-		GameWorld Game;
-		WorldInfo World;
-		
 		public SectorType SecType;
 		public int LocationX, LocationY;
 		public int ZedCount;
@@ -51,54 +48,48 @@ public class Sector : MonoBehaviour
 		public bool IsVisible = false;
 		public Sector[] NeighboringSectors;
 		public SectorType[] NeighboringSectorTypes;
+		
+		GameWorld Game;
+		WorldInfo World;
 		GameObject[] myRegions;
 		SpriteRenderer[] mySprites;
 		SpriteRenderer mapMask;
 		
-		
-		public static float SecondsPerUpdate = 10.0f;
-		public static float NextUpdateCountdown;
+		//public static float SecondsPerUpdate = 10.0f;
+		//public static float NextUpdateCountdown;
 		
 		// Use this for initialization
 		void Start ()
 		{
 				Game = GameObject.Find ("Game").GetComponent<GameWorld> ();
 				World = GameObject.Find ("World").GetComponent<WorldInfo> ();
-						
+				mapMask = gameObject.GetComponent<SpriteRenderer> ();
+		
 				GroupCount = new int[World.NumGroups];
 				for (int i = 0; i < World.NumGroups; i++) {
 						GroupCount [i] = 0;
 				}
-				
-			
-				
-				myRegions = new GameObject[SectorRegionNames.Length];
-				mySprites = new SpriteRenderer[SectorRegionNames.Length];
-				
-				
-				/*for (int i = 0; i < SectorRegionNames.Length; i++) {
-						myRegions [i] = new GameObject (SectorRegionNames [i] + " Sprite");
-						myRegions [i].AddComponent<SpriteRenderer> ();
-						myRegions [i].transform.parent = transform;
-						myRegions [i].transform.localPosition = new Vector3 ((float)((i % 3) - 1) / 3, (float)((i - 1) / 3) / 3, -1.0f);
 						
-						mySprites [i] = myRegions [i].GetComponent<SpriteRenderer> ();
-						mySprites [i].sprite = Game.Sprites.RandomSprite ();
-						//mySprites [i].sortingLayerID = 2;
-				}*/
-				
-				mapMask = gameObject.GetComponent<SpriteRenderer> ();
-														
+				SetZeds ();				
+				SetNeighboringSectors ();				
+				GetRegionSprites ();
+		}
+	
+		void SetZeds ()
+		{
 				ZedCount = Random.Range (0, 100);
-				ZedProbabilityMigrate = new float[4];			
-				
+				ZedProbabilityMigrate = new float[4];	
+		}
+	
+		void SetNeighboringSectors ()
+		{
 				NeighboringSectors = new Sector[4];
 				NeighboringSectorTypes = new SectorType[8];
 				if (LocationX > 0) {
 						NeighboringSectors [West] = World.WorldSectors [LocationX - 1, LocationY];
 						NeighboringSectorTypes [West] = World.WorldSectors [LocationX - 1, LocationY].SecType;
 						ZedProbabilityMigrate [West] = 0.015f;
-						
+			
 						if (LocationY > 0)
 								NeighboringSectorTypes [SouthWest] = World.WorldSectors [LocationX - 1, LocationY - 1].SecType;
 						if (LocationY < World.Dimensions [1] - 1)
@@ -108,7 +99,7 @@ public class Sector : MonoBehaviour
 						NeighboringSectors [East] = World.WorldSectors [LocationX + 1, LocationY];
 						NeighboringSectorTypes [East] = World.WorldSectors [LocationX + 1, LocationY].SecType;
 						ZedProbabilityMigrate [East] = 0.015f;
-						
+			
 						if (LocationY > 0)
 								NeighboringSectorTypes [SouthEast] = World.WorldSectors [LocationX + 1, LocationY - 1].SecType;
 						if (LocationY < World.Dimensions [1] - 1)
@@ -124,18 +115,16 @@ public class Sector : MonoBehaviour
 						NeighboringSectorTypes [North] = World.WorldSectors [LocationX, LocationY + 1].SecType;
 						ZedProbabilityMigrate [North] = 0.015f;
 				}
-				
-				GetRegionSprites ();
-				
 		}
 	
 		void GetRegionSprites ()
 		{
+				myRegions = new GameObject[SectorRegionNames.Length];
+				mySprites = new SpriteRenderer[SectorRegionNames.Length];
+		
 				for (int x = 0; x < 3; x++) {
 						for (int y = 0; y < 3; y++) {
-				
 								int i = x + y * 3;
-				
 								myRegions [i] = new GameObject (SectorRegionNames [i] + " Sprite");
 								myRegions [i].AddComponent<SpriteRenderer> ();
 								myRegions [i].transform.parent = transform;
@@ -145,7 +134,6 @@ public class Sector : MonoBehaviour
 				}
 				
 				switch (SecType) {
-				
 				case SectorType.Water:
 						SetWaterTiles ();
 						break;
@@ -153,10 +141,8 @@ public class Sector : MonoBehaviour
 						SetNonWaterTiles ();
 						break;
 				}
-		
 		}
-				
-								
+						
 		void SetWaterTiles ()
 		{			
 				for (int i = 0; i < 9; i++)
@@ -211,17 +197,33 @@ public class Sector : MonoBehaviour
 		
 				if (LocationX < World.Dimensions [0] - 1 && LocationY < World.Dimensions [1] - 1 && NeighboringSectorTypes [NorthEast] != SectorType.Water && mySprites [8].sprite == Game.Sprites.ReturnSprite ("water-center"))
 						mySprites [8].sprite = Game.Sprites.ReturnSprite ("water-ne");
-		
-				//0,2,6,8:
-				
-				//NW - 0
-		
 		}
 		
 		void SetNonWaterTiles ()
 		{
-				for (int i = 0; i < 9; i++) {
-						mySprites [i].sprite = Game.Sprites.ReturnSprite ("grass-center");
+		
+				switch (SecType) {
+				case SectorType.Residential:
+						for (int x = 0; x < 3; x++) {
+								for (int y = 0; y < 3; y++) {
+										int spriteNum = x * 3 + y;
+										mySprites [spriteNum].sprite = Game.Sprites.ReturnSprite ("res-zone-" + (x + 1) + "-" + (y + 1));
+								}
+						}
+						break;
+				case SectorType.Commercial:
+						for (int x = 0; x < 3; x++) {
+								for (int y = 0; y < 3; y++) {
+										int spriteNum = x * 3 + y;
+										mySprites [spriteNum].sprite = Game.Sprites.ReturnSprite ("comm-zone-" + (x + 1) + "-" + (y + 1));
+								}
+						}
+						break;
+				case SectorType.Grass:
+						for (int i = 0; i < 9; i++) {
+								mySprites [i].sprite = Game.Sprites.ReturnSprite ("grass-center");
+						}
+						break;
 				}
 		}
 	
@@ -234,17 +236,13 @@ public class Sector : MonoBehaviour
 
 		void FixedUpdate ()
 		{
-		
-		
-			
 				if (PlayerGroupCount > 0) {
 						IsVisible = true;
 						IsVisited = true;
-				}
-			
-				if (PlayerGroupCount <= 0) {
+				} else {
 						IsVisible = false;
 				}
+				
 				if (IsVisible || Game.IsDebug) {
 						mapMask.enabled = false;
 						//mapMask.color = new Color (1.0f, 1.0f, 1.0f);
@@ -253,25 +251,13 @@ public class Sector : MonoBehaviour
 						mapMask.color = new Color (0.7f, 0.7f, 1.0f);
 				} else {
 						mapMask.enabled = true;
-						mapMask.color = new Color (0.0f, 0.0f, 0.0f);
-				
-				}
-			
-
-		
-				if (Game.IsPlaying) {
-						NextUpdateCountdown -= Time.fixedDeltaTime;
-						if (NextUpdateCountdown < 0) {
-								DoNextUpdate ();
-								NextUpdateCountdown = SecondsPerUpdate;		
-						}
+						mapMask.color = new Color (0.0f, 0.0f, 0.0f);	
 				}
 		}
 		
 		//updated each game hour
-		void DoNextUpdate ()
+		public void DoNextUpdate ()
 		{
-		
 				int[] numMigrating = {0,0,0,0};
 		
 				for (int i = 0; i < ZedCount; i++) {
@@ -305,6 +291,5 @@ public class Sector : MonoBehaviour
 						NeighboringSectors [West].ZedCount += numMigrating [West];
 						ZedCount = ZedCount - numMigrating [West]; 
 				}
-				
 		}
 }

@@ -55,6 +55,8 @@ public class InputHandler : MonoBehaviour
 						UI.ToggleSectorInfoPanel ();
 				}
 		
+		
+		
 				MoveCamera ();
 		
 		}
@@ -66,10 +68,23 @@ public class InputHandler : MonoBehaviour
 		
 				float xDelta = Input.GetAxis ("Horizontal") * Time.deltaTime * CameraPixelsPerSecond;
 				float yDelta = Input.GetAxis ("Vertical") * Time.deltaTime * CameraPixelsPerSecond;
-		
+				
+				
 				newCameraPos.x += xDelta;
 				newCameraPos.y += yDelta;
 		
+				float zoomDelta = Input.GetAxis ("Mouse ScrollWheel") * Time.deltaTime * CameraPixelsPerSecond;
+				//Debug.Log ("Mousewheel: " + zoomDelta);
+				if (!Mathf.Approximately (zoomDelta, 0.0f)) {
+						float newZoom = mainCamera.orthographicSize * (1.0f - zoomDelta); 
+						if (newZoom < 5) {
+								newZoom = 5;
+						}
+						if (newZoom > 16) {
+								newZoom = 16;
+						}
+						mainCamera.orthographicSize = newZoom;
+				}
 				//mainCamera.transform.Translate (Vector3.up * yDelta);
 		
 				if (newCameraPos.x < 0) {
@@ -91,6 +106,7 @@ public class InputHandler : MonoBehaviour
 				}
 		
 				mainCamera.transform.position = newCameraPos;
+				
 		}
 	
 		/*public void ChangeCamTarget (string groupName, int delta)

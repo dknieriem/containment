@@ -18,12 +18,6 @@ public class GroupInfoScript : MonoBehaviour
 				GroupMemberNamesText = GameObject.Find ("PlayerGroupMemberNames").GetComponent<Text> ();
 		}
 	
-		// Update is called once per frame
-		void Update ()
-		{
-	
-		}
-		
 		void FixedUpdate ()
 		{
 				HomeSectorLocationText.text = "(" + Group.HomeSectorLocation [0] + "," + Group.HomeSectorLocation [1] + ")";

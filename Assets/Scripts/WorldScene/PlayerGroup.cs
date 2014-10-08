@@ -57,9 +57,6 @@ public class PlayerGroup : MonoBehaviour
 		
 		//public ArrayList GroupMemberNames = new ArrayList ();
 		
-		public static float SecondsPerUpdate = 10.0f;
-		public static float NextUpdateCountdown;
-
 		GameWorld Game;
 		WorldInfo World;
 	
@@ -91,12 +88,6 @@ public class PlayerGroup : MonoBehaviour
 				return x;
 		}
 	
-		// Update is called once per frame
-		void Update ()
-		{
-	
-		}
-	
 		public void GroupMemberMoved ()
 		{
 				SectorGroupMembers = new int[World.Dimensions [0], World.Dimensions [1]];
@@ -105,20 +96,9 @@ public class PlayerGroup : MonoBehaviour
 						SectorGroupMembers [sectorToAdd [0], sectorToAdd [1]] ++;
 				}	
 		}
-	
-		void FixedUpdate ()
-		{
-				if (Game.IsPlaying) {
-						NextUpdateCountdown -= Time.fixedDeltaTime;
-						if (NextUpdateCountdown < 0) {
-								DoNextUpdate ();
-								NextUpdateCountdown = SecondsPerUpdate;
-						}
-				}
-		}
-	
+		
 		//updated each game hour
-		void DoNextUpdate ()
+		public void DoNextUpdate ()
 		{
 		
 				//for each group member in 

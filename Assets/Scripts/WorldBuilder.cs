@@ -21,19 +21,19 @@ public class WorldBuilder : MonoBehaviour
 		
 		public struct Float2D : IComparable , IComparable<Float2D>
 		{
-				public int x, y;
-				public float value;
+				public int X, Y;
+				public float Value;
 
 				public Float2D (int x, int y, float value)
 				{
-						this.x = x;
-						this.y = y;
-						this.value = value;
+						this.X = x;
+						this.Y = y;
+						this.Value = value;
 				}
 				
 				public int CompareTo (Float2D other)
 				{
-						if (this.value > (other).value) {
+						if (this.Value > (other).Value) {
 								return 1;
 						} else {
 								return -1;
@@ -56,18 +56,19 @@ public class WorldBuilder : MonoBehaviour
 						return n1.CompareTo (n2) > 0;
 				}
 		}
-			
-			
+		
 		public static int X = 0, Y = 1;
 		public GameObject SectorPrefab;
 		public WorldInfo WorkingWith;
 		public int[] Dimensions;
-		public float[][] Noise;
+		public float[][] WaterNoise, CityNoise;
 		public float[,,] MapImage;
 		public Sector.SectorType[,] WorldSectorTypes;
 		public bool[,] SectorIsWater;
+		public bool[,] SectorIsCity;
 		public float WaterLevel = 0.1f;
 		public float CivLevel = 0.4f;
+		public float CommCityFraction = 0.05f; //fraction of city sectors that are commercial centers
 
 		void Start ()
 		{
@@ -82,9 +83,12 @@ public class WorldBuilder : MonoBehaviour
 				
 				WorldSectorTypes = new Sector.SectorType[Dimensions [0], Dimensions [1]];
 				SectorIsWater = new bool[Dimensions [0], Dimensions [1]];
-			
-				Noise = PerlinNoise.PerlinNoise.GeneratePerlinNoise (Dimensions [0], Dimensions [1], 4);
+				SectorIsCity = new bool[Dimensions [0], Dimensions [1]];
+				WaterNoise = PerlinNoise.PerlinNoise.GeneratePerlinNoise (Dimensions [0], Dimensions [1], 4);
+				CityNoise = PerlinNoise.PerlinNoise.GeneratePerlinNoise (Dimensions [0], Dimensions [1], 3);
 				GenerateWater ();
+			
+				GenerateCities ();
 			
 				SaveImages ();
 				
@@ -104,13 +108,17 @@ public class WorldBuilder : MonoBehaviour
 						for (int y = 0; y < Dimensions[1]; y++) {
 				
 								if (SectorIsWater [x, y]) {
-										MapImage [x, y, 0] = Noise [x] [y];
-										MapImage [x, y, 1] = Noise [x] [y];
+										MapImage [x, y, 0] = WaterNoise [x] [y];
+										MapImage [x, y, 1] = WaterNoise [x] [y];
 										MapImage [x, y, 2] = 1.0f;
+								} else if (SectorIsCity [x, y]) {
+										MapImage [x, y, 0] = 1.0f;
+										MapImage [x, y, 1] = CityNoise [x] [y];
+										MapImage [x, y, 2] = CityNoise [x] [y];
 								} else {
-										MapImage [x, y, 0] = Noise [x] [y];
-										MapImage [x, y, 1] = Noise [x] [y];
-										MapImage [x, y, 2] = Noise [x] [y];
+										MapImage [x, y, 0] = WaterNoise [x] [y];
+										MapImage [x, y, 1] = WaterNoise [x] [y];
+										MapImage [x, y, 2] = WaterNoise [x] [y];
 								}
 						}
 				}
@@ -169,49 +177,49 @@ public class WorldBuilder : MonoBehaviour
 				List<Float2D> Candidates = new List<Float2D> ();
 				for (int x = 0; x < Dimensions[0]; x++) {
 						for (int y = 0; y < Dimensions[1]; y++) {
-								Candidates.Add (new Float2D (x, y, Noise [x] [y]));
+								Candidates.Add (new Float2D (x, y, WaterNoise [x] [y]));
 						}
 				}
 			
 				//first sorted array	
-				Float2D[] SortedCandidates = Candidates.OrderByDescending (c => c.value).ToArray<Float2D> ();
+				Float2D[] SortedCandidates = Candidates.OrderByDescending (c => c.Value).ToArray<Float2D> ();
 				
 				for (int i = 0; i < numWaterBodies; i++) {
 						Float2D firstSeed = SortedCandidates [0]; //pick a water sector
-						SectorIsWater [firstSeed.x, firstSeed.y] = true; //set it as water
-						WorldSectorTypes [firstSeed.x, firstSeed.y] = Sector.SectorType.Water;
+						SectorIsWater [firstSeed.X, firstSeed.Y] = true; //set it as water
+						WorldSectorTypes [firstSeed.X, firstSeed.Y] = Sector.SectorType.Water;
 						numWaterSectorsToCreate--; //record that a water sector was made
 						//Collection<Float2D> Exceptions = Candidates.Where (c => Distance (c.x, firstSeed.x) < Dimensions [0] / 4 && 
 						//		Distance (c.y, firstSeed.y) < Dimensions [1] / 4);
-						Candidates = Candidates.Where (c => Distance (c.x, firstSeed.x) > Dimensions [0] / 4 && 
-								Distance (c.y, firstSeed.y) > Dimensions [1] / 4).ToList<Float2D> ();//.Except (Exceptions); //remove nearby sectors from the seeding process
-						SortedCandidates = Candidates.OrderByDescending (c => c.value).ToArray<Float2D> ();
+						Candidates = Candidates.Where (c => Distance (c.X, firstSeed.X) > Dimensions [0] / 4 && 
+								Distance (c.Y, firstSeed.Y) > Dimensions [1] / 4).ToList<Float2D> ();//.Except (Exceptions); //remove nearby sectors from the seeding process
+						SortedCandidates = Candidates.OrderByDescending (c => c.Value).ToArray<Float2D> ();
 				}
 				
 				Candidates = new List<Float2D> ();
 				for (int x = 0; x < Dimensions[0]; x++) {
 						for (int y = 0; y < Dimensions[1]; y++) {
 								if (SectorIsWater [x, y]) {
-										AddNeighbors (Candidates, x, y);
+										AddNeighbors (Candidates, x, y, WaterNoise, SectorIsWater);
 								}
 						}
 				}
 		
-				SortedCandidates = Candidates.OrderByDescending (c => c.value).ToArray<Float2D> ();
+				SortedCandidates = Candidates.OrderByDescending (c => c.Value).ToArray<Float2D> ();
 		
 				while (numWaterSectorsToCreate > 0) {
 						Float2D newSecWater = SortedCandidates [0];
-						SectorIsWater [newSecWater.x, newSecWater.y] = true;
-						WorldSectorTypes [newSecWater.x, newSecWater.y] = Sector.SectorType.Water;
+						SectorIsWater [newSecWater.X, newSecWater.Y] = true;
+						WorldSectorTypes [newSecWater.X, newSecWater.Y] = Sector.SectorType.Water;
 						numWaterSectorsToCreate--;
-						AddNeighbors (Candidates, newSecWater.x, newSecWater.y);
+						AddNeighbors (Candidates, newSecWater.X, newSecWater.Y, WaterNoise, SectorIsWater);
 						Candidates.Remove (newSecWater);
 						
-						SortedCandidates = Candidates.OrderByDescending (c => c.value).ToArray<Float2D> ();
+						SortedCandidates = Candidates.OrderByDescending (c => c.Value).ToArray<Float2D> ();
 						
 						foreach (Float2D candidate in SortedCandidates) {
-								int x = candidate.x;
-								int y = candidate.y;
+								int x = candidate.X;
+								int y = candidate.Y;
 								if (x > 0 && x < Dimensions [0] - 1 && y > 0 && y < Dimensions [1] - 1) {
 										if (SectorIsWater [x - 1, y] && SectorIsWater [x + 1, y] && SectorIsWater [x, y - 1] && SectorIsWater [x, y + 1]) {
 												SectorIsWater [x, y] = true;
@@ -221,37 +229,116 @@ public class WorldBuilder : MonoBehaviour
 										}
 								}
 						}//end foreach
-						SortedCandidates = Candidates.OrderByDescending (c => c.value).ToArray<Float2D> ();
+						SortedCandidates = Candidates.OrderByDescending (c => c.Value).ToArray<Float2D> ();
 				}//end while
 		}
 		
-		void AddNeighbors (List<Float2D> candidates, int x, int y)
+		public void GenerateCities ()
+		{
+				if (CivLevel == 0.0f) {
+						return;
+				}
+			
+				int numCitySectorsToCreate = Mathf.FloorToInt (Dimensions [0] * Dimensions [1] * CivLevel);
+				int numCommSectorsToCreate = Mathf.FloorToInt (numCitySectorsToCreate * CommCityFraction);
+				Debug.Log ("Creating " + numCitySectorsToCreate + " city Sectors");
+				Debug.Log ("Of which " + numCommSectorsToCreate + " are commercial sectors");
+				int numCities = UnityEngine.Random.Range (1, 4);
+				Debug.Log ("Total of " + numCities + " Cities");
+				List<Float2D> Candidates = new List<Float2D> ();
+				for (int x = 0; x < Dimensions[0]; x++) {
+						for (int y = 0; y < Dimensions[1]; y++) {
+								Candidates.Add (new Float2D (x, y, CityNoise [x] [y]));
+						}
+				}
+		
+				//first sorted array	
+				Float2D[] SortedCandidates = Candidates.OrderByDescending (c => c.Value).ToArray<Float2D> ();
+		
+				for (int i = 0; i < numCities; i++) {
+						Float2D firstSeed = SortedCandidates [0]; //pick a water sector
+						SectorIsCity [firstSeed.X, firstSeed.Y] = true; //set it as water
+						WorldSectorTypes [firstSeed.X, firstSeed.Y] = Sector.SectorType.Commercial;
+						numCitySectorsToCreate--; //record that a water sector was made
+						numCommSectorsToCreate--;
+						//Collection<Float2D> Exceptions = Candidates.Where (c => Distance (c.x, firstSeed.x) < Dimensions [0] / 4 && 
+						//		Distance (c.y, firstSeed.y) < Dimensions [1] / 4);
+						Candidates = Candidates.Where (c => Distance (c.X, firstSeed.X) > Dimensions [0] / 4 && 
+								Distance (c.Y, firstSeed.Y) > Dimensions [1] / 4).ToList<Float2D> ();//.Except (Exceptions); //remove nearby sectors from the seeding process
+						SortedCandidates = Candidates.OrderByDescending (c => c.Value).ToArray<Float2D> ();
+				}
+		
+				Candidates = new List<Float2D> ();
+				for (int x = 0; x < Dimensions[0]; x++) {
+						for (int y = 0; y < Dimensions[1]; y++) {
+								if (SectorIsCity [x, y]) {
+										AddNeighbors (Candidates, x, y, CityNoise, SectorIsCity);
+								}
+						}
+				}
+		
+				SortedCandidates = Candidates.OrderByDescending (c => c.Value).ToArray<Float2D> ();
+		
+				while (numCitySectorsToCreate > 0) {
+						Float2D newSecCity = SortedCandidates [0];
+						SectorIsCity [newSecCity.X, newSecCity.Y] = true;
+						if (numCommSectorsToCreate > 0) {
+								WorldSectorTypes [newSecCity.X, newSecCity.Y] = Sector.SectorType.Commercial;
+								numCommSectorsToCreate--;
+						} else {
+								WorldSectorTypes [newSecCity.X, newSecCity.Y] = Sector.SectorType.Residential;
+						}
+						numCitySectorsToCreate--;
+						AddNeighbors (Candidates, newSecCity.X, newSecCity.Y, CityNoise, SectorIsCity);
+						Candidates.Remove (newSecCity);
+			
+						SortedCandidates = Candidates.OrderByDescending (c => c.Value).ToArray<Float2D> ();
+			
+						foreach (Float2D candidate in SortedCandidates) {
+								int x = candidate.X;
+								int y = candidate.Y;
+								if (x > 0 && x < Dimensions [0] - 1 && y > 0 && y < Dimensions [1] - 1) {
+										if (SectorIsCity [x - 1, y] && SectorIsCity [x + 1, y] && SectorIsCity [x, y - 1] && SectorIsCity [x, y + 1]) {
+												SectorIsCity [x, y] = true;
+												WorldSectorTypes [x, y] = Sector.SectorType.Residential;
+												numCitySectorsToCreate--;
+												Candidates.Remove (candidate);
+										}
+								}
+						}//end foreach
+						SortedCandidates = Candidates.OrderByDescending (c => c.Value).ToArray<Float2D> ();
+				}//end while
+		}
+		
+		void AddNeighbors (List<Float2D> candidates, int x, int y, float[][] valueSource, bool[,] checkSource)
 		{
 		
-				if (x > 0 && !SectorIsWater [x - 1, y])
-						candidates.Add (new Float2D (x - 1, y, Noise [x - 1] [y]));
-				if (x < Dimensions [0] - 1 && !SectorIsWater [x + 1, y])
-						candidates.Add (new Float2D (x + 1, y, Noise [x + 1] [y]));
-				if (y > 0 && !SectorIsWater [x, y - 1])
-						candidates.Add (new Float2D (x, y - 1, Noise [x] [y - 1]));
-				if (y < Dimensions [1] - 1 && !SectorIsWater [x, y + 1])
-						candidates.Add (new Float2D (x, y + 1, Noise [x] [y + 1]));
-		
-		
+				if (x > 0 && !SectorIsWater [x - 1, y] && !checkSource [x - 1, y]) {
+						candidates.Add (new Float2D (x - 1, y, valueSource [x - 1] [y] + valueSource [x] [y]));
+				}
+				if (x < Dimensions [0] - 1 && !SectorIsWater [x + 1, y] && !checkSource [x + 1, y]) {
+						candidates.Add (new Float2D (x + 1, y, valueSource [x + 1] [y] + valueSource [x] [y]));
+				}
+				if (y > 0 && !SectorIsWater [x, y - 1] && !checkSource [x, y - 1]) {
+						candidates.Add (new Float2D (x, y - 1, valueSource [x] [y - 1] + valueSource [x] [y]));
+				}
+				if (y < Dimensions [1] - 1 && !SectorIsWater [x, y + 1] && !checkSource [x, y + 1]) {
+						candidates.Add (new Float2D (x, y + 1, valueSource [x] [y + 1] + valueSource [x] [y]));
+				}
 		}
 		
 		void RemoveExistingSectors ()
 		{
-		
-		}
-		void InstantiateSectors ()
-		{
-		
 				ICollection<Sector> ExistingSectors = WorkingWith.GetComponentsInChildren<Sector> ();
 				Debug.Log ("About to destroy " + ExistingSectors.Count);
 				foreach (Sector sector in ExistingSectors) {
 						Destroy (sector.gameObject);
 				}
+		}
+		void InstantiateSectors ()
+		{
+				RemoveExistingSectors ();
+
 				WorkingWith.WorldSectors = new Sector[Dimensions [0], Dimensions [1]];
 				for (int i = 0; i < Dimensions[0]; i++) {
 						for (int j = 0; j < Dimensions[1]; j++) {

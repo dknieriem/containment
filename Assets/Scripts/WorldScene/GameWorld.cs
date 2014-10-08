@@ -32,12 +32,6 @@ public class GameWorld : MonoBehaviour
 				Builder.BuildWorld ();
 		}
 	
-		// Update is called once per frame
-		void Update ()
-		{
-		
-		}
-	
 		void FixedUpdate ()
 		{
 				NextHourCountdown -= Time.fixedDeltaTime;

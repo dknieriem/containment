@@ -760,6 +760,7 @@ MonoBehaviour:
   Dimensions: 4000000040000000
   WaterLevel: .100000001
   CivLevel: .400000006
+  CommCityFraction: .0500000007
 --- !u!1 &322021457
 GameObject:
   m_ObjectHideFlags: 0
@@ -1141,6 +1142,7 @@ MonoBehaviour:
   SectorPrefab: {fileID: 100000, guid: 4ef9dce188de50846922b17f2f214a8a, type: 2}
   Dimensions: 
   NumGroups: 0
+  PlayerGroup: {fileID: 839551718}
 --- !u!61 &790421417
 BoxCollider2D:
   m_ObjectHideFlags: 0
