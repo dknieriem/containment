@@ -256,13 +256,13 @@ public class WorldBuilder : MonoBehaviour
 				Float2D[] SortedCandidates = Candidates.OrderByDescending (c => c.Value).ToArray<Float2D> ();
 		
 				for (int i = 0; i < numCities; i++) {
-						Float2D firstSeed = SortedCandidates [0]; //pick a water sector
-						SectorIsCity [firstSeed.X, firstSeed.Y] = true; //set it as water
+						Float2D firstSeed = SortedCandidates [0]; //pick a city sector
+						SectorIsCity [firstSeed.X, firstSeed.Y] = true; //set it as city
+						
+						AddToNeighbors (CityNoise, firstSeed.X, firstSeed.Y, 0.2f);
 						WorldSectorTypes [firstSeed.X, firstSeed.Y] = Sector.SectorType.Commercial;
 						numCitySectorsToCreate--; //record that a water sector was made
 						numCommSectorsToCreate--;
-						//Collection<Float2D> Exceptions = Candidates.Where (c => Distance (c.x, firstSeed.x) < Dimensions [0] / 4 && 
-						//		Distance (c.y, firstSeed.y) < Dimensions [1] / 4);
 						Candidates = Candidates.Where (c => Distance (c.X, firstSeed.X) > Dimensions [0] / 4 && 
 								Distance (c.Y, firstSeed.Y) > Dimensions [1] / 4).ToList<Float2D> ();//.Except (Exceptions); //remove nearby sectors from the seeding process
 						SortedCandidates = Candidates.OrderByDescending (c => c.Value).ToArray<Float2D> ();
@@ -309,6 +309,26 @@ public class WorldBuilder : MonoBehaviour
 						SortedCandidates = Candidates.OrderByDescending (c => c.Value).ToArray<Float2D> ();
 				}//end while
 		}
+
+		void AddToNeighbors (float[][] floatArray2D, int x, int y, float s)
+		{
+				int maximumX = floatArray2D.Length;
+				int maximumY = floatArray2D [0].Length;
+				if (x > 0) {
+						floatArray2D [x - 1] [y] += s;
+				}
+				if (x < maximumX) {
+						floatArray2D [x + 1] [y] += s;
+				}
+				if (y > 0) {
+						floatArray2D [x] [y - 1] += s;
+				}
+				if (y < maximumY) {
+						floatArray2D [x] [y + 1] += s;
+				}
+		
+		}		
+		
 		
 		void AddNeighbors (List<Float2D> candidates, int x, int y, float[][] valueSource, bool[,] checkSource)
 		{

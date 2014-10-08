@@ -155,9 +155,9 @@ public class InputHandler : MonoBehaviour
 	
 		void getClick (string action)
 		{
-				Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
-				//Debug.Log (ray.origin.ToString()+", "+((ray.direction - Camera.main.transform.position) * 10).ToString());
-				Debug.Log (action + ", " + ray.origin.ToString ());
+				Ray ray = mainCamera.ScreenPointToRay (Input.mousePosition);
+				Debug.Log (action + ", " + ray.origin);
+				
 				if (ray.origin.x > 0 && ray.origin.y > 0 && ray.origin.x < worldInfo.Dimensions [0] && ray.origin.y < worldInfo.Dimensions [1]) {			
 						Sector sectorClicked = worldInfo.GetSectorAtPosition (ray.origin);
 						Debug.Log ("Clicked " + sectorClicked.LocationX + ", " + sectorClicked.LocationY);
