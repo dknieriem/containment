@@ -11,6 +11,10 @@ public class WorldInfo : MonoBehaviour
 		public int NumGroups = 0;
 		public DateTime CurrentDate;
 		public PlayerGroup PlayerGroup;
+		
+		public int WorldZedCount;
+		public int WorldPlayerGroupMemberCount;
+		public int WorldOtherGroupMemberCount;
 	 
 		void Start ()
 		{

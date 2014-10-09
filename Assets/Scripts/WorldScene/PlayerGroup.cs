@@ -28,7 +28,7 @@ public class PlayerGroup : MonoBehaviour
 				Stamina }
 		;
 
-		public struct Person
+		public class Person
 		{
 				public string FirstName;
 				public string LastName;
@@ -38,7 +38,7 @@ public class PlayerGroup : MonoBehaviour
 				public 	float BaseAttackStrength; //average number of Zeds per hour killed, modified by melee weapon strength and stamina.
 				public 	float CurrentAttackStrength; //modified attack strength
 				public 	float BaseStamina; // maximum stamina fully-rested
-				public 	float Stamina; //current stamina. when < 10%, character should seek rest. at 0, will pass out.
+				public 	float CurrentStamina; //current stamina. when < 10%, character should seek rest. at 0, will pass out.
 				public 	float BaseHealth; //maximum health
 				public 	float CurrentHealth; //current health
 		}
@@ -57,7 +57,7 @@ public class PlayerGroup : MonoBehaviour
 		
 		//public ArrayList GroupMemberNames = new ArrayList ();
 		
-		GameWorld Game;
+//		GameWorld Game;
 		WorldInfo World;
 	
 						
@@ -65,7 +65,7 @@ public class PlayerGroup : MonoBehaviour
 		void Start ()
 		{
 				Debug.Log ("Starting: PlayerGroup");
-				Game = GameObject.Find ("Game").GetComponent<GameWorld> ();
+				//		Game = GameObject.Find ("Game").GetComponent<GameWorld> ();
 				World = GameObject.Find ("World").GetComponent<WorldInfo> ();
 				//Debug.Log (World.ToString ());
 				SectorGroupMembers = new int[World.Dimensions [0], World.Dimensions [1]];
@@ -100,10 +100,39 @@ public class PlayerGroup : MonoBehaviour
 		//updated each game hour
 		public void DoNextUpdate ()
 		{
+				UpdatePersonAttributes ();
+				DoAttacks ();
+		}
+				
+		void UpdatePersonAttributes ()
+		{
+				for (int i = 0; i < GroupMembers.Count; i++) {
+						Person p = GroupMembers [i];
+						p.CurrentHealth = p.BaseHealth;
+						p.CurrentStamina = p.BaseStamina * (p.CurrentHealth / p.BaseHealth);
+						p.CurrentAttackStrength = p.BaseAttackStrength * (p.CurrentStamina / p.BaseStamina);
+						Debug.Log (string.Format ("{0} {1} stats H,S,A: {2} {3} {4}", p.FirstName, p.LastName, p.CurrentHealth, p.CurrentStamina, p.CurrentAttackStrength));
+				}
+		}
+				
+		void DoAttacks ()
+		{
 		
 				//for each group member in 
-		
+				for (int i = 0; i < GroupMembers.Count; i++) {
+						Person p = GroupMembers [i];
+						int numZedsKilled = (int)(p.CurrentAttackStrength * Random.Range (0.8f, 1.0f));
+						Debug.Log ("NZK 1: " + numZedsKilled);
+						if (numZedsKilled > World.WorldSectors [p.LocationX, p.LocationY].ZedCount) {
+								numZedsKilled = World.WorldSectors [p.LocationX, p.LocationY].ZedCount;
+						}
+						//TODO: EventHandler.NewMessage(p.FirstName + " " + p.LastName + " killed " + numZedsKilled + " zeds", p.LocationX, p.LocationY, World.CurrentDate);
+						Debug.Log (string.Format ("{0} {1} killed {2} zeds at sector {3}, {4} on {5}", p.FirstName, p.LastName, numZedsKilled, p.LocationX, p.LocationY, World.CurrentDate));
+						World.WorldSectors [p.LocationX, p.LocationY].ZedCount -= numZedsKilled;
+				}		
+				
 		}
+				
 		public void StartGroup (int numMembers, Sector homeSector)
 		{
 				SetHomeSector (homeSector);

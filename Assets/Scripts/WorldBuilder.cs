@@ -62,12 +62,15 @@ public class WorldBuilder : MonoBehaviour
 		public WorldInfo WorkingWith;
 		public int[] Dimensions;
 		public float[][] WaterNoise, CityNoise;
+		public float[,] ZedDensity;
 		public float[,,] MapImage;
 		public Sector.SectorType[,] WorldSectorTypes;
 		public bool[,] SectorIsWater;
 		public bool[,] SectorIsCity;
 		public float WaterLevel = 0.1f;
 		public float CivLevel = 0.4f;
+		public float MaxStartingZedsPerSector = 150.0f;
+		
 		public float CommCityFraction = 0.05f; //fraction of city sectors that are commercial centers
 
 		void Start ()
@@ -86,14 +89,19 @@ public class WorldBuilder : MonoBehaviour
 				SectorIsCity = new bool[Dimensions [0], Dimensions [1]];
 				WaterNoise = PerlinNoise.PerlinNoise.GeneratePerlinNoise (Dimensions [0], Dimensions [1], 4);
 				CityNoise = PerlinNoise.PerlinNoise.GeneratePerlinNoise (Dimensions [0], Dimensions [1], 3);
+				
+				ZedDensity = new float[Dimensions [0], Dimensions [1]];
+				
 				GenerateWater ();
 			
 				GenerateCities ();
 			
-				SaveImages ();
+				
 				
 				RemoveExistingSectors ();
 				InstantiateSectors ();
+				SetSectorZedCounts ();
+				SaveImages ();
 				WorkingWith.NumGroups = 4;
 				WorkingWith.CurrentDate = new DateTime (1999, 10, 5, 14, 0, 0);
 				//TODO: MORE
@@ -110,15 +118,15 @@ public class WorldBuilder : MonoBehaviour
 								if (SectorIsWater [x, y]) {
 										MapImage [x, y, 0] = WaterNoise [x] [y];
 										MapImage [x, y, 1] = WaterNoise [x] [y];
-										MapImage [x, y, 2] = 1.0f;
+										MapImage [x, y, 2] = 0.8f;
 								} else if (SectorIsCity [x, y]) {
-										MapImage [x, y, 0] = 1.0f;
-										MapImage [x, y, 1] = CityNoise [x] [y];
+										MapImage [x, y, 0] = 0.8f;
+										MapImage [x, y, 1] = Mathf.Clamp01 (ZedDensity [x, y]);
 										MapImage [x, y, 2] = CityNoise [x] [y];
 								} else {
-										MapImage [x, y, 0] = WaterNoise [x] [y];
-										MapImage [x, y, 1] = WaterNoise [x] [y];
-										MapImage [x, y, 2] = WaterNoise [x] [y];
+										MapImage [x, y, 0] = (WaterNoise [x] [y] + Mathf.Clamp01 (ZedDensity [x, y])) * 0.5f;
+										MapImage [x, y, 1] = Mathf.Clamp01 (ZedDensity [x, y]);
+										MapImage [x, y, 2] = Mathf.Clamp01 (ZedDensity [x, y]);
 								}
 						}
 				}
@@ -375,5 +383,38 @@ public class WorldBuilder : MonoBehaviour
 						}
 				}
 		}
+		
+		void SetSectorZedCounts ()
+		{
+				for (int x = 0; x < Dimensions[0]; x++) {
+						for (int y = 0; y < Dimensions[1]; y++) {		
+								Sector sec = WorkingWith.WorldSectors [x, y];
+								switch (sec.SecType) {
+								case Sector.SectorType.Airport:
+								case Sector.SectorType.Seaport:
+										ZedDensity [x, y] = 1.5f;
+										break;
+								case Sector.SectorType.Commercial:
+										ZedDensity [x, y] = UnityEngine.Random.Range (0.5f, 1.0f);
+										break;
+								case Sector.SectorType.Forest:
+								case Sector.SectorType.Grass:
+										ZedDensity [x, y] = UnityEngine.Random.Range (0.0f, 0.05f);
+										break;
+								case Sector.SectorType.Industrial:
+										ZedDensity [x, y] = UnityEngine.Random.Range (0.1f, 0.2f);
+										break;
+								case Sector.SectorType.Residential:
+										ZedDensity [x, y] = UnityEngine.Random.Range (0.1f, 0.5f);
+										break;
+								case Sector.SectorType.Water:
+										ZedDensity [x, y] = 0.0f;
+										break;
+								}
+								sec.ZedCount = Mathf.FloorToInt (ZedDensity [x, y] * MaxStartingZedsPerSector);
+						}
+				}
+		}
+		
 }
 
