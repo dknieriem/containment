@@ -24,8 +24,12 @@ public class PersonInfoScript : MonoBehaviour
 
 		public void UpdatePerson (Person newPerson)
 		{
+				if (person == newPerson) {
+						return;
+				}
 				person = newPerson;
 				PersonNameText.text = string.Format ("{0} {1}", person.FirstName, person.LastName);
+				Debug.Log ("New Person! " + newPerson.BaseAttackStrength);
 		}
 
 		void FixedUpdate ()

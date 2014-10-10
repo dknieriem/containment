@@ -58,10 +58,11 @@ public class GroupInfoScript : MonoBehaviour
 						Button button = newButton.AddComponent<Button> ();
 						buttTransform.sizeDelta = new Vector2 (200.0f, 16.0f);
 						buttTransform.anchoredPosition = new Vector2 (50.0f, -16.0f * i + 45.0f);
-						/*button.onClick.AddListener (() => {
-								int p = i;
+						
+						int p = i;
+						button.onClick.AddListener (() => {
 								PersonScript.UpdatePerson (Group.GroupMembers [p]); 
-						});*/
+						});
 						
 						GameObject newText = new GameObject ();
 						newText.transform.SetParent (newButton.transform);
