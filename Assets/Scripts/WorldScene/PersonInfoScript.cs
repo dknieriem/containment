@@ -8,14 +8,14 @@ public class PersonInfoScript : MonoBehaviour
 		Person person;
 		Text PersonNameText;
 		Text PersonLocationText;
-		//Text GroupMemberNamesText;
+		Text PersonStatsText;
 
 		void Start ()
 		{
 				Debug.Log ("Starting: PersonInfoScript");
 				PersonNameText = GameObject.Find ("PersonName").GetComponent<Text> ();
 				PersonLocationText = GameObject.Find ("PersonLocation").GetComponent<Text> ();
-				
+				PersonStatsText = GameObject.Find ("PersonStats").GetComponent<Text> ();
 				PlayerGroup group = GameObject.Find ("PlayerGroup").GetComponent<PlayerGroup> ();
 				Debug.Log (group.name);
 				Debug.Log (group.GroupMembers.ToArray ().Length);
@@ -38,6 +38,11 @@ public class PersonInfoScript : MonoBehaviour
 						return;
 				}
 				
-				PersonLocationText.text = "(" + person.LocationX + "," + person.LocationY + ")";			
+				PersonLocationText.text = "(" + person.LocationX + "," + person.LocationY + ")";
+				
+				PersonStatsText.text = "H: " + person.CurrentHealth + "/" + person.BaseHealth + "\n";
+				PersonStatsText.text += "S: " + person.CurrentStamina + "/" + person.BaseStamina + "\n";
+				PersonStatsText.text += "A: " + person.CurrentAttackStrength + "/" + person.BaseAttackStrength + "\n";		
+				PersonStatsText.text += "Zeds Killed: " + person.LifetimeZedKills;
 		}
 }

@@ -95,7 +95,7 @@ public class PlayerGroup : MonoBehaviour
 		{
 				SetHomeSector (homeSector);
 				homeSector.PlayerGroupCount = numMembers;
-				SectorGroupMembers [(int)HomeSectorLocation [0], (int)HomeSectorLocation [1]] = numMembers;
+				SectorGroupMembers [HomeSectorLocation [0], HomeSectorLocation [1]] = numMembers;
 				TotalGroupMembers = numMembers;
 				
 				for (int i = 0; i < numMembers; i++) {

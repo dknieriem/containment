@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Person
+public partial class Person
 {
 
 		public enum CharacterState
@@ -44,12 +44,16 @@ public class Person
 		public static Person CreateRandomCharacter ()
 		{
 				Person x = new Person ();
-				x.FirstName = "Steve";
-				x.LastName = "Johnson";
+				x.FirstName = maleFirstNames [Random.Range (1, maleFirstNames.Length) - 1];
+				x.LastName = lastNames [Random.Range (1, lastNames.Length) - 1];
 				x.CurrentState = Person.CharacterState.Idle;
-				x.BaseAttackStrength = Random.Range (10.0f, 20.0f);
-				x.BaseHealth = Random.Range (80.0f, 100.0f);
-				x.BaseStamina = Random.Range (70.0f, 90.0f);
+				x.BaseAttackStrength = Random.Range (1000, 2000) / 100.0f;
+				x.BaseHealth = Random.Range (8000, 10000) / 100.0f;
+				x.BaseStamina = Random.Range (7000, 9000) / 100.0f;
+		
+				x.CurrentAttackStrength = x.BaseAttackStrength;
+				x.CurrentHealth = x.BaseHealth;
+				x.CurrentStamina = x.BaseStamina;
 		
 				return x;
 		}	

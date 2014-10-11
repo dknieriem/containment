@@ -2301,6 +2301,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DefaultFont: {fileID: 12800000, guid: 67f6f28b9a6421644801a428a8d17b0e, type: 3}
+  DefaultFontSize: 8
 --- !u!114 &1464314448
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3626,7 +3627,7 @@ GameObject:
   - 222: {fileID: 2110725271}
   - 114: {fileID: 2110725270}
   m_Layer: 5
-  m_Name: PersonPlaceholderStatText1
+  m_Name: PersonStats
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
