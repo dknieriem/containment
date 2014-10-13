@@ -17,6 +17,25 @@ public partial class Person
 				Looting }//looting buildings in the sector	
 		;
 	
+		public enum CharacterLocation
+		{
+				Outside = 0,
+				UnclearedBuilding,
+				ClearedBuilding,
+				Safehouse }
+		;
+	
+		public enum CharacterMission
+		{
+				None = 0,
+				HealSelf,
+				Doctor,
+				Repair,
+				ClearSector,
+				ScoutSector,
+				LootSector }
+		;
+	
 		public enum Skill
 		{
 				MeleeAttack = 0,
@@ -40,6 +59,8 @@ public partial class Person
 		public 	float CurrentHealth; //current health
 		
 		public int LifetimeZedKills;			
+		
+		//TODO: Queue / BehaviorTree of actions to perform
 		
 		public static Person CreateRandomCharacter ()
 		{

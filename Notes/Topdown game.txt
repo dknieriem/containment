@@ -1,0 +1,30 @@
+Topdown game:
+
+More like EU4 or CK2? 
+
+Region types:
+
+Urban
+suburban
+Exurban
+Rural
+Wilderness
+Industrial
+
+Menus
+=====
+
+###Group###
+
+Resource amt 
+Clout/honor
+Leader&leadership stats
+Group status (emotional)
+Bases
+Links to each member's info
+
+####Resource page####
+In storage
+Known locations
+Amount grown
+Expected scavenged

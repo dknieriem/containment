@@ -1,0 +1,16 @@
+End of day
+
+Group:
+
+Adjust members stability by security level of their current sector (security level is a combination of zed count, group count, and structure modifiers, with any bonuses from character traits)
+
+Members whose stability drops below a certain level will shut down, walk off, or go berserk. 
+
+Zeds:
+
+Hordes have a small chance to lose zeds, 
+Can gain zeds at rate ( p * z * h), p = constant rate, z = num other zeds in sector, h = horde size
+
+Hordes move as one, and give a 25% combat penalty to any groups in sector.
+
+Individual zeds decay at a slow rate. Decay level sets their combat ability and chance of migration. Decayed past a certain point zeds will not join hordes (too slow), past another point will not migrate either
