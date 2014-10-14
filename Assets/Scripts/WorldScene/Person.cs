@@ -60,6 +60,7 @@ public partial class Person
 		
 		public float Leadership;
 		
+		public PlayerGroup MyGroup;
 		public Person[] Relationships;
 		public float[] RelationshipStrengths;
 		
@@ -67,9 +68,10 @@ public partial class Person
 		
 		//TODO: Queue / BehaviorTree of actions to perform
 		
-		public static Person CreateRandomCharacter ()
+		public static Person CreateRandomCharacter (PlayerGroup myGroup)
 		{
 				Person x = new Person ();
+				x.MyGroup = myGroup;
 				x.FirstName = maleFirstNames [Random.Range (1, maleFirstNames.Length) - 1];
 				x.LastName = lastNames [Random.Range (1, lastNames.Length) - 1];
 				x.CurrentState = Person.CharacterState.Idle;
@@ -82,33 +84,33 @@ public partial class Person
 				x.CurrentStamina = x.BaseStamina;
 		
 				x.Leadership = Random.Range (0.0f, 100.0f);
-				if(x.Leadership < 30.0f){
-					x.Leadership = 0.0f;
+				if (x.Leadership < 30.0f) {
+						x.Leadership = 0.0f;
 				}
 		
 				return x;
 		}	
 
-		public void SetRelationships(Person[] people)
+		public void SetRelationships (Person[] people)
 		{
-				Relationships = new Person[people.length];
-				RelationshipStrengths = new float[people.length];
+				Relationships = new Person[people.Length];
+				RelationshipStrengths = new float[people.Length];
 		
-				for(int i = 0; i < people.length; i++){
-						Relationships[i] = people[i];
-						RelationshipStrengths[i] = 0.0f;
+				for (int i = 0; i < people.Length; i++) {
+						Relationships [i] = people [i];
+						RelationshipStrengths [i] = 0.0f;
 				}
 		
 		}
 		
-		public void SetRelationships(Person[] people, float[] strengths)
+		public void SetRelationships (Person[] people, float[] strengths)
 		{
-				Relationships = new Person[people.length];
-				RelationshipStrengths = new float[people.length];
+				Relationships = new Person[people.Length];
+				RelationshipStrengths = new float[people.Length];
 		
-				for(int i = 0; i < people.length; i++){
-						Relationships[i] = people[i];
-						RelationshipStrengths[i] = strengths[i];
+				for (int i = 0; i < people.Length; i++) {
+						Relationships [i] = people [i];
+						RelationshipStrengths [i] = strengths [i];
 				}
 		
 		}

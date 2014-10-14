@@ -103,10 +103,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 643359790}
   m_RootOrder: 2
-  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -44}
-  m_SizeDelta: {x: -5, y: 16}
+  m_AnchoredPosition: {x: -50, y: -44}
+  m_SizeDelta: {x: 40, y: 16}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &62188172
 MonoBehaviour:
@@ -1193,6 +1193,7 @@ RectTransform:
   - {fileID: 2061544170}
   - {fileID: 62188171}
   - {fileID: 2110725269}
+  - {fileID: 1854705854}
   m_Father: {fileID: 776582385}
   m_RootOrder: 8
   m_AnchorMin: {x: .5, y: .5}
@@ -3150,6 +3151,76 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1802816535}
+--- !u!1 &1854705853
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 224: {fileID: 1854705854}
+  - 222: {fileID: 1854705856}
+  - 114: {fileID: 1854705855}
+  m_Layer: 5
+  m_Name: PersonRelationships
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1854705854
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1854705853}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 643359790}
+  m_RootOrder: 4
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 10, y: -250}
+  m_SizeDelta: {x: 80, y: 96}
+  m_Pivot: {x: 0, y: 0}
+--- !u!114 &1854705855
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1854705853}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 708705254, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Mat: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_FontData:
+    m_Font: {fileID: 12800000, guid: 67f6f28b9a6421644801a428a8d17b0e, type: 3}
+    m_FontSize: 8
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 10
+    m_MaxSize: 40
+    m_Alignment: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 1
+    m_VerticalOverflow: 1
+    m_LineSpacing: 1
+  m_Text: 'Tom 50 / 30
+
+    Steve 30 / 25
+
+'
+--- !u!222 &1854705856
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1854705853}
 --- !u!1 &1874594730
 GameObject:
   m_ObjectHideFlags: 0
@@ -3647,8 +3718,8 @@ RectTransform:
   m_RootOrder: 3
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 10, y: -60}
-  m_SizeDelta: {x: 40, y: 16}
+  m_AnchoredPosition: {x: 10, y: -150}
+  m_SizeDelta: {x: 80, y: 96}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &2110725270
 MonoBehaviour:

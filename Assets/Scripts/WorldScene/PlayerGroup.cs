@@ -4,19 +4,16 @@ using System.Collections.Generic;
 
 public class PlayerGroup : MonoBehaviour
 {
-		GroupStartingSize = 5;
+		int GroupStartingSize = 5;
 		public static int MaxSquadsAllowed = 10;
 		public static int MaxMembersAllowed = 100;
 		public static int MaxMembersPerSquadAllowed = 16;
-
 		public Sector HomeSector;
 		public int[] HomeSectorLocation;
-		
 		public List<Person> GroupMembers;
 		public Person GroupLeader;
-		
 		public float[][] RelationshipStrengths;
-		
+		public float[][] LeadershipLinks;
 		public int TotalGroupMembers;
 		//public ArrayList GroupMemberLocations = new ArrayList ();
 		public int[,] SectorGroupMembers;
@@ -101,14 +98,15 @@ public class PlayerGroup : MonoBehaviour
 				InitializeHomeSector (homeSector);
 												
 				for (int i = 0; i < numMembers; i++) {
-						Person newPerson = Person.CreateRandomCharacter ();
+						Person newPerson = Person.CreateRandomCharacter (this);
 						newPerson.LocationX = homeSector.LocationX;
 						newPerson.LocationY = homeSector.LocationY;
 						GroupMembers.Add (newPerson);
 				}
 				
-				GenerateRandomRelationships();
-				CopyRelationshipsToPeople();
+				GenerateRandomRelationships ();
+				CopyRelationshipsToPeople ();
+				CalculatePowerStructure ();
 		}
 		
 		public void StartGroup (int numMembers, int homeSectorX, int homeSectorY)
@@ -119,20 +117,20 @@ public class PlayerGroup : MonoBehaviour
 				InitializeHomeSector (homeSector);
 
 				for (int i = 0; i < numMembers; i++) {
-						Person newPerson = Person.CreateRandomCharacter ();
+						Person newPerson = Person.CreateRandomCharacter (this);
 						newPerson.LocationX = homeSectorX;
 						newPerson.LocationY = homeSectorY;
 						GroupMembers.Add (newPerson);
 				}
 				
-				GenerateRandomRelationships();
-				CopyRelationshipsToPeople();
+				GenerateRandomRelationships ();
+				CopyRelationshipsToPeople ();
 		}
 		
-		public void InitializeHomeSector(Sector newLocation)
+		public void InitializeHomeSector (Sector newLocation)
 		{
-				SetHomeSector(newLocation);
-				SectorGroupMembers [newLocation.LocationX, newLocation.LocationY] = numMembers;
+				SetHomeSector (newLocation);
+				SectorGroupMembers [newLocation.LocationX, newLocation.LocationY] = TotalGroupMembers;
 				HomeSector.PlayerGroupCount = TotalGroupMembers;
 		}
 		
@@ -143,40 +141,52 @@ public class PlayerGroup : MonoBehaviour
 				HomeSectorLocation [1] = HomeSector.LocationY;
 		}
 		
-		public void GenerateRandomRelationships()
+		public void GenerateRandomRelationships ()
 		{
-				RelationshipStrengths = new float[TotalGroupMembers];
+				RelationshipStrengths = new float[TotalGroupMembers][];
 				
-				for(int i = 0; i < TotalGroupMembers; i++){
-						RelationshipStrengths[i] = new float[TotalGroupMembers];				
-				for(int j = 0; j <= i; j++){
-								if(i == j){
-										RelationshipStrength[i][j] == 100.0f;
+				for (int i = 0; i < TotalGroupMembers; i++) {
+						RelationshipStrengths [i] = new float[TotalGroupMembers];				
+						for (int j = 0; j <= i; j++) {
+								if (i == j) {
+										RelationshipStrengths [i] [j] = 100.0f;
 								} else {
-										float strengthItoJ = Random.Range(10.0f, 50.0f);
-										float strengthJtoI = Random.Range(10.0f, 50.0f);
+										float strengthItoJ = Random.Range (10.0f, 90.0f);
+										float strengthJtoI = Random.Range (10.0f, 90.0f);
 										float deltaStrength = strengthItoJ - strengthJtoI;
 										strengthItoJ -= deltaStrength / 4;
 										strengthJtoI += deltaStrength / 4;
-										RelationshipStrength[i][j] = strengthItoJ;
-										RelationshipStrength[j][i] = strengthJtoI;
+										RelationshipStrengths [i] [j] = strengthItoJ;
+										RelationshipStrengths [j] [i] = strengthJtoI;
 								}
 						}
 				}
 		}
 		
-		public void CopyRelationshipsToPeople()
+		public void CopyRelationshipsToPeople ()
 		{
-			for(int i = 0; i < GroupMembers.Length; i++){
-					Person p = GroupMembers[i];
-					p.SetRelationships(GroupMembers, RelationshipStrengths[i]);
-			}
+				for (int i = 0; i < GroupMembers.Count; i++) {
+						Person p = GroupMembers [i];
+						p.SetRelationships (GroupMembers.ToArray (), RelationshipStrengths [i]);
+				}
 		}
 		
-		public void CalculatePowerStructure()
+		public void CalculatePowerStructure ()
 		{
-				float[TotalGroupMembers] leadershipAbility;
-				//TODO: magic
+				LeadershipLinks = new float[TotalGroupMembers][];
+				float[] leadershipPoints = new float[TotalGroupMembers]; 
+				//Person[] PeopleSortedByLeadership = GroupMembers.OrderBy( p => p.Leadership ).ToArray();
+				
+				for (int i = 0; i < GroupMembers.Count; i++) {
+						LeadershipLinks [i] = new float[TotalGroupMembers];				
+						for (int j = 0; j < GroupMembers.Count; j++) {
+								if (GroupMembers [i].Leadership > GroupMembers [j].Leadership) { 
+										LeadershipLinks [i] [j] = (GroupMembers [j].Leadership / 100.0f) * RelationshipStrengths [j] [i] * RelationshipStrengths [j] [i]; // i == j gives bonus equal to i's Leadership score
+										leadershipPoints [i] += (GroupMembers [j].Leadership / 100.0f) * RelationshipStrengths [j] [i] * RelationshipStrengths [j] [i];
+								}
+						}
+				}
+				
 		
 		}
 }
