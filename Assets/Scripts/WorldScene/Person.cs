@@ -58,6 +58,11 @@ public partial class Person
 		public 	float BaseHealth; //maximum health
 		public 	float CurrentHealth; //current health
 		
+		public float Leadership;
+		
+		public Person[] Relationships;
+		public float[] RelationshipStrengths;
+		
 		public int LifetimeZedKills;			
 		
 		//TODO: Queue / BehaviorTree of actions to perform
@@ -76,7 +81,42 @@ public partial class Person
 				x.CurrentHealth = x.BaseHealth;
 				x.CurrentStamina = x.BaseStamina;
 		
+				x.Leadership = Random.Range (0.0f, 100.0f);
+				if(x.Leadership < 30.0f){
+					x.Leadership = 0.0f;
+				}
+		
 				return x;
 		}	
 
+		public void SetRelationships(Person[] people)
+		{
+				Relationships = new Person[people.length];
+				RelationshipStrengths = new float[people.length];
+		
+				for(int i = 0; i < people.length; i++){
+						Relationships[i] = people[i];
+						RelationshipStrengths[i] = 0.0f;
+				}
+		
+		}
+		
+		public void SetRelationships(Person[] people, float[] strengths)
+		{
+				Relationships = new Person[people.length];
+				RelationshipStrengths = new float[people.length];
+		
+				for(int i = 0; i < people.length; i++){
+						Relationships[i] = people[i];
+						RelationshipStrengths[i] = strengths[i];
+				}
+		
+		}
+		public void DoNextUpdate ()
+		{
+		
+		
+		
+		}
+		
 }

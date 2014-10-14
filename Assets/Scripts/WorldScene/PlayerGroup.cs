@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class PlayerGroup : MonoBehaviour
 {
-
+		GroupStartingSize = 5;
 		public static int MaxSquadsAllowed = 10;
 		public static int MaxMembersAllowed = 100;
 		public static int MaxMembersPerSquadAllowed = 16;
@@ -13,6 +13,10 @@ public class PlayerGroup : MonoBehaviour
 		public int[] HomeSectorLocation;
 		
 		public List<Person> GroupMembers;
+		public Person GroupLeader;
+		
+		public float[][] RelationshipStrengths;
+		
 		public int TotalGroupMembers;
 		//public ArrayList GroupMemberLocations = new ArrayList ();
 		public int[,] SectorGroupMembers;
@@ -33,8 +37,8 @@ public class PlayerGroup : MonoBehaviour
 				SectorGroupMembers = new int[World.Dimensions [0], World.Dimensions [1]];
 				//Debug.Log ("GroupMember Size: " + SectorGroupMembers.Length);
 				HomeSectorLocation = new int[2];			
-				GroupMembers = new List<Person> (5);
-				StartGroup (Random.Range (5, 10), Random.Range (0, 10), Random.Range (0, 10));
+				GroupMembers = new List<Person> (GroupStartingSize);
+				StartGroup (GroupStartingSize, Random.Range (0, 10), Random.Range (0, 10));
 		}
 		
 		public void GroupMemberMoved ()
@@ -93,35 +97,43 @@ public class PlayerGroup : MonoBehaviour
 				
 		public void StartGroup (int numMembers, Sector homeSector)
 		{
-				SetHomeSector (homeSector);
-				homeSector.PlayerGroupCount = numMembers;
-				SectorGroupMembers [HomeSectorLocation [0], HomeSectorLocation [1]] = numMembers;
 				TotalGroupMembers = numMembers;
-				
+				InitializeHomeSector (homeSector);
+												
 				for (int i = 0; i < numMembers; i++) {
 						Person newPerson = Person.CreateRandomCharacter ();
 						newPerson.LocationX = homeSector.LocationX;
 						newPerson.LocationY = homeSector.LocationY;
 						GroupMembers.Add (newPerson);
 				}
+				
+				GenerateRandomRelationships();
+				CopyRelationshipsToPeople();
 		}
 		
 		public void StartGroup (int numMembers, int homeSectorX, int homeSectorY)
 		{
-		
-				Debug.Log ("Adding " + numMembers + " to (" + homeSectorX + ", " + homeSectorY + ").");
-				Sector homeSector = World.WorldSectors [homeSectorX, homeSectorY];
-				SetHomeSector (homeSector);
-				homeSector.PlayerGroupCount = numMembers;
-				SectorGroupMembers [homeSectorX, homeSectorY] = numMembers;
 				TotalGroupMembers = numMembers;
-				
+				//Debug.Log ("Adding " + numMembers + " to (" + homeSectorX + ", " + homeSectorY + ").");
+				Sector homeSector = World.WorldSectors [homeSectorX, homeSectorY];
+				InitializeHomeSector (homeSector);
+
 				for (int i = 0; i < numMembers; i++) {
 						Person newPerson = Person.CreateRandomCharacter ();
 						newPerson.LocationX = homeSectorX;
 						newPerson.LocationY = homeSectorY;
 						GroupMembers.Add (newPerson);
 				}
+				
+				GenerateRandomRelationships();
+				CopyRelationshipsToPeople();
+		}
+		
+		public void InitializeHomeSector(Sector newLocation)
+		{
+				SetHomeSector(newLocation);
+				SectorGroupMembers [newLocation.LocationX, newLocation.LocationY] = numMembers;
+				HomeSector.PlayerGroupCount = TotalGroupMembers;
 		}
 		
 		public void SetHomeSector (Sector newLocation)
@@ -129,5 +141,42 @@ public class PlayerGroup : MonoBehaviour
 				HomeSector = newLocation;
 				HomeSectorLocation [0] = HomeSector.LocationX;
 				HomeSectorLocation [1] = HomeSector.LocationY;
+		}
+		
+		public void GenerateRandomRelationships()
+		{
+				RelationshipStrengths = new float[TotalGroupMembers];
+				
+				for(int i = 0; i < TotalGroupMembers; i++){
+						RelationshipStrengths[i] = new float[TotalGroupMembers];				
+				for(int j = 0; j <= i; j++){
+								if(i == j){
+										RelationshipStrength[i][j] == 100.0f;
+								} else {
+										float strengthItoJ = Random.Range(10.0f, 50.0f);
+										float strengthJtoI = Random.Range(10.0f, 50.0f);
+										float deltaStrength = strengthItoJ - strengthJtoI;
+										strengthItoJ -= deltaStrength / 4;
+										strengthJtoI += deltaStrength / 4;
+										RelationshipStrength[i][j] = strengthItoJ;
+										RelationshipStrength[j][i] = strengthJtoI;
+								}
+						}
+				}
+		}
+		
+		public void CopyRelationshipsToPeople()
+		{
+			for(int i = 0; i < GroupMembers.Length; i++){
+					Person p = GroupMembers[i];
+					p.SetRelationships(GroupMembers, RelationshipStrengths[i]);
+			}
+		}
+		
+		public void CalculatePowerStructure()
+		{
+				float[TotalGroupMembers] leadershipAbility;
+				//TODO: magic
+		
 		}
 }
