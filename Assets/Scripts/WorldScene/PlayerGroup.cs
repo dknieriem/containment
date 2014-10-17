@@ -18,6 +18,8 @@ public class PlayerGroup : MonoBehaviour
 		//public ArrayList GroupMemberLocations = new ArrayList ();
 		public int[,] SectorGroupMembers;
 		
+		public float[] GroupStatTotals;
+		
 		//public ArrayList GroupMemberNames = new ArrayList ();
 		
 //		GameWorld Game;
@@ -50,18 +52,19 @@ public class PlayerGroup : MonoBehaviour
 		//updated each game hour
 		public void DoNextUpdate ()
 		{
-				UpdatePersonAttributes ();
+				
+				UpdateGroupStats ();
 				DoAttacks ();
 		}
 				
-		void UpdatePersonAttributes ()
+		void UpdateGroupStats ()
 		{
+				GroupStatTotals = new float[Person.Stats.Length];
 				for (int i = 0; i < GroupMembers.Count; i++) {
 						Person p = GroupMembers [i];
-						p.CurrentHealth = p.BaseHealth;
-						p.CurrentStamina = p.BaseStamina * (p.CurrentHealth / p.BaseHealth);
-						p.CurrentAttackStrength = p.BaseAttackStrength * (p.CurrentStamina / p.BaseStamina);
-						Debug.Log (string.Format ("{0} {1} stats H,S,A: {2} {3} {4}", p.FirstName, p.LastName, p.CurrentHealth, p.CurrentStamina, p.CurrentAttackStrength));
+						for(int k = 0; k < Person.Stats.Length; k++){
+							GroupStatTotals[k] += p.Stats[k];
+						}
 				}
 		}
 				

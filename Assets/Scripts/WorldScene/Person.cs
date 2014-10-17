@@ -25,26 +25,35 @@ public partial class Person
 				Safehouse }
 		;
 	
-		public enum CharacterMission
+		public enum Role
 		{
 				None = 0,
-				HealSelf,
+				Patient,
 				Doctor,
-				Repair,
-				ClearSector,
-				ScoutSector,
-				LootSector }
+				Builder,
+				Guard,
+				Scout,
+				Looter }
 		;
 	
 		public enum Skill
 		{
-				MeleeAttack = 0,
-				RangedAttack,
-				Sneak,
-				Sprint,
-				Strength,
-				Stamina }
+				MeleeStrength = 0,
+				FirearmStrength,
+				AmmoHeld,
+				Doctor,
+				Agility,
+				Construction,
+				Stamina,
+				Leadereship }
 		;
+		
+		public enum Stats
+		{
+				KillRate = 0,
+				BuildRate,
+				InjuryRate }
+		}
 
 		public string FirstName;
 		public string LastName;
@@ -64,6 +73,8 @@ public partial class Person
 		public Person[] Relationships;
 		public float[] RelationshipStrengths;
 		
+		public float[] Stats;
+		public float Skills;
 		public int LifetimeZedKills;			
 		
 		//TODO: Queue / BehaviorTree of actions to perform
@@ -79,6 +90,9 @@ public partial class Person
 				x.BaseHealth = Random.Range (8000, 10000) / 100.0f;
 				x.BaseStamina = Random.Range (7000, 9000) / 100.0f;
 		
+				x.Stats = new float[Player.Stats.Length];
+				x.Skills = new float[Player.Skills.Length];
+				
 				x.CurrentAttackStrength = x.BaseAttackStrength;
 				x.CurrentHealth = x.BaseHealth;
 				x.CurrentStamina = x.BaseStamina;
@@ -117,8 +131,27 @@ public partial class Person
 		public void DoNextUpdate ()
 		{
 		
-		
+		UpdateAttributes();
+		UpdateSkills();
+		UpdateStats();
 		
 		}
 		
+		public void UpdateAttributes()
+		{
+				CurrentHealth = BaseHealth;
+				CurrentStamina = BaseStamina * (CurrentHealth / BaseHealth);
+				CurrentAttackStrength = BaseAttackStrength * (CurrentStamina / BaseStamina);
+				Debug.Log (string.Format ("{0} {1} stats H,S,A: {2} {3} {4}", FirstName, LastName, CurrentHealth, CurrentStamina, CurrentAttackStrength));
+		}
+		
+		public void UpdateSkills()
+		{
+		
+		}
+		
+		public void UpdateStats()
+		{
+		
+		}
 }
