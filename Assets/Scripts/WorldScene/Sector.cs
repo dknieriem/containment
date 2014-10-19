@@ -41,6 +41,7 @@ public class Sector : MonoBehaviour
 		public SectorType SecType;
 		public int LocationX, LocationY;
 		public int ZedCount;
+		public float DefenseRating;
 		public int[] GroupCount;
 		public int PlayerGroupCount;
 		public float[] ZedProbabilityMigrate;
@@ -50,7 +51,7 @@ public class Sector : MonoBehaviour
 		public SectorType[] NeighboringSectorTypes;
 		
 		GameWorld Game;
-		WorldInfo World;
+		public WorldInfo World;
 		GameObject[] myRegions;
 		SpriteRenderer[] mySprites;
 		SpriteRenderer mapMask;
@@ -61,6 +62,7 @@ public class Sector : MonoBehaviour
 		// Use this for initialization
 		void Start ()
 		{
+				//TOO Many statements Debug.Log ("Starting: Sector");
 				Game = GameObject.Find ("Game").GetComponent<GameWorld> ();
 				World = GameObject.Find ("World").GetComponent<WorldInfo> ();
 				mapMask = gameObject.GetComponent<SpriteRenderer> ();
@@ -69,19 +71,15 @@ public class Sector : MonoBehaviour
 				for (int i = 0; i < World.NumGroups; i++) {
 						GroupCount [i] = 0;
 				}
-						
-				SetZeds ();				
-				SetNeighboringSectors ();				
-				GetRegionSprites ();
 		}
 	
-		void SetZeds ()
+		public void SetZedCountRandom (int min, int max)
 		{
-				ZedCount = Random.Range (0, 100);
+				ZedCount = Random.Range (min, max);
 				ZedProbabilityMigrate = new float[4];	
 		}
 	
-		void SetNeighboringSectors ()
+		public void SetNeighboringSectors ()
 		{
 				NeighboringSectors = new Sector[4];
 				NeighboringSectorTypes = new SectorType[8];
@@ -117,11 +115,16 @@ public class Sector : MonoBehaviour
 				}
 		}
 	
-		void GetRegionSprites ()
+		public void GetRegionSprites ()
 		{
 				myRegions = new GameObject[SectorRegionNames.Length];
 				mySprites = new SpriteRenderer[SectorRegionNames.Length];
-		
+				//Debug.Log ("myRegions: " + myRegions.Length + ", mySprites: " + mySprites.Length);
+				//Debug.Log (Game);
+				if (Game == null) {
+						Game = GameObject.Find ("Game").GetComponent<GameWorld> ();
+						Debug.Log ("Game was null");
+				}
 				for (int x = 0; x < 3; x++) {
 						for (int y = 0; y < 3; y++) {
 								int i = x + y * 3;
@@ -201,7 +204,6 @@ public class Sector : MonoBehaviour
 		
 		void SetNonWaterTiles ()
 		{
-		
 				switch (SecType) {
 				case SectorType.Residential:
 						for (int x = 0; x < 3; x++) {
@@ -221,6 +223,7 @@ public class Sector : MonoBehaviour
 						break;
 				case SectorType.Grass:
 						for (int i = 0; i < 9; i++) {
+								//Debug.Log ("Grass i=" + i);
 								mySprites [i].sprite = Game.Sprites.ReturnSprite ("grass-center");
 						}
 						break;
@@ -258,6 +261,12 @@ public class Sector : MonoBehaviour
 		//updated each game hour
 		public void DoNextUpdate ()
 		{
+				DoMigration ();
+				DoAttacks ();
+		}
+		
+		void DoMigration ()
+		{
 				int[] numMigrating = {0,0,0,0};
 		
 				for (int i = 0; i < ZedCount; i++) {
@@ -291,5 +300,34 @@ public class Sector : MonoBehaviour
 						NeighboringSectors [West].ZedCount += numMigrating [West];
 						ZedCount = ZedCount - numMigrating [West]; 
 				}
+		}
+		
+		void DoAttacks ()
+		{
+				PlayerGroup theGroup = World.PlayerGroup;
+				//int numCharsInSector = theGroup.SectorGroupMembers [LocationX, LocationY];
+				int numZedsKilled = 0;
+				//for each group member in 
+				for (int i = 0; i < theGroup.GroupMembers.Count; i++) {
+						Person p = theGroup.GroupMembers [i];
+						if (p.LocationX == LocationX && p.LocationY == LocationY) {
+								numZedsKilled += (int)(p.CurrentStats [(int)Person.Stats.KillRate]);
+								if (numZedsKilled > ZedCount) {
+										numZedsKilled = ZedCount;
+								}
+								//TODO: EventHandler.NewMessage(p.FirstName + " " + p.LastName + " killed " + numZedsKilled + " zeds", p.LocationX, p.LocationY, World.CurrentDate);
+						}
+				}		
+				
+				for (int i = 0; i < theGroup.GroupMembers.Count; i++) {
+						Person p = theGroup.GroupMembers [i];
+						if (p.LocationX == LocationX && p.LocationY == LocationY && p.CurrentStats [(int)Person.Stats.KillRate] != 0.0f) {
+								int curCharZedKills = (int)(numZedsKilled / p.CurrentStats [(int)Person.Stats.KillRate]);
+								Debug.Log (string.Format ("{0} {1} killed {2} zeds at sector {3}, {4} on {5}", p.FirstName, p.LastName, curCharZedKills, LocationX, LocationY, World.CurrentDate));
+								ZedCount -= curCharZedKills;
+								p.AddZedKills (curCharZedKills);
+						}
+				}	
+				
 		}
 }

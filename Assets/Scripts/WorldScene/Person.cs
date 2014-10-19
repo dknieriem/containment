@@ -7,10 +7,10 @@ public partial class Person
 
 		public string FirstName;
 		public string LastName;
-		public 	int LocationX; 
-		public 	int LocationY;
+		public int LocationX; 
+		public int LocationY;
 		public Sector CurrentSector;
-		public 	CharacterState CurrentState;
+		public CharacterState CurrentState;
 		public Role CurrentRole;
 		
 		public PlayerGroup MyGroup;
@@ -51,7 +51,7 @@ public partial class Person
 		
 				x.CurrentStats [(int)Stats.Health] = x.BaseStats [(int)Stats.Health];
 				x.CurrentStats [(int)Stats.Stamina] = x.BaseStats [(int)Stats.Stamina];
-				x.CurrentStats [(int)Stats.KillRate] = x.BaseStats [(int)Stats.KillRate];
+				x.CurrentStats [(int)Stats.KillRate] = 0;
 				
 				x.Skills [(int)Skill.Leadership] = UnityEngine.Random.Range (0.0f, 60.0f);
 				if (x.Skills [(int)Skill.Leadership] < 30.0f) {
@@ -86,36 +86,138 @@ public partial class Person
 		}
 		public void DoNextUpdate ()
 		{
-		
 				UpdateAttributes ();
 				UpdateSkills ();
 				UpdateStats ();
 		
 		}
 		
-		public void UpdateAttributes ()
-		{
-		}
-		
-		public void UpdateSkills ()
+		void UpdateAttributes ()
 		{
 		
 		}
 		
-		public void UpdateStats ()
+		void UpdateSkills ()
 		{
 		
+		}
+		
+		void UpdateStats ()
+		{
 				BaseStats [(int)Stats.InjuryRate] = CurrentSector.ZedCount;
+				
+				switch (CurrentRole) {
+				case Role.None:
+						UpdateStatsNone ();
+						break;
+				case Role.Patient:
+						UpdateStatsPatient ();
+						break;
+				case Role.Doctor:
+						UpdateStatsDoctor ();
+						break;
+				case Role.Builder:
+						UpdateStatBuilder ();
+						break;
+				case Role.Guard:
+						UpdateStatsGuard ();
+						break;
+				case Role.Scout:
+						UpdateStatsScout ();
+						break;
+				case Role.Looter:
+						UpdateStatsLooter ();
+						break;				
+				}
+				
+				CurrentStats [(int)Stats.InjuryRate] = 0; //reset Injury Rate 
+				for (int k = 0; k < CurrentStats.Length; k++) {
+						if (CurrentStats [k] < 0) {
+								CurrentStats [k] = 0;
+						}
+				}
+		}
+		
+		void UpdateStatsNone ()
+		{
+				CurrentStats [(int)Stats.InjuryRate] = BaseStats [(int)Stats.InjuryRate] / (Skills [(int)Skill.MeleeStrength] + Skills [(int)Skill.FirearmStrength]); 		
+				CurrentStats [(int)Stats.Health] -= 0; //TODO: adjust based on current location in sector (safe or not?)
+				CurrentStats [(int)Stats.Stamina] += 0; //TODO: adjust based on food level + rationing
+				CurrentStats [(int)Stats.KillRate] = 0;
+		}
+		
+		void UpdateStatsPatient ()
+		{
 				CurrentStats [(int)Stats.InjuryRate] = BaseStats [(int)Stats.InjuryRate] / (Skills [(int)Skill.MeleeStrength] + Skills [(int)Skill.FirearmStrength]); 
 				//if a patient, injury rate will be modified by the doctor's skill 
 				CurrentStats [(int)Stats.InjuryRate] -= MyGroup.GetDoctorSkillInSector (CurrentSector);
-				
 				CurrentStats [(int)Stats.Health] -= CurrentStats [(int)Stats.InjuryRate];
-				CurrentStats [(int)Stats.Stamina] = BaseStats [(int)Stats.Stamina] * (CurrentStats [(int)Stats.Health] / BaseStats [(int)Stats.Health]);
-				//OR stamina -= killrate
-				CurrentStats [(int)Stats.KillRate] = BaseStats [(int)Stats.KillRate] * (CurrentStats [(int)Stats.Stamina] / BaseStats [(int)Stats.Stamina]);
-					
-				CurrentStats [(int)Stats.InjuryRate] = 0; //reset Injury Rate 
+				CurrentStats [(int)Stats.Stamina] -= CurrentStats [(int)Stats.KillRate];
+				CurrentStats [(int)Stats.KillRate] = 0;
+		}
 		
+		void UpdateStatsDoctor ()
+		{
+				CurrentStats [(int)Stats.InjuryRate] = BaseStats [(int)Stats.InjuryRate] / (Skills [(int)Skill.MeleeStrength] + Skills [(int)Skill.FirearmStrength]); 
+				CurrentStats [(int)Stats.Health] -= CurrentStats [(int)Stats.InjuryRate];
+				CurrentStats [(int)Stats.Stamina] -= CurrentStats [(int)Stats.KillRate];
+				CurrentStats [(int)Stats.KillRate] = 0;
+		}
+		
+		void UpdateStatBuilder ()
+		{
+				CurrentStats [(int)Stats.InjuryRate] = BaseStats [(int)Stats.InjuryRate] / (Skills [(int)Skill.MeleeStrength] + Skills [(int)Skill.FirearmStrength]); 
+				CurrentStats [(int)Stats.BuildRate] = BaseStats [(int)Stats.BuildRate] * (CurrentStats [(int)Stats.Stamina] / BaseStats [(int)Stats.Stamina]);
+				CurrentStats [(int)Stats.Health] -= CurrentStats [(int)Stats.InjuryRate];
+				CurrentStats [(int)Stats.Stamina] -= CurrentStats [(int)Stats.KillRate];
+				CurrentStats [(int)Stats.KillRate] = 0;
+		}
+		
+		void UpdateStatsGuard ()
+		{
+				CurrentStats [(int)Stats.InjuryRate] = BaseStats [(int)Stats.InjuryRate] / (Skills [(int)Skill.MeleeStrength] + Skills [(int)Skill.FirearmStrength]); 
+				CurrentStats [(int)Stats.Health] -= CurrentStats [(int)Stats.InjuryRate];
+				CurrentStats [(int)Stats.Stamina] -= CurrentStats [(int)Stats.KillRate];
+				CurrentStats [(int)Stats.KillRate] = BaseStats [(int)Stats.KillRate] * (CurrentStats [(int)Stats.Stamina] / BaseStats [(int)Stats.Stamina]);
+		}
+		
+		void UpdateStatsScout ()
+		{
+				CurrentStats [(int)Stats.InjuryRate] = BaseStats [(int)Stats.InjuryRate] / (Skills [(int)Skill.MeleeStrength] + Skills [(int)Skill.FirearmStrength]); 
+				CurrentStats [(int)Stats.Health] -= CurrentStats [(int)Stats.InjuryRate];
+				CurrentStats [(int)Stats.Stamina] -= CurrentStats [(int)Stats.KillRate];
+				CurrentStats [(int)Stats.KillRate] = BaseStats [(int)Stats.KillRate] * (CurrentStats [(int)Stats.Stamina] / BaseStats [(int)Stats.Stamina]);
+		}
+		
+		void UpdateStatsLooter ()
+		{
+				CurrentStats [(int)Stats.InjuryRate] = BaseStats [(int)Stats.InjuryRate] / (Skills [(int)Skill.MeleeStrength] + Skills [(int)Skill.FirearmStrength]); 
+				CurrentStats [(int)Stats.Health] -= CurrentStats [(int)Stats.InjuryRate];
+				CurrentStats [(int)Stats.Stamina] -= CurrentStats [(int)Stats.KillRate];
+				CurrentStats [(int)Stats.KillRate] = BaseStats [(int)Stats.KillRate] * (CurrentStats [(int)Stats.Stamina] / BaseStats [(int)Stats.Stamina]);
+		}
+		
+		public void AddZedKills (int numZedsKilled)
+		{
+				LifetimeZedKills += numZedsKilled;
+				//TODO: add experience for each kill,
+								
+				Person[] sectorMates = MyGroup.GetMembersInSector (LocationX, LocationY);
+			
+				for (int j = 0; j < sectorMates.Length; j++) {
+						if (sectorMates [j].CurrentRole == Role.Guard || sectorMates [j].CurrentRole == Role.Scout || sectorMates [j].CurrentRole == Role.Looter) { //we have a match!
+								AdjustRelationship (sectorMates [j], 0.5f);
+						}
+				}
+		}
+		
+		public void AdjustRelationship (Person otherPerson, float adjustment)
+		{
+				//otherPerson.AdjustRelationship(this, adjustment); From addzedkills, this will be done in other person's update.
+				for (int i = 0; i < Relationships.Length; i++) {
+						if (Relationships [i] == otherPerson) { //we have a match!
+								RelationshipStrengths [i] += adjustment;
+						}
+				}
 		}
 }

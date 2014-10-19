@@ -29,7 +29,6 @@ public class GameWorld : MonoBehaviour
 				Sprites = gameObject.GetComponent<SpriteManager> ();
 				Builder = gameObject.GetComponent<WorldBuilder> ();
 				NextHourCountdown = SecondsPerHour;
-				Builder.BuildWorld ();
 		}
 	
 		void FixedUpdate ()

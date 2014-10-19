@@ -796,7 +796,7 @@ MonoBehaviour:
   Builder: {fileID: 212386801}
   World: {fileID: 790421416}
   MapClick: {fileID: 8300000, guid: 49fab3db4d899b14ca89f16b98f7f4bb, type: 3}
-  Sprites: {fileID: 0}
+  Sprites: {fileID: 212386800}
   DebugPanel: {fileID: 95592015}
 --- !u!114 &212386800
 MonoBehaviour:
@@ -1413,6 +1413,7 @@ MonoBehaviour:
   HomeSector: {fileID: 0}
   HomeSectorLocation: 000000000000000000000000
   TotalGroupMembers: 0
+  GroupStatTotals: []
 --- !u!4 &839551719
 Transform:
   m_ObjectHideFlags: 0

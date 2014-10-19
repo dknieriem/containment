@@ -1,0 +1,14 @@
+Dismissable notifications. Can be warnings of poor conditions, actionable items.
+
+Examples of notifications:
+Sector 2,5 has damage, and no builders are assigned to repair
+
+Notification Possibilities:
+* Group member low on health, not a patient
+* Group member low on health, patient, no doctor
+* Dangerous relationship score between two group members
+* Incoming horde in visible sector
+* No guards in claimed sector
+* No looters (no food / supplies increase )
+* Damage in sector, no builders
+* Low food (will run out at current rationing level within 24 hrs)

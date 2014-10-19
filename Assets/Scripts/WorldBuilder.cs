@@ -75,12 +75,13 @@ public class WorldBuilder : MonoBehaviour
 
 		void Start ()
 		{
+				Debug.Log ("Starting: WorldBuilder");
 				WorkingWith = GameObject.Find ("World").GetComponent<WorldInfo> ();
+				BuildWorld ();
 		}
 
 		public void BuildWorld ()
 		{		
-
 				Debug.Log ("Working With: " + WorkingWith.name);
 				WorkingWith.Dimensions = Dimensions;
 				
@@ -98,7 +99,7 @@ public class WorldBuilder : MonoBehaviour
 			
 				
 				
-				RemoveExistingSectors ();
+				//RemoveExistingSectors ();
 				InstantiateSectors ();
 				SetSectorZedCounts ();
 				SaveImages ();
@@ -366,7 +367,7 @@ public class WorldBuilder : MonoBehaviour
 		void InstantiateSectors ()
 		{
 				RemoveExistingSectors ();
-
+				WorkingWith.Dimensions = Dimensions;
 				WorkingWith.WorldSectors = new Sector[Dimensions [0], Dimensions [1]];
 				for (int i = 0; i < Dimensions[0]; i++) {
 						for (int j = 0; j < Dimensions[1]; j++) {
@@ -377,9 +378,17 @@ public class WorldBuilder : MonoBehaviour
 								
 								sec.LocationX = i;
 								sec.LocationY = j;
+								sec.World = WorkingWith;
 								sec.SecType = WorldSectorTypes [i, j];
 								Sector.name = "Sector [" + i + ", " + j + "]";
 								WorkingWith.WorldSectors [i, j] = sec;
+						}
+				}
+				for (int i = 0; i < Dimensions[0]; i++) {
+						for (int j = 0; j < Dimensions[1]; j++) {
+								WorkingWith.WorldSectors [i, j].SetZedCountRandom (0, 100);
+								WorkingWith.WorldSectors [i, j].SetNeighboringSectors ();				
+								WorkingWith.WorldSectors [i, j].GetRegionSprites ();
 						}
 				}
 		}

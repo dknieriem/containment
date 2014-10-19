@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System;
 
 public class PlayerGroup : MonoBehaviour
@@ -41,7 +42,7 @@ public class PlayerGroup : MonoBehaviour
 				StartGroup (GroupStartingSize, UnityEngine.Random.Range (0, 10), UnityEngine.Random.Range (0, 10));
 		}
 		
-		public void GroupMemberMoved ()
+		void UpdateGroupMemberCounts ()
 		{
 				SectorGroupMembers = new int[World.Dimensions [0], World.Dimensions [1]];
 				foreach (Person p in GroupMembers) {
@@ -50,12 +51,19 @@ public class PlayerGroup : MonoBehaviour
 				}	
 		}
 		
+		void UpdateGroupMembers ()
+		{
+				foreach (Person p in GroupMembers) {
+						p.DoNextUpdate ();
+				}
+		}
 		//updated each game hour
 		public void DoNextUpdate ()
 		{
-				
+				UpdateGroupMemberCounts ();
+				UpdateGroupMembers ();
 				UpdateGroupStats ();
-				DoAttacks ();
+				
 		}
 				
 		void UpdateGroupStats ()
@@ -68,34 +76,7 @@ public class PlayerGroup : MonoBehaviour
 						}
 				}
 		}
-				
-		void DoAttacks ()
-		{
-		
-				int[,] numZedsKilled = new int[World.Dimensions [0], World.Dimensions [1]];
-				int[,] numCharsInSector = new int[World.Dimensions [0], World.Dimensions [1]];
-				
-				//for each group member in 
-				for (int i = 0; i < GroupMembers.Count; i++) {
-						Person p = GroupMembers [i];
-						numZedsKilled [p.LocationX, p.LocationY] += (int)(p.CurrentStats [(int)Person.Stats.KillRate] * UnityEngine.Random.Range (0.8f, 1.0f));
-						numCharsInSector [p.LocationX, p.LocationY] ++;
-						if (numZedsKilled [p.LocationX, p.LocationY] > World.WorldSectors [p.LocationX, p.LocationY].ZedCount) {
-								numZedsKilled [p.LocationX, p.LocationY] = World.WorldSectors [p.LocationX, p.LocationY].ZedCount;
-						}
-						//TODO: EventHandler.NewMessage(p.FirstName + " " + p.LastName + " killed " + numZedsKilled + " zeds", p.LocationX, p.LocationY, World.CurrentDate);
-				}		
-				
-				for (int i = 0; i < GroupMembers.Count; i++) {
-						Person p = GroupMembers [i];
-						int curCharZedKills = (int)(numZedsKilled [p.LocationX, p.LocationY] / p.CurrentStats [(int)Person.Stats.KillRate]);
-						Debug.Log (string.Format ("{0} {1} killed {2} zeds at sector {3}, {4} on {5}", p.FirstName, p.LastName, curCharZedKills, p.LocationX, p.LocationY, World.CurrentDate));
-						World.WorldSectors [p.LocationX, p.LocationY].ZedCount -= curCharZedKills;
-						p.LifetimeZedKills += curCharZedKills;
-				}	
-				
-		}
-				
+							
 		public void StartGroup (int numMembers, Sector homeSector)
 		{
 				TotalGroupMembers = numMembers;
@@ -203,7 +184,12 @@ public class PlayerGroup : MonoBehaviour
 								}
 						}
 				}
-				
+		}
 		
+		public Person[] GetMembersInSector (int locationX, int locationY)
+		{
+				Person[] members = GroupMembers.Where (p => p.LocationX == locationX && p.LocationY == locationY).ToArray ();
+		
+				return members;
 		}
 }

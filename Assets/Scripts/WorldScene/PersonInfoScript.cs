@@ -22,8 +22,8 @@ public class PersonInfoScript : MonoBehaviour
 				PersonStatsText = GameObject.Find ("PersonStats").GetComponent<Text> ();
 				PersonRelationshipsText = GameObject.Find ("PersonRelationships").GetComponent<Text> ();
 				PlayerGroup group = GameObject.Find ("PlayerGroup").GetComponent<PlayerGroup> ();
-				Debug.Log (group.name);
-				Debug.Log (group.GroupMembers.ToArray ().Length);
+				//Debug.Log (group.name);
+				//Debug.Log (group.GroupMembers.ToArray ().Length);
 				UpdatePerson (group.GroupMembers.ToArray () [0]);
 		}
 

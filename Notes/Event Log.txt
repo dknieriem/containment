@@ -1,0 +1,19 @@
+Archived log of event items.
+
+Events contain: 
+# Date + Time of occurence.
+# Sector occured in
+# Person(s) involved
+
+Example Event in log:
+Jul 1, 2014, 10 AM: Completed Fence Building in Sector 13,2
+Jul 1, 2014,  3 PM: Steve Johnson joined group in Sector 5,15
+
+Event Possibilities:
+* Combat in a sector. Condition: Group has members present in that sector
+* Group member death
+* Sector Repairs completed
+* Sector Building completed
+* Group member scout or looter MIA.
+* New sector arrivals (asking to join group)
+* New Group member accepted

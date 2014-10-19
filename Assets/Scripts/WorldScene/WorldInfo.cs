@@ -24,12 +24,13 @@ public class WorldInfo : MonoBehaviour
 		public void DoNextUpdate ()
 		{
 				CurrentDate = CurrentDate.AddHours (1);
-				foreach (Sector s in WorldSectors) {
-						s.DoNextUpdate ();
-				}
 				
 				PlayerGroup.DoNextUpdate ();
 				
+				foreach (Sector s in WorldSectors) {
+						s.DoNextUpdate ();
+				}
+							
 				Debug.Log (CurrentDate);
 		}
 
