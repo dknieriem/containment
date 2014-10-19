@@ -2,27 +2,27 @@
 using UnityEngine.UI;
 using System.Collections;
 
-public class InfoWindowScript : MonoBehavior
+public class InfoWindowScript : MonoBehaviour
 {
 
-public Text[] TextElements;
+		public Text[] TextElements;
 
 //TODO: abstractify the infoscript classes to pull all child components of type ui.text, then have a method to implement called "update text"
 
-void Start()
-{
-TextElements = gameObject.GetComponents<Text>();
-}
+		void Start ()
+		{
+				TextElements = gameObject.GetComponents<Text> ();
+		}
 
-void Update()
-{
+		void Update ()
+		{
 //update each text element somehow?
-}
+		}
 
 
-void GetMessage(string ElementName, string newText)
-{
+		void GetMessage (string ElementName, string newText)
+		{
 
-}
+		}
 
 }

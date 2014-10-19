@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 public class PlayerGroup : MonoBehaviour
 {
@@ -37,7 +38,7 @@ public class PlayerGroup : MonoBehaviour
 				//Debug.Log ("GroupMember Size: " + SectorGroupMembers.Length);
 				HomeSectorLocation = new int[2];			
 				GroupMembers = new List<Person> (GroupStartingSize);
-				StartGroup (GroupStartingSize, Random.Range (0, 10), Random.Range (0, 10));
+				StartGroup (GroupStartingSize, UnityEngine.Random.Range (0, 10), UnityEngine.Random.Range (0, 10));
 		}
 		
 		public void GroupMemberMoved ()
@@ -59,11 +60,11 @@ public class PlayerGroup : MonoBehaviour
 				
 		void UpdateGroupStats ()
 		{
-				GroupStatTotals = new float[Person.Stats.Length];
+				GroupStatTotals = new float[Enum.GetNames (typeof(Person.Stats)).Length];
 				for (int i = 0; i < GroupMembers.Count; i++) {
 						Person p = GroupMembers [i];
-						for(int k = 0; k < Person.Stats.Length; k++){
-							GroupStatTotals[k] += p.Stats[k];
+						for (int k = 0; k < GroupStatTotals.Length; k++) {
+								GroupStatTotals [k] += p.CurrentStats [k];
 						}
 				}
 		}
@@ -77,7 +78,7 @@ public class PlayerGroup : MonoBehaviour
 				//for each group member in 
 				for (int i = 0; i < GroupMembers.Count; i++) {
 						Person p = GroupMembers [i];
-						numZedsKilled [p.LocationX, p.LocationY] += (int)(p.CurrentAttackStrength * Random.Range (0.8f, 1.0f));
+						numZedsKilled [p.LocationX, p.LocationY] += (int)(p.CurrentStats [(int)Person.Stats.KillRate] * UnityEngine.Random.Range (0.8f, 1.0f));
 						numCharsInSector [p.LocationX, p.LocationY] ++;
 						if (numZedsKilled [p.LocationX, p.LocationY] > World.WorldSectors [p.LocationX, p.LocationY].ZedCount) {
 								numZedsKilled [p.LocationX, p.LocationY] = World.WorldSectors [p.LocationX, p.LocationY].ZedCount;
@@ -87,7 +88,7 @@ public class PlayerGroup : MonoBehaviour
 				
 				for (int i = 0; i < GroupMembers.Count; i++) {
 						Person p = GroupMembers [i];
-						int curCharZedKills = (int)(numZedsKilled [p.LocationX, p.LocationY] / p.CurrentAttackStrength);
+						int curCharZedKills = (int)(numZedsKilled [p.LocationX, p.LocationY] / p.CurrentStats [(int)Person.Stats.KillRate]);
 						Debug.Log (string.Format ("{0} {1} killed {2} zeds at sector {3}, {4} on {5}", p.FirstName, p.LastName, curCharZedKills, p.LocationX, p.LocationY, World.CurrentDate));
 						World.WorldSectors [p.LocationX, p.LocationY].ZedCount -= curCharZedKills;
 						p.LifetimeZedKills += curCharZedKills;
@@ -143,6 +144,19 @@ public class PlayerGroup : MonoBehaviour
 				HomeSectorLocation [0] = HomeSector.LocationX;
 				HomeSectorLocation [1] = HomeSector.LocationY;
 		}
+
+		public float GetDoctorSkillInSector (Sector currentSector)
+		{
+				float doctorSkill = 0;
+		
+				foreach (Person member in GroupMembers) {
+						if (member.CurrentSector == currentSector && member.CurrentRole == Person.Role.Doctor) {
+								doctorSkill += member.Skills [(int)Person.Skill.Doctor];
+						}
+		
+				}
+				return doctorSkill;
+		}
 		
 		public void GenerateRandomRelationships ()
 		{
@@ -154,8 +168,8 @@ public class PlayerGroup : MonoBehaviour
 								if (i == j) {
 										RelationshipStrengths [i] [j] = 100.0f;
 								} else {
-										float strengthItoJ = Random.Range (10.0f, 90.0f);
-										float strengthJtoI = Random.Range (10.0f, 90.0f);
+										float strengthItoJ = UnityEngine.Random.Range (10.0f, 90.0f);
+										float strengthJtoI = UnityEngine.Random.Range (10.0f, 90.0f);
 										float deltaStrength = strengthItoJ - strengthJtoI;
 										strengthItoJ -= deltaStrength / 4;
 										strengthJtoI += deltaStrength / 4;
@@ -183,9 +197,9 @@ public class PlayerGroup : MonoBehaviour
 				for (int i = 0; i < GroupMembers.Count; i++) {
 						LeadershipLinks [i] = new float[TotalGroupMembers];				
 						for (int j = 0; j < GroupMembers.Count; j++) {
-								if (GroupMembers [i].Leadership > GroupMembers [j].Leadership) { 
-										LeadershipLinks [i] [j] = (GroupMembers [j].Leadership / 100.0f) * RelationshipStrengths [j] [i] * RelationshipStrengths [j] [i]; // i == j gives bonus equal to i's Leadership score
-										leadershipPoints [i] += (GroupMembers [j].Leadership / 100.0f) * RelationshipStrengths [j] [i] * RelationshipStrengths [j] [i];
+								if (GroupMembers [i].Skills [(int)Person.Skill.Leadership] > GroupMembers [j].Skills [(int)Person.Skill.Leadership]) { 
+										LeadershipLinks [i] [j] = (GroupMembers [j].Skills [(int)Person.Skill.Leadership] / 100.0f) * RelationshipStrengths [j] [i] * RelationshipStrengths [j] [i]; // i == j gives bonus equal to i's Leadership score
+										leadershipPoints [i] += (GroupMembers [j].Skills [(int)Person.Skill.Leadership] / 100.0f) * RelationshipStrengths [j] [i] * RelationshipStrengths [j] [i];
 								}
 						}
 				}

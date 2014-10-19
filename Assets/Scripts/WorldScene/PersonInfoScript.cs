@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 public class PersonInfoScript : MonoBehaviour
 {
@@ -33,7 +34,7 @@ public class PersonInfoScript : MonoBehaviour
 				}
 				person = newPerson;
 				PersonNameText.text = string.Format ("{0} {1}", person.FirstName, person.LastName);
-				Debug.Log ("New Person! " + newPerson.BaseAttackStrength);
+				Debug.Log ("New Person! " + PersonNameText.text);
 		}
 
 		void FixedUpdate ()
@@ -45,12 +46,12 @@ public class PersonInfoScript : MonoBehaviour
 				PersonLocationText.text = "(" + person.LocationX + "," + person.LocationY + ")";
 				
 				PersonStatsText.text = "Stats: \n";
-				PersonStatsText.text += "H: " + person.CurrentHealth + "/" + person.BaseHealth + "\n";
-				PersonStatsText.text += "S: " + person.CurrentStamina + "/" + person.BaseStamina + "\n";
-				PersonStatsText.text += "A: " + person.CurrentAttackStrength + "/" + person.BaseAttackStrength + "\n";		
+				for (int i = 0; i < Enum.GetNames (typeof(Person.Stats)).Length; i++) {
+						PersonStatsText.text += Person.StatNames [i] + person.CurrentStats [i] + "/" + person.BaseStats [i] + "\n";
+				}
+	
 				PersonStatsText.text += "Zeds Killed: " + person.LifetimeZedKills;
-				
-				
+					
 				PersonRelationshipsText.text = "Relationships: \n";
 				
 				Person[] Relationships = person.Relationships;
