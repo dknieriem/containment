@@ -3,7 +3,53 @@ using System.Collections;
 
 public partial class Person
 {
-
+	
+		public enum CharacterLocation
+		{
+				Outside = 0,
+				UnclearedBuilding,
+				ClearedBuilding,
+				Safehouse }
+		;
+	
+		public enum Role
+		{
+				None = 0,
+				Patient,
+				Doctor,
+				Builder,
+				Guard,
+				Scout,
+				Looter }
+		;
+	
+		public string[] RoleNames = { "None", "Patient", "Doctor", "Builder", "Guard", "Scout", "Looter" };
+	
+		public enum Skill
+		{
+				MeleeStrength = 0,
+				FirearmStrength,
+				AmmoHeld,
+				Doctor,
+				Agility,
+				Construction,
+				Stamina,
+				Leadership }
+		;
+		
+		public string[] SkillNames = { "Melee", "Firearm", "Ammo", "Doctor", "Agility", "Construction", "Stamina", "Leadership"};
+		
+		public enum Stats
+		{
+				Health = 0,
+				Stamina, //current stamina. when < 10%, character should seek rest. at 0, will pass out.
+				KillRate, //average number of Zeds per hour killed, modified by melee weapon strength and stamina.
+				BuildRate, //rate of building and repairing defenses
+				InjuryRate }//rate of this person's health loss
+		;
+		
+		public string[] StatNames = { "Health", "Stamina", "Kill Rate", "Build Rate", "Injury Rate" };
+		
 		public static string[] maleFirstNames = {"James",
 	"James",
 	"John",

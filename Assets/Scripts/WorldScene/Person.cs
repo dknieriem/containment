@@ -16,90 +16,59 @@ public partial class Person
 				Scouting, //scouting buildings in the sector, discovering safety values and lootable contents
 				Looting }//looting buildings in the sector	
 		;
-	
-		public enum CharacterLocation
-		{
-				Outside = 0,
-				UnclearedBuilding,
-				ClearedBuilding,
-				Safehouse }
-		;
-	
-		public enum Role
-		{
-				None = 0,
-				Patient,
-				Doctor,
-				Builder,
-				Guard,
-				Scout,
-				Looter }
-		;
-	
-		public enum Skill
-		{
-				MeleeStrength = 0,
-				FirearmStrength,
-				AmmoHeld,
-				Doctor,
-				Agility,
-				Construction,
-				Stamina,
-				Leadereship }
-		;
-		
-		public enum Stats
-		{
-				KillRate = 0,
-				BuildRate,
-				InjuryRate }
-		}
 
 		public string FirstName;
 		public string LastName;
 		public 	int LocationX; 
 		public 	int LocationY;
+		public Sector CurrentSector;
 		public 	CharacterState CurrentState;
-		public 	float BaseAttackStrength; //average number of Zeds per hour killed, modified by melee weapon strength and stamina.
-		public 	float CurrentAttackStrength; //modified attack strength
-		public 	float BaseStamina; // maximum stamina fully-rested
-		public 	float CurrentStamina; //current stamina. when < 10%, character should seek rest. at 0, will pass out.
-		public 	float BaseHealth; //maximum health
-		public 	float CurrentHealth; //current health
 		
-		public float Leadership;
 		
 		public PlayerGroup MyGroup;
 		public Person[] Relationships;
 		public float[] RelationshipStrengths;
 		
-		public float[] Stats;
-		public float Skills;
+		public float[] BaseStats;
+		public float[] CurrentStats;
+		public float[] Skills;
 		public int LifetimeZedKills;			
 		
 		//TODO: Queue / BehaviorTree of actions to perform
+		
+		public Person()
+		{
+		x.MyGroup = myGroup;
+				x.FirstName = "Blankity";
+				x.LastName = "Blank";
+				x.CurrentState = Person.CharacterState.Idle;
+				
+				x.BaseStats = new float[Player.Stats.Length];
+				x.CurrentStats = new float[Player.Stats.Length];
+				x.Skills = new float[Player.Skills.Length];
+		}
 		
 		public static Person CreateRandomCharacter (PlayerGroup myGroup)
 		{
 				Person x = new Person ();
 				x.MyGroup = myGroup;
+				x.mySector = myGroup.HomeSector;
+				x.LocationX = x.mySector.LocationX;
+				x.LocationY = x.mySector.LocationY;
 				x.FirstName = maleFirstNames [Random.Range (1, maleFirstNames.Length) - 1];
 				x.LastName = lastNames [Random.Range (1, lastNames.Length) - 1];
-				x.CurrentState = Person.CharacterState.Idle;
-				x.BaseAttackStrength = Random.Range (1000, 2000) / 100.0f;
-				x.BaseHealth = Random.Range (8000, 10000) / 100.0f;
-				x.BaseStamina = Random.Range (7000, 9000) / 100.0f;
-		
-				x.Stats = new float[Player.Stats.Length];
-				x.Skills = new float[Player.Skills.Length];
 				
-				x.CurrentAttackStrength = x.BaseAttackStrength;
-				x.CurrentHealth = x.BaseHealth;
-				x.CurrentStamina = x.BaseStamina;
+				x.BaseStats[Stats.Health] = Random.Range (8000, 10000) / 100.0f;
+				x.BaseStats[Stats.Stamina] = Random.Range (7000, 9000) / 100.0f;
+				x.BaseStats[Stats.KillRate] = Random.Range (1000, 2000) / 100.0f;
 		
-				x.Leadership = Random.Range (0.0f, 100.0f);
-				if (x.Leadership < 30.0f) {
-						x.Leadership = 0.0f;
+				x.CurrentStats[Stats.Health] = x.BaseStats[Stats.Health];
+				x.CurrentStats[Stats.Stamina]= x.BaseStats[Stats.Stamina];
+				x.CurrentStats[Stats.KillRate] = x.BaseStats[Stats.KillRate];
+				
+				x.Skills[Skills.Leadership] = Random.Range (0.0f, 60.0f);
+				if (x.Skills[Skills.Leadership] < 30.0f) {
+						x.Skills[Skills.Leadership] = 0.0f;
 				}
 		
 				return x;
@@ -139,11 +108,7 @@ public partial class Person
 		
 		public void UpdateAttributes()
 		{
-				CurrentHealth = BaseHealth;
-				CurrentStamina = BaseStamina * (CurrentHealth / BaseHealth);
-				CurrentAttackStrength = BaseAttackStrength * (CurrentStamina / BaseStamina);
-				Debug.Log (string.Format ("{0} {1} stats H,S,A: {2} {3} {4}", FirstName, LastName, CurrentHealth, CurrentStamina, CurrentAttackStrength));
-		}
+				}
 		
 		public void UpdateSkills()
 		{
@@ -152,6 +117,21 @@ public partial class Person
 		
 		public void UpdateStats()
 		{
+		
+				BaseStats[Stats.InjuryRate] = mySector.ZedCount;
+				CurrentStats[Stats.InjuryRate] = BaseStats[Stats.InjuryRate] / (Skills[Skill.MeleeStrength] + Skills[Skill.FirearmStrength] ); 
+				//if a patient, injury rate will be modified by the doctor's skill 
+				CurrentStats[Stats.InjuryRate] -= myGroup.GetDoctorSkillInSector(mySector);
+				
+				CurrentStats[Stats.Health] -= CurrentStats[Stats.InjuryRate];
+				CurrentStats[Stats.Stamina] = BaseStats[Stats.Stamina] * (CurrentHealth / BaseHealth);
+				//OR stamina -= killrate
+				CurrentAttackStrength = BaseAttackStrength * (CurrentStamina / BaseStamina);
+				Debug.Log (string.Format ("{0} {1} stats H,S,A: {2} {3} {4}", FirstName, LastName, CurrentHealth, CurrentStamina, CurrentAttackStrength));
+				
+		
+		
+				CurrentStats[Stats.InjuryRate] = 0; //reset Injury Rate 
 		
 		}
 }
