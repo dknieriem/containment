@@ -23,6 +23,8 @@ public partial class Person
 				Looter }
 		;
 		
+		public static string[] RoleNames = { "None", "Patient", "Doctor", "Builder", "Guard", "Scout", "Looter" };
+				
 		public enum CharacterState
 		{
 				Dead = 0,
@@ -35,9 +37,7 @@ public partial class Person
 				Scouting, //scouting buildings in the sector, discovering safety values and lootable contents
 				Looting }//looting buildings in the sector	
 		;
-		public static string[] RoleNames = { "None", "Patient", "Doctor", "Builder", "Guard", "Scout", "Looter" };
-		
-	
+			
 		public enum Skill
 		{
 				MeleeStrength = 0,

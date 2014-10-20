@@ -44,6 +44,7 @@ public class PersonInfoScript : MonoBehaviour
 				}
 				
 				PersonLocationText.text = "(" + person.LocationX + "," + person.LocationY + ")";
+				PersonRoleText.text = "Role: " + person.RoleNames[(int) Person.CurrentRole];
 				
 				PersonStatsText.text = "Stats: \n";
 				for (int i = 0; i < Enum.GetNames (typeof(Person.Stats)).Length; i++) {
