@@ -13,7 +13,7 @@ public partial class Person
 		public CharacterState CurrentState;
 		public Role CurrentRole;
 		
-		public PlayerGroup MyGroup;
+		public Faction MyGroup;
 		public Person[] Relationships;
 		public float[] RelationshipStrengths;
 		
@@ -35,7 +35,7 @@ public partial class Person
 				Skills = new float[Enum.GetNames (typeof(Person.Skill)).Length];
 		}
 		
-		public static Person CreateRandomCharacter (PlayerGroup myGroup)
+		public static Person CreateRandomCharacter (Faction myGroup)
 		{
 				Person x = new Person ();
 				x.MyGroup = myGroup;
@@ -104,33 +104,6 @@ public partial class Person
 		
 		void UpdateStats ()
 		{
-				BaseStats [(int)Stats.InjuryRate] = CurrentSector.ZedCount;
-				
-				switch (CurrentRole) {
-				case Role.None:
-						UpdateStatsNone ();
-						break;
-				case Role.Patient:
-						UpdateStatsPatient ();
-						break;
-				case Role.Doctor:
-						UpdateStatsDoctor ();
-						break;
-				case Role.Builder:
-						UpdateStatBuilder ();
-						break;
-				case Role.Guard:
-						UpdateStatsGuard ();
-						break;
-				case Role.Scout:
-						UpdateStatsScout ();
-						break;
-				case Role.Looter:
-						UpdateStatsLooter ();
-						break;				
-				}
-				
-				CurrentStats [(int)Stats.InjuryRate] = 0; //reset Injury Rate 
 				for (int k = 0; k < CurrentStats.Length; k++) {
 						if (CurrentStats [k] < 0) {
 								CurrentStats [k] = 0;

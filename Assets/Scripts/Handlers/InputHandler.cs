@@ -1,41 +1,30 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.EventSystems;
 
 public class InputHandler : MonoBehaviour
 {
 	
-		public float CameraPixelsPerSecond = 5.0f; 
+	public float CameraPixelsPerSecond = 5.0f;
 	
-		public GameObject SoundPrefab;
-	
-		Camera mainCamera;
-	
-		WorldInfo worldInfo;
-	
-		//GameWorld Game;
+	public World world;
+	public GameManager gameManager;
+	public UIHandler uiHandler;
+	public GameObject SoundPrefab;
+	public Camera mainCamera;
+
+	void Start ()
+	{
+		//gameManager = GameManager.Instance;
+		//world = gameManager.world;
+		//mainCamera = GameObject.Find ("Main Camera").GetComponent<Camera> ();
+		//uiHandler = UIHandler.Instance ();
+	}
+
+	void Update ()
+	{
 		
-		UIHandler UI;
-	
-		// Use this for initialization
-		void Start ()
-		{
-		
-				mainCamera = GameObject.Find ("Main Camera").GetComponent<Camera> ();
-				//Debug.Log ("Camera name: " + mainCamera.name);
-		
-				worldInfo = gameObject.GetComponentInChildren<WorldInfo> ();//GameObject.Find ("Terrain").GetComponent<Terrain> ();
-				//Debug.Log ("Terrain name: " + terrainInfo.name);
-		
-				//Game = gameObject.GetComponent<GameWorld> ();
-				
-				UI = gameObject.GetComponent<UIHandler> ();
-		}
-	
-		// Update is called once per frame
-		void Update ()
-		{
-		
-				/*if (Input.GetButtonDown ("Previous Zed")) {
+		/*if (Input.GetButtonDown ("Previous Zed")) {
 						ChangeCamTarget ("Zeds", -1);
 				}
 	
@@ -43,73 +32,79 @@ public class InputHandler : MonoBehaviour
 						ChangeCamTarget ("Zeds", +1);
 				}*/
 		
-				if (Input.GetButtonDown ("Action 1")) {
-						getClick ("Action 1");
-				}
-		
-				if (Input.GetButtonDown ("Action 2")) {
-						getClick ("Action 2");
-				}
-				
-				if (Input.GetKeyDown ("i")) {
-						UI.ToggleSectorInfoPanel ();
-				}
-		
-		
-		
-				MoveCamera ();
-		
+		if (Input.GetButtonDown ("Action 1")) {
+			if (EventSystem.current.IsPointerOverGameObject ())
+				Debug.Log ("Clicked an event system object...");
+			else
+				getClick ("Action 1");
 		}
-	
-		void MoveCamera ()
-		{
 		
-				Vector3 newCameraPos = new Vector3 (mainCamera.transform.position.x, mainCamera.transform.position.y, mainCamera.transform.position.z);
-		
-				float xDelta = Input.GetAxis ("Horizontal") * Time.deltaTime * CameraPixelsPerSecond;
-				float yDelta = Input.GetAxis ("Vertical") * Time.deltaTime * CameraPixelsPerSecond;
-				
-				
-				newCameraPos.x += xDelta;
-				newCameraPos.y += yDelta;
-		
-				float zoomDelta = Input.GetAxis ("Mouse ScrollWheel") * Time.deltaTime * CameraPixelsPerSecond;
-				//Debug.Log ("Mousewheel: " + zoomDelta);
-				if (!Mathf.Approximately (zoomDelta, 0.0f)) {
-						float newZoom = mainCamera.orthographicSize * (1.0f - zoomDelta); 
-						if (newZoom < 5) {
-								newZoom = 5;
-						}
-						if (newZoom > 16) {
-								newZoom = 16;
-						}
-						mainCamera.orthographicSize = newZoom;
-				}
-				//mainCamera.transform.Translate (Vector3.up * yDelta);
-		
-				if (newCameraPos.x < 0) {
-						newCameraPos.x = 0.0f;
-				}
-		
-				if (newCameraPos.y < 0) {
-						newCameraPos.y = 0.0f;
-				}
-		
-				//TODO: stop camera from showing past edge of terrain
-		
-				if (newCameraPos.x > worldInfo.Dimensions [0] - 1) {
-						newCameraPos.x = (float)worldInfo.Dimensions [0] - 1;
-				}
-		
-				if (newCameraPos.y > worldInfo.Dimensions [1] - 1) {
-						newCameraPos.y = (float)worldInfo.Dimensions [1] - 1;
-				}
-		
-				mainCamera.transform.position = newCameraPos;
-				
+		if (Input.GetButtonDown ("Action 2")) {
+			if (EventSystem.current.IsPointerOverGameObject ())
+				Debug.Log ("Clicked an event system object...");
+			else
+				getClick ("Action 2");
 		}
+				
+		if (Input.GetKeyDown ("i")) {
+			uiHandler.ToggleSectorInfoPanel ();
+		}
+		
+		
+		
+		MoveCamera ();
+		
+	}
+
+	void MoveCamera ()
+	{
+		
+		Vector3 newCameraPos = new Vector3 (mainCamera.transform.position.x, mainCamera.transform.position.y, mainCamera.transform.position.z);
+		
+		float xDelta = Input.GetAxis ("Horizontal") * Time.deltaTime * CameraPixelsPerSecond;
+		float yDelta = Input.GetAxis ("Vertical") * Time.deltaTime * CameraPixelsPerSecond;
+				
+				
+		newCameraPos.x += xDelta;
+		newCameraPos.y += yDelta;
+		
+		float zoomDelta = Input.GetAxis ("Mouse ScrollWheel") * Time.deltaTime * CameraPixelsPerSecond;
+		//Debug.Log ("Mousewheel: " + zoomDelta);
+		if (!Mathf.Approximately (zoomDelta, 0.0f)) {
+			float newZoom = mainCamera.orthographicSize * (1.0f - zoomDelta); 
+			if (newZoom < 5) {
+				newZoom = 5;
+			}
+			if (newZoom > 16) {
+				newZoom = 16;
+			}
+			mainCamera.orthographicSize = newZoom;
+		}
+		//mainCamera.transform.Translate (Vector3.up * yDelta);
+		
+		if (newCameraPos.x < 0) {
+			newCameraPos.x = 0.0f;
+		}
+		
+		if (newCameraPos.y < 0) {
+			newCameraPos.y = 0.0f;
+		}
+		
+		//TODO: stop camera from showing past edge of terrain
+		
+		if (newCameraPos.x > world.DimensionsX - 1) {
+			newCameraPos.x = (float)world.DimensionsX - 1;
+		}
+		
+		if (newCameraPos.y > world.DimensionsY - 1) {
+			newCameraPos.y = (float)world.DimensionsY - 1;
+		}
+		
+		mainCamera.transform.position = newCameraPos;
+				
+	}
 	
-		/*public void ChangeCamTarget (string groupName, int delta)
+	/*public void ChangeCamTarget (string groupName, int delta)
 		{
 		
 				currentSetFollowed = groupName;
@@ -137,7 +132,7 @@ public class InputHandler : MonoBehaviour
 		
 		}*/
 	
-		/*public void MoveCamToTarget ()
+	/*public void MoveCamToTarget ()
 		{
 		
 				if (currentSetFollowed == "Zeds") {
@@ -153,16 +148,16 @@ public class InputHandler : MonoBehaviour
 		
 		}*/
 	
-		void getClick (string action)
-		{
-				Ray ray = mainCamera.ScreenPointToRay (Input.mousePosition);
-				Debug.Log (action + ", " + ray.origin);
+	void getClick (string action)
+	{
+		Ray ray = mainCamera.ScreenPointToRay (Input.mousePosition);
+		Debug.Log (action + ", " + ray.origin);
 				
-				if (ray.origin.x > 0 && ray.origin.y > 0 && ray.origin.x < worldInfo.Dimensions [0] && ray.origin.y < worldInfo.Dimensions [1]) {			
-						Sector sectorClicked = worldInfo.GetSectorAtPosition (ray.origin);
-						Debug.Log ("Clicked " + sectorClicked.LocationX + ", " + sectorClicked.LocationY);
-				}
+		if (ray.origin.x > 0 && ray.origin.y > 0 && ray.origin.x < world.DimensionsX && ray.origin.y < world.DimensionsY) {			
+			Sector sectorClicked = world.GetSectorAtPosition (ray.origin);
+			Debug.Log ("Clicked " + sectorClicked.LocationX + ", " + sectorClicked.LocationY);
 		}
+	}
 		
 		
 }
