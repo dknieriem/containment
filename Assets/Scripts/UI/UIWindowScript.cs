@@ -5,11 +5,12 @@ using System.Collections;
 
 public class UIWindowScript : MonoBehaviour, IDragHandler
 {
-	RectTransform m_transform = null;
+	protected RectTransform m_transform = null;
 	public Button CloseButton;
 	public GameObject windowObject;
 	public bool isEnabled;
 	public bool isDraggable;
+
 	// Use this for initialization
 	void Start ()
 	{
@@ -58,5 +59,10 @@ public class UIWindowScript : MonoBehaviour, IDragHandler
 			windowObject.transform.localScale = new Vector3 (0, 0, 0);
 
 		//windowObject.SetActive (!windowObject.activeSelf);
+	}
+
+	public virtual void Complete () //override and close
+	{
+		ClosePanel ();
 	}
 }

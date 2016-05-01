@@ -1,4 +1,4 @@
-Names["male"] = {"James",
+return {
 	"James",
 	"John",
 	"Robert",

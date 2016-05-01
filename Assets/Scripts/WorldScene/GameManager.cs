@@ -8,7 +8,6 @@ public class GameManager : MonoBehaviour
 
 	public static GameManager Instance = null;
 
-	//TODO on build, change to false
 	public bool IsDebug = false;
 	public bool inGame = false;
 	public bool isPaused = false;
@@ -18,7 +17,8 @@ public class GameManager : MonoBehaviour
 	public Faction playerGroup;
 	public AudioClip MapClickAudio;
 	public SpriteManager Sprites;
-		
+	public LuaLoader luaLoader;
+
 	public float SecondsPerHour = 10.0f;
 
 	public float NextHourCountdown = 10.0f;
@@ -53,8 +53,6 @@ public class GameManager : MonoBehaviour
 	void FixedUpdate ()
 	{
 
-
-
 		NextHourCountdown -= Time.fixedDeltaTime;
 //		Debug.Log (Time.fixedDeltaTime);
 		if (NextHourCountdown < 0) {
@@ -66,7 +64,6 @@ public class GameManager : MonoBehaviour
 
 	public void TogglePause ()
 	{
-		
 		isPaused = !isPaused;
 		
 		if (isPaused) {
@@ -76,7 +73,6 @@ public class GameManager : MonoBehaviour
 			Debug.Log ("Paused");
 			Time.timeScale = 0;
 		}
-		
 	}
 
 	public void ToggleDebug ()
@@ -84,10 +80,19 @@ public class GameManager : MonoBehaviour
 		IsDebug = !IsDebug;
 	}
 
+	public void NewGame (CharacterPropertySet charProps, GroupPropertySet groupProps, WorldPropertySet worldProps)
+	{
+		//NewGameWindow newGameWindow = GameObject.Find ("New Game Window").GetComponent<NewGameWindow> ();
+		Debug.Log ("GameManager.NewGame()");
+		worldBuilder.BuildWorld (charProps, groupProps, worldProps);
+		inGame = true;
+	}
+
 	public void NewGame ()
 	{
+		NewGameWindow newGameWindow = GameObject.Find ("New Game Window").GetComponent<NewGameWindow> ();
 		Debug.Log ("GameManager.NewGame()");
-		worldBuilder.BuildWorld ();
+		worldBuilder.BuildWorld (newGameWindow.charPropertySet, newGameWindow.groupPropertySet, newGameWindow.worldPropertySet);
 		inGame = true;
 	}
 }

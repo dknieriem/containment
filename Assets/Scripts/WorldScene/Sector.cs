@@ -41,20 +41,24 @@ public class Sector : MonoBehaviour
 	public SectorType SecType;
 	public int LocationX, LocationY;
 	//public static int MaxPopulation = 1000;
-	public int Population;
-	public int PlayerGroupCount;
+
 	public Sector[] NeighboringSectors;
 	public SectorType[] NeighboringSectorTypes;
-	public bool IsVisible;
-	public bool IsVisited;
-	//Gameworld Game;
+
 	public World world;
 	GameObject[] myRegions;
 	SpriteRenderer[] mySprites;
 	SpriteRenderer mapMask;
 	//public static float SecondsPerUpdate = 10.0f;
 	//public static float NextUpdateCountdown;
-		
+	public bool IsVisible;
+	public bool IsVisited;
+	public int ZedCount;
+	public int PlayerGroupCount;
+	public int residentCapacity;
+	public int defenseRating;
+
+
 	// Use this for initialization
 	void Start ()
 	{

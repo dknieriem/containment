@@ -8,51 +8,22 @@ using System.Collections.Generic;
 public class PropertySet : MonoBehaviour
 {
 
-	Dictionary<String,Property> properties;
+	protected Dictionary<String,Property> properties;
 
 	public Transform InputParent;
 	public GameObject textPrefab, boolPrefab, enumPrefab;
 
-	//Old
-	//	//Character Info
-	//
-	//	public string FirstName, LastName;
-	//
-	//
-	//	//Group Info
-	//
-	//	//Government GovtType;
-	//	public int GovtType;
-	//
-	//	//-1 defensive, 0 neutral, 1 aggressive
-	//	public int defaultStance;
-	//
-	//	public bool AllLifeIsSacred;
-	//	public bool Cannibal;
-	//	public bool ZombiesArePeopleToo;
-	//
-	//	//eliminate Zeds, Repopulate the Earth, New World Order, Live and Let Live, Retreat from the World
-	//	public int GroupMantra;
-	//
-	//
-	//	//World Info
-	//	public string WorldName;
-	//	//0,S=20x20 1,M = 40x40 2,L=64x64 3,XL=128x128
-	//	public int WorldSize;
-	//
-	//	//Rural, Suburban, Urban
-	//	public int WorldType;
-
 	void Start ()
 	{
-		properties = new Dictionary<string, Property> ();
+		//Debug.Log ("PropertySet.Start()");
+	}
 
-		properties.Add ("First Name", new StringProperty ("First Name", "first") as Property);
-		properties.Add ("Last Name", new StringProperty ("Last Name", "last") as Property);
-		properties.Add ("Gov't Type", new EnumProperty (new string[] { "Council", "Dictatorship", "Fiefdom" }, 0) as Property);
+	protected void CreatePropertyObjects ()
+	{
 
-		//Type type = this.GetType ();
-		//FieldInfo[] members = type.GetFields ();
+		//	while (InputParent.childCount > 0) {
+		//		GameObject.Destroy (InputParent.GetChild (0));
+		//	}
 
 		Dictionary<string,Property>.Enumerator PropEnum = properties.GetEnumerator ();
 		Debug.Log (properties.Count);
@@ -67,34 +38,34 @@ public class PropertySet : MonoBehaviour
 			Property localCopy = currentProp;
 
 			GameObject newField;// = new GameObject ();
+			Transform labelGameObj;
 			Text labelObject; 
 			//LayoutElement myLayout = newField.AddComponent<LayoutElement> ();
 			switch (typeName) {
 			case "System.Boolean":
 				newField = Instantiate (boolPrefab);
 				Toggle newToggle = newField.GetComponent<Toggle> ();
+				newToggle.isOn = (bool)currentProp.GetValue ();
 				newToggle.onValueChanged.RemoveAllListeners ();
 				newToggle.onValueChanged.AddListener (delegate {
-					return this.setValue (localCopy, newToggle.isOn);
+					return this.SetValue (localCopy, newToggle.isOn);
 				});
-				labelObject = newField.transform.Find ("Label").GetComponent<Text> ();
-				labelObject.text = currentName;
 				break;
 
 			case "System.String":
 				newField = Instantiate (textPrefab);
 				InputField newInput = newField.GetComponent<InputField> ();
+				newInput.text = currentProp.GetValue ().ToString ();
 				newInput.onEndEdit.RemoveAllListeners ();
 				newInput.onEndEdit.AddListener (delegate {
-					return this.setValue (localCopy, newInput.text);
+					return this.SetValue (localCopy, newInput.text);
 				});
-				labelObject = newField.transform.Find ("Label").GetComponent<Text> ();
-				labelObject.text = currentName;
 				break;
 			case "System.Enum":
 				EnumProperty enumProp = currentProp as EnumProperty;
 				newField = Instantiate (enumPrefab);
 				Dropdown dropdown = newField.GetComponent<Dropdown> ();
+				dropdown.value = (int)currentProp.GetValue ();
 				dropdown.ClearOptions ();
 				//for (int i = enumProp.min; i <= enumProp.max; i++) {
 				List<string> options = new List<string> (enumProp.possibleValues);
@@ -102,7 +73,7 @@ public class PropertySet : MonoBehaviour
 				dropdown.AddOptions (options);
 				dropdown.onValueChanged.RemoveAllListeners ();
 				dropdown.onValueChanged.AddListener (delegate {
-					return this.setValue (localCopy, dropdown.value);
+					return this.SetValue (localCopy, dropdown.value);
 				});
 				//}
 				break;
@@ -110,71 +81,69 @@ public class PropertySet : MonoBehaviour
 				newField = new GameObject ();
 				break;
 			}
-
-			newField.name = currentName + " Field";
-			newField.transform.parent = InputParent;
-
-
-		}
-	}
-
-	void OldStart ()
-	{
-		
-
-		Type type = this.GetType ();
-		FieldInfo[] members = type.GetFields ();
-
-		for (int i = 0; i < members.Length; i++) {
-			string typeName = members [i].FieldType.ToString ();//members[i].ToString ();
-			Debug.Log ("\"" + typeName + "\" " + members [i].Name + ": " + members [i].GetValue (this));
-			FieldInfo localCopy = members [i];
-
-			GameObject newField;// = new GameObject ();
-			Text labelObject; 
-			//LayoutElement myLayout = newField.AddComponent<LayoutElement> ();
-			switch (typeName) {
-			case "System.Boolean":
-				newField = Instantiate (boolPrefab);
-				Toggle newToggle = newField.GetComponent<Toggle> ();
-				newToggle.onValueChanged.RemoveAllListeners ();
-				newToggle.onValueChanged.AddListener (delegate {
-					return this.setValue (localCopy, newToggle.isOn);
-				});
-				labelObject = newField.transform.Find ("Label").GetComponent<Text> ();
-				labelObject.text = members [i].Name;
-				break;
-
-			case "System.String":
-				newField = Instantiate (textPrefab);
-				InputField newInput = newField.GetComponent<InputField> ();
-				newInput.onEndEdit.RemoveAllListeners ();
-				newInput.onEndEdit.AddListener (delegate {
-					return this.setValue (localCopy, newInput.text);
-				});
-				labelObject = newField.transform.Find ("Property Label").GetComponent<Text> ();
-				labelObject.text = members [i].Name;
-				break;
-			default:
-				newField = new GameObject ();
-				break;
+			labelGameObj = newField.transform.Find ("Property Label"); 
+			if (labelGameObj != null) {
+				labelObject = labelGameObj.GetComponent<Text> ();
+				labelObject.text = currentName;
 			}
+			newField.name = currentName + " Field";
+			newField.transform.SetParent (InputParent);
 
-			newField.name = members [i].Name + " Field";
-			newField.transform.parent = InputParent;
 
 		}
 	}
 
-	void setValue (FieldInfo field, System.Object newValue)
-	{
-		field.SetValue (this, newValue);
-
-	}
-
-	void setValue (Property field, System.Object newValue)
+	void SetValue (Property field, System.Object newValue)
 	{
 		field.SetValue (newValue);
+
+	}
+
+	public string GetStringValue (string propertyName)
+	{
+		Property received;
+		bool found = properties.TryGetValue (propertyName, out received);
+		if (!found)
+			return "";
+
+		string type = received.GetPropTypeString ();
+
+		if (type == "System.String")
+			return received.GetValue () as string;
+		else
+			return "";
+
+	}
+
+	public int GetIntValue (string propertyName)
+	{
+		Property received;
+		bool found = properties.TryGetValue (propertyName, out received);
+		if (!found)
+			return 0;
+
+		string type = received.GetPropTypeString ();
+
+		if (type == "System.Int32")
+			return (int)received.GetValue ();
+		else
+			return 0;
+
+	}
+
+	public int GetEnumValue (string propertyName)
+	{
+		Property received;
+		bool found = properties.TryGetValue (propertyName, out received);
+		if (!found)
+			return -1;
+
+		string type = received.GetPropTypeString ();
+
+		if (type == "System.Enum")
+			return (int)received.GetValue ();
+		else
+			return -1;
 
 	}
 }

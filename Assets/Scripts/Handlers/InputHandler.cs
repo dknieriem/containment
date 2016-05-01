@@ -5,8 +5,8 @@ using UnityEngine.EventSystems;
 public class InputHandler : MonoBehaviour
 {
 	
-	public float CameraPixelsPerSecond = 5.0f;
-	
+	public float CameraPixelsPerSecond;
+
 	public World world;
 	public GameManager gameManager;
 	public UIHandler uiHandler;
@@ -15,22 +15,11 @@ public class InputHandler : MonoBehaviour
 
 	void Start ()
 	{
-		//gameManager = GameManager.Instance;
-		//world = gameManager.world;
-		//mainCamera = GameObject.Find ("Main Camera").GetComponent<Camera> ();
-		//uiHandler = UIHandler.Instance ();
+
 	}
 
 	void Update ()
 	{
-		
-		/*if (Input.GetButtonDown ("Previous Zed")) {
-						ChangeCamTarget ("Zeds", -1);
-				}
-	
-				if (Input.GetButtonDown ("Next Zed")) {
-						ChangeCamTarget ("Zeds", +1);
-				}*/
 		
 		if (Input.GetButtonDown ("Action 1")) {
 			if (EventSystem.current.IsPointerOverGameObject ())
@@ -49,9 +38,7 @@ public class InputHandler : MonoBehaviour
 		if (Input.GetKeyDown ("i")) {
 			uiHandler.ToggleSectorInfoPanel ();
 		}
-		
-		
-		
+
 		MoveCamera ();
 		
 	}
@@ -60,11 +47,10 @@ public class InputHandler : MonoBehaviour
 	{
 		
 		Vector3 newCameraPos = new Vector3 (mainCamera.transform.position.x, mainCamera.transform.position.y, mainCamera.transform.position.z);
-		
+
 		float xDelta = Input.GetAxis ("Horizontal") * Time.deltaTime * CameraPixelsPerSecond;
 		float yDelta = Input.GetAxis ("Vertical") * Time.deltaTime * CameraPixelsPerSecond;
-				
-				
+
 		newCameraPos.x += xDelta;
 		newCameraPos.y += yDelta;
 		

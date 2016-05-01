@@ -46,7 +46,7 @@ public class SectorInfoPanel : MonoBehaviour
 		if (CursorSector != null) {
 			sectorInfoPanel.position = Input.mousePosition + (SectorInfoPanelDimensions / 2) + InfoPanelCursorOffset;
 			SectorCoordsText.text = "(" + CursorSector.LocationX + "," + CursorSector.LocationY + ")";		
-			SectorZedsText.text = "Pop: " + CursorSector.Population;
+			SectorZedsText.text = "Pop: " + CursorSector.ZedCount;
 			SectorPlayerGroupCountText.text = "Group: " + CursorSector.PlayerGroupCount;
 			SectorTypeText.text = CursorSector.SecType.ToString ();
 			//sectorInfoPanel.gameObject.SetActive (true);

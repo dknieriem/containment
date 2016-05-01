@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 
 public class World : MonoBehaviour
 {
@@ -19,10 +20,12 @@ public class World : MonoBehaviour
 
 	public RawImage MapImage;
 	public Texture Tex;
+	public static Dictionary<int,int> WorldSizes;
 
 	void Start ()
 	{
 		//Debug.Log ("World.Start()");
+
 	}
 
 	public void DoNextUpdate ()

@@ -45,6 +45,8 @@ public class UITabbedWindow : MonoBehaviour
 
 		if (myWindow == null)
 			myWindow = GetComponentInParent<UIWindowScript> ();
+
+		updateWindowTitle ();
 	}
 
 	void previousTab ()
@@ -59,7 +61,7 @@ public class UITabbedWindow : MonoBehaviour
 		Panels [currentTab].transform.SetAsLastSibling ();
 
 		if (tabNames != null && tabNames [currentTab] != null)
-			windowTitle.text = windowName + tabNames [currentTab];
+			updateWindowTitle ();
 
 	}
 
@@ -71,13 +73,18 @@ public class UITabbedWindow : MonoBehaviour
 		if (currentTab >= Panels.Length) {
 			currentTab = Panels.Length - 1;
 			if (nextQuits)
-				myWindow.ClosePanel ();
+				myWindow.Complete ();
 		}
 
 		Panels [currentTab].transform.SetAsLastSibling ();
 
 		if (tabNames != null && tabNames [currentTab] != null)
-			windowTitle.text = windowName + tabNames [currentTab];
+			updateWindowTitle ();
 
+	}
+
+	void updateWindowTitle ()
+	{
+		windowTitle.text = windowName + ": " + tabNames [currentTab];
 	}
 }
