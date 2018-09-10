@@ -21,24 +21,32 @@ public class LuaLoader : MonoBehaviour
 		//Debug.Log ("Time: " + Time.unscaledTime);
 		foreach (TextAsset ta in result.OfType<TextAsset>()) {
 			scripts.Add (ta.name, ta.text);
-			//	Debug.Log ("LoaLoader loaded script: " + ta.name);
+            //	Debug.Log ("LoaLoader loaded script: " + ta.name);
 
-			DynValue mfn = Script.RunString (ta.text);
-			//	Debug.Log (mfn.Table [1]);
-			switch (ta.name) {
+            Script mfn = new Script();
+            mfn.DoString(ta.text);
+            DynValue nameFn = mfn.Globals.Get("Name");
+            DynValue name = mfn.Call(nameFn);
+
+            DynValue dataFn = mfn.Globals.Get("ReturnData");
+			Debug.Log (name.String);
+			switch (name.String){//(ta.name) {
 
 			case "data.names.first.male":
-				Person.DataNamesFirstMale = mfn.ToObject<string[]> ();
+                Person.DataNamesFirstMale = mfn.Call(dataFn).ToObject<string[]>();//ToObject<string[]> ();
 				break;
 			case "data.names.first.female":
-				Person.DataNamesFirstFemale = mfn.ToObject<string[]> ();
+				Person.DataNamesFirstFemale = mfn.Call(dataFn).ToObject<string[]>(); //mfn.ToObject<string[]> ();
 				break;
 			case "data.names.last":
-				Person.DataNamesLast = mfn.ToObject<string[]> ();
-				break;
+				Person.DataNamesLast = mfn.Call(dataFn).ToObject<string[]>(); //mfn.ToObject<string[]> ();
+                break;
 			case "data.world.sizes":
-				World.WorldSizes = mfn.ToObject<Dictionary<int,int>> ();
-				break;
+                    World.WorldSizes = mfn.Call(dataFn).ToObject<Dictionary<int, int>>(); //mfn.ToObject<Dictionary<int,int>> ();
+                break;
+             case "Relationship.modifierPrototypes":
+                Relationship.AddModifierPrototype(mfn.Call(dataFn).ToObject<RelationshipModifier>());
+                break;
 			}
 		}
 		//Debug.Log ("Time: " + Time.unscaledTime);

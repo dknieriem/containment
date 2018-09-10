@@ -14,16 +14,18 @@ public class GameManager : MonoBehaviour
 		
 	public WorldBuilder worldBuilder;
 	public World world;
-	public Faction playerGroup;
+	public Group playerGroup;
 	public AudioClip MapClickAudio;
 	public SpriteManager Sprites;
 	public LuaLoader luaLoader;
+    public UIHandler uiHandler;
+    public GameObject DebugPanel;
 
-	public float SecondsPerHour = 10.0f;
+    public float SecondsPerHour = 10.0f;
 
 	public float NextHourCountdown = 10.0f;
 	
-	public GameObject DebugPanel;
+
 
 	void Awake ()
 	{
@@ -83,7 +85,7 @@ public class GameManager : MonoBehaviour
 	public void NewGame (CharacterPropertySet charProps, GroupPropertySet groupProps, WorldPropertySet worldProps)
 	{
 		//NewGameWindow newGameWindow = GameObject.Find ("New Game Window").GetComponent<NewGameWindow> ();
-		Debug.Log ("GameManager.NewGame()");
+		Debug.Log ("GameManager.NewGame(props)");
 		worldBuilder.BuildWorld (charProps, groupProps, worldProps);
 		inGame = true;
 	}

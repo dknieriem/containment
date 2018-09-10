@@ -1,4 +1,8 @@
-return {
+function Name()
+	return "data.names.first.male";
+end
+function ReturnData()
+	return {
 	"James",
 	"John",
 	"Robert",
@@ -1218,3 +1222,4 @@ return {
 	"Broderick",
 	"Alonso"
 }
+end

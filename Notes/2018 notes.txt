@@ -1,0 +1,77 @@
+Game
+----
+World
+Groups
+Zeds
+
+World
+-----
+Sectors
+Towns
+Roads/Routes?
+
+Groups
+------
+Members (people)
+hierarchy - depends on structure
+parties - subset of group members on a mission
+home base (sector, must be owned by group)
+group stats
+inventory:
+	- inventory in sectors owned by group
+	- inventory for each group member
+
+Person
+------
+Face img
+Name
+Sector
+Group
+Party
+Relationships
+Stats
+
+
+Party
+-----
+Group
+Members
+Mission
+
+Mission
+-------
+Group
+Target (sector or town)
+Goal: scavenge, clear, rebuild, etc
+
+Town
+----
+Sectors
+Name
+Zeds
+is clear?
+
+Sector
+------
+Loc x,y
+Zeds -List
+Owned group
+Inventory
+Stats:
+	- Def
+Zed
+---
+Loc x,y
+Stats:
+Health
+
+
+Group panel
+-----------
+* list members
+	"Members (cur/max)"
+	each member: face, name, party? loc <- hover for more info, click for person window
+* list parties
+	"Parties (cur/max)"
+	each party: faces, mission, mission status, loc <- hover on a face for name, click anywhere for party context menu
+* group stats

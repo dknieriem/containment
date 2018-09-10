@@ -7,14 +7,14 @@ public class SectorInfoPanel : MonoBehaviour
 
 	//public GameManager gameManager;
 	//World world;
-	RectTransform sectorInfoPanel;
+	//RectTransform sectorInfoPanel;
 	Sector CursorSector;
 	//Text SectorName;
 	Text SectorCoordsText;
 	Text SectorZedsText;
 	Text SectorPlayerGroupCountText;
 	Text SectorTypeText;
-	Vector3 SectorInfoPanelDimensions;
+	//Vector3 SectorInfoPanelDimensions;
 	public Vector3 InfoPanelCursorOffset = new Vector3 (10, 0, 0);
 
 	// Use this for initialization
@@ -23,8 +23,8 @@ public class SectorInfoPanel : MonoBehaviour
 		Debug.Log ("Starting: SectorInfoScript");
 		//gameManager = GameManager.Instance ();
 		//world = gameManager.world;
-		sectorInfoPanel = gameObject.GetComponent<RectTransform> ();
-		SectorInfoPanelDimensions = new Vector3 (sectorInfoPanel.rect.width, -sectorInfoPanel.rect.height, 0);
+		//sectorInfoPanel = gameObject.GetComponent<RectTransform> ();
+		//SectorInfoPanelDimensions = new Vector3 (sectorInfoPanel.rect.width, -sectorInfoPanel.rect.height, 0);
 		//SectorName = GameObject.Find ("SectorName").GetComponent<Text> ();
 		SectorCoordsText = GameObject.Find ("SectorLocation").GetComponent<Text> ();
 		SectorZedsText = GameObject.Find ("SectorZeds").GetComponent<Text> ();
@@ -44,9 +44,9 @@ public class SectorInfoPanel : MonoBehaviour
 	{
 		//CursorSector = World.GetSectorFromScreenPos (Input.mousePosition);
 		if (CursorSector != null) {
-			sectorInfoPanel.position = Input.mousePosition + (SectorInfoPanelDimensions / 2) + InfoPanelCursorOffset;
+			// sectorInfoPanel.position = Input.mousePosition + (SectorInfoPanelDimensions / 2) + InfoPanelCursorOffset;
 			SectorCoordsText.text = "(" + CursorSector.LocationX + "," + CursorSector.LocationY + ")";		
-			SectorZedsText.text = "Pop: " + CursorSector.ZedCount;
+			SectorZedsText.text = "Zed Pop: " + CursorSector.ZedCount;
 			SectorPlayerGroupCountText.text = "Group: " + CursorSector.PlayerGroupCount;
 			SectorTypeText.text = CursorSector.SecType.ToString ();
 			//sectorInfoPanel.gameObject.SetActive (true);

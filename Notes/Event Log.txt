@@ -3,7 +3,7 @@ Archived log of event items.
 Events contain: 
 # Date + Time of occurence.
 # Sector occured in
-# Person(s) involved
+# Person(s) / party / group involved
 
 Example Event in log:
 Jul 1, 2014, 10 AM: Completed Fence Building in Sector 13,2

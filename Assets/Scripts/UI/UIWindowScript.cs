@@ -10,17 +10,27 @@ public class UIWindowScript : MonoBehaviour, IDragHandler
 	public GameObject windowObject;
 	public bool isEnabled;
 	public bool isDraggable;
+    public bool isDisposable;
 
 	// Use this for initialization
-	void Start ()
+	protected void Start ()
 	{
 		Debug.Log ("UIWindow.Start() for: " + windowObject.name);
 		m_transform = GetComponent<RectTransform> ();
-		if (CloseButton == null)
+        m_transform.anchorMax = new Vector2(0.5f, 0.5f);
+        m_transform.anchorMin = new Vector2(0.5f, 0.5f);
+        m_transform.anchoredPosition = new Vector2(0.0f, 0.0f);
+
+
+
+        if (CloseButton == null)
 			return;
 
 		CloseButton.onClick.RemoveAllListeners ();
 		CloseButton.onClick.AddListener (this.ClosePanel);
+
+        if (!this.isEnabled)
+            this.ClosePanel();
 	}
 
 	public void OnDrag (PointerEventData eventData)
@@ -42,16 +52,26 @@ public class UIWindowScript : MonoBehaviour, IDragHandler
 		//windowObject.SetActive (false);
 	}
 
+    public void RemovePanel()
+    {
+        Debug.Log("RemovePanel() for: " + windowObject.name);
+        Destroy(windowObject);
+    }
+
 	public void OpenPanel ()
 	{
-		isEnabled = true;
-		windowObject.transform.localScale = new Vector3 (1, 1, 1);
+        Debug.Log("OpenPanel() for: " + windowObject.name);
+        isEnabled = true;
+        windowObject.transform.SetAsLastSibling();
+        windowObject.transform.localScale = new Vector3 (1, 1, 1);
 		//windowObject.SetActive (true);
 	}
 
 	public void TogglePanel ()
 	{
-		isEnabled = !isEnabled;
+
+        Debug.Log("TogglePanel() for: " + windowObject.name);
+        isEnabled = !isEnabled;
 
 		if (isEnabled)
 			windowObject.transform.localScale = new Vector3 (1, 1, 1);

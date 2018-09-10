@@ -59,8 +59,8 @@ public class StringProperty : Property
 
 public class IntegerProperty : Property
 {
-	int Value;
-	int minValue, maxValue;
+	public int Value;
+    public int minValue, maxValue;
 	bool ValueRestricted;
 
 	public IntegerProperty (string name)
@@ -130,6 +130,7 @@ public class IntegerProperty : Property
 	{
 		return "System.Int32";
 	}
+
 }
 
 public class BoolProperty : Property

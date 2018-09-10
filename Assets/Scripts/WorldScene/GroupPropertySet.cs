@@ -9,11 +9,13 @@ public class GroupPropertySet : PropertySet
 	{
 		//Debug.Log ("CharacterPropertySet.Start()");
 		properties = new Dictionary<string, Property> ();
-		properties.Add ("Gov't Type", new EnumProperty (new string[] { "Council", "Dictatorship", "Fiefdom" }, 0) as Property);
-		properties.Add ("Stance", new EnumProperty (new string[] { "Hiding", "Avoidant", "Defensive", "Aggressive" }, 2) as Property);
-		properties.Add ("All Life Is Sacred", new BoolProperty ("All Life Is Sacred") as Property);
-		properties.Add ("Cannibal", new BoolProperty ("Cannibal") as Property);
-		properties.Add ("Zombies are People, Too", new BoolProperty ("Zombies are People, Too") as Property);
+        properties.Add("Group Members", new IntegerProperty("Group Members", 3, 2, 5) as Property);
+        properties.Add("Starting Location", new EnumProperty(new string[] { "Camp Site", "House", "Fortified House" }, 1) as Property);
+        properties.Add("Starting Sector", new EnumProperty(new string[] { "Not Cleared", "A Few Stray Zeds", "Secured" }, 1) as Property);
+        //properties.Add ("Gov't Type", new EnumProperty (new string[] { "Council", "Dictatorship", "Fiefdom" }, 0) as Property);
+		//properties.Add ("All Life Is Sacred", new BoolProperty ("All Life Is Sacred") as Property);
+		//properties.Add ("Cannibal", new BoolProperty ("Cannibal") as Property);
+		//properties.Add ("Zombies are People, Too", new BoolProperty ("Zombies are People, Too") as Property);
 		properties.Add ("Group Mantra", new EnumProperty (new string[] {
 			"Eliminate Zeds",
 			"Repopulate the Earth",

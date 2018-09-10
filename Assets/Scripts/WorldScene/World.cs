@@ -12,7 +12,7 @@ public class World : MonoBehaviour
 	public int DimensionsX, DimensionsY;
 	public int NumGroups = 0;
 	public DateTime CurrentDate;
-	public Faction PlayerGroup;
+	public Group PlayerGroup;
 		
 	public int WorldZedCount;
 	public int WorldPlayerGroupMemberCount;
@@ -49,7 +49,12 @@ public class World : MonoBehaviour
 				
 		int x = Mathf.FloorToInt (origin.x);
 		int y = Mathf.FloorToInt (origin.y);
-				
+		
+        if(WorldSectors.GetUpperBound(0) < x || WorldSectors.GetUpperBound(1) < y)
+        {
+            throw new System.MissingMemberException("WorldSectors not initialized");
+        }
+
 		return WorldSectors [x, y];	
 	}
 
@@ -62,6 +67,26 @@ public class World : MonoBehaviour
 				
 		return null;
 	}
+
+    public Sector GetSectorFromCoords(int posX, int posY)
+    {
+        if (posX < 0 || posY < 0 || posX > DimensionsX || posY > DimensionsY)
+        {
+            throw new System.ArgumentOutOfRangeException("int[] position", "Not in valid range: x = [0," + DimensionsX + "], y = [0," + DimensionsY + "]");
+         }
+
+        return WorldSectors[posX, posY];
+    }
+
+    public Sector GetSectorFromCoords(int[] position)
+    {
+        if (position[0] < 0 || position[1] < 0 || position[0] > DimensionsX || position[1] > DimensionsY)
+        {
+            throw new System.ArgumentOutOfRangeException("int[] position", "Not in valid range: x = [0," + DimensionsX + "], y = [0," + DimensionsY + "]");
+        }
+
+        return WorldSectors[position[0], position[1]];
+    }
 
 	public void SetMinimapImage (Texture newTexture)
 	{

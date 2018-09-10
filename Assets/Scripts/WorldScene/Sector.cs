@@ -1,12 +1,12 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
+using System;
 
 public class Sector : MonoBehaviour
 {
 
 	public enum SectorType
 	{
-				
 		Grass,
 		Forest,
 		Residential,
@@ -49,15 +49,23 @@ public class Sector : MonoBehaviour
 	GameObject[] myRegions;
 	SpriteRenderer[] mySprites;
 	SpriteRenderer mapMask;
-	//public static float SecondsPerUpdate = 10.0f;
-	//public static float NextUpdateCountdown;
+
 	public bool IsVisible;
 	public bool IsVisited;
+    public bool PlayerGroupPresent;
+    public bool ZedsPresent;
+
 	public int ZedCount;
 	public int PlayerGroupCount;
+
 	public int residentCapacity;
 	public int defenseRating;
+    public int elevation; //meters
+    public int deltaElevation; //total change in elevation relative to neighboring sectors
+    public int maxBuildingCount;
+    public int BuildingCount;
 
+    public List<Building> Buildings;
 
 	// Use this for initialization
 	void Start ()
@@ -235,13 +243,28 @@ public class Sector : MonoBehaviour
 				}
 			}
 			break;
-		case SectorType.Grass:
+
+        case SectorType.Forest:
+            for (int i = 0; i < 9; i++)
+            {
+                //Debug.Log ("Grass i=" + i);
+                mySprites[i].sprite = GameManager.Instance.Sprites.ReturnSprite("forest-center");
+            }
+            break;
+        case SectorType.Grass:
 			for (int i = 0; i < 9; i++) {
 				//Debug.Log ("Grass i=" + i);
 				mySprites [i].sprite = GameManager.Instance.Sprites.ReturnSprite ("grass-center");
 			}
 			break;
-		}
+            default:
+                for (int i = 0; i < 9; i++)
+                {
+                    //Debug.Log ("Grass i=" + i);
+                    mySprites[i].sprite = GameManager.Instance.Sprites.ReturnSprite("ground");
+                }
+                break;
+        }
 	}
 	
 	// Update is called once per frame
@@ -282,5 +305,10 @@ public class Sector : MonoBehaviour
 	public void DoNextUpdate ()
 	{
 	}
+
+    static public int Distance(int[] posOne, int[] posTwo)
+    {
+        return Mathf.FloorToInt( Mathf.Sqrt(Mathf.Pow(posOne[0] - posTwo[0], 2) + Mathf.Pow(posOne[1] - posTwo[1], 2)));
+    }
 
 }

@@ -7,11 +7,11 @@ public class PersonButton : MonoBehaviour
 
 	public Person person;
 	public Button myButton;
-	PersonInfoPanel personPanel;
+    UIHandler UIHandlerInstance;
 
 	void Start ()
 	{
-		personPanel = PersonInfoPanel.Instance ();
+        UIHandlerInstance = UIHandler.Instance();
 		myButton = gameObject.GetComponent<Button> ();
 		if (myButton == null) {
 			Debug.Log ("Button null...");
@@ -20,35 +20,21 @@ public class PersonButton : MonoBehaviour
 
 		if (person == null) {
 			Debug.Log ("No Person to link...");
-			//return;
+			return;
 		}
 
 		myButton.onClick.RemoveAllListeners ();
 		myButton.onClick.AddListener (delegate {
-			personPanel.ShowPerson (person);
+            //PersonInfoPanel newPersonPanel = 
+            UIHandlerInstance.AddPersonInfoPanel(person);
+            //newPersonPanel.ShowPerson (person);
 		});
 		
 	}
 
 	void Awake ()
 	{
-		personPanel = PersonInfoPanel.Instance ();
 		myButton = gameObject.GetComponent<Button> ();
-		if (myButton == null) {
-			Debug.Log ("Button null...");
-			return;
-		}
-
-		if (person == null) {
-			Debug.Log ("No Person to link...");
-			//return;
-		}
-
-		myButton.onClick.RemoveAllListeners ();
-		myButton.onClick.AddListener (delegate {
-			personPanel.ShowPerson (person);
-		});
-		
 	}
 
 	public void SetPerson (Person newPerson)
@@ -59,9 +45,16 @@ public class PersonButton : MonoBehaviour
 			return;
 		}
 
+        Debug.Log("SetPerson to " + person.FirstName);
 		Text buttonText = myButton.gameObject.GetComponentInChildren<Text> ();
 		if (buttonText != null) {
 			buttonText.text = person.FirstName + " " + person.LastName + "\t(" + person.LocationX + "," + person.LocationY + ")";
 		}
-	}
+
+        myButton.onClick.RemoveAllListeners();
+        myButton.onClick.AddListener(delegate {
+            UIHandlerInstance.AddPersonInfoPanel(person);
+            //personPanel.ShowPerson (person);
+        });
+    }
 }

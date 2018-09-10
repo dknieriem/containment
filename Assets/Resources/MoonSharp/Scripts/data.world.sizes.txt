@@ -1,1 +1,6 @@
-return {32,64,128,250,500}
+function Name()
+	return "data.world.sizes";
+end
+function ReturnData()
+	return {32,64,128,250,500}
+end

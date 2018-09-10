@@ -12,6 +12,7 @@ public class CharacterPropertySet : PropertySet
 		properties = new Dictionary<string, Property> ();
 		properties.Add ("First Name", new StringProperty ("First Name", "first") as Property);
 		properties.Add ("Last Name", new StringProperty ("Last Name", "last") as Property);
+        properties.Add("Age", new IntegerProperty("Age", 23, 18, 65));
 		CreatePropertyObjects ();
 	}
 

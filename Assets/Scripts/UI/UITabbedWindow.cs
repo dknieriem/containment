@@ -11,6 +11,8 @@ public class UITabbedWindow : MonoBehaviour
 	public Button previousTabButton;
 	public Button nextTabButton;
 	public UIWindowScript myWindow;
+    public UIWindowScript previousWindow;
+    public UIWindowScript nextWindow;
 	public int currentTab = 0;
 	public bool prevQuits = true;
 	public bool nextQuits = false;
@@ -56,7 +58,15 @@ public class UITabbedWindow : MonoBehaviour
 		if (currentTab < 0) {
 			currentTab = 0;
 			if (prevQuits)
-				myWindow.ClosePanel ();
+            {
+                myWindow.ClosePanel();
+            }
+			
+            if(previousWindow != null)
+            {
+                previousWindow.OpenPanel();
+            }
+
 		}
 		Panels [currentTab].transform.SetAsLastSibling ();
 
@@ -73,8 +83,15 @@ public class UITabbedWindow : MonoBehaviour
 		if (currentTab >= Panels.Length) {
 			currentTab = Panels.Length - 1;
 			if (nextQuits)
-				myWindow.Complete ();
-		}
+            {
+                myWindow.Complete();
+            }
+				
+            if (nextWindow != null)
+            {
+                nextWindow.OpenPanel();
+            }
+        }
 
 		Panels [currentTab].transform.SetAsLastSibling ();
 

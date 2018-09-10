@@ -1,0 +1,23 @@
+
+
+Group Start Options:
+
+- Start with points to spend:
+Easy - 100
+Medium - 50
+Hard - 25
+
+-- # of Members: 3
+Each additional member: -10*(number of members)
+Removing starting members: +10*(number of members)
+
+-- Starting Location
+Camp Site: -50pts
+House: 0pts
+Fortified House: 50pts
+
+-- Starting Sector
+
+Not Cleared: +50pts
+A Few Stray Zeds: 0pts
+Secured: -50pts

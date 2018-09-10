@@ -1,0 +1,58 @@
+function GenerateCities(int numCities, int totalPop)
+{
+	//given dimensionX, dimensionY
+	//avoid edges
+
+	float score[dimensionX][dimensionY] = 100.0f;
+	int maxRadius = Math.Max(Math.FloorToInt(Math.sqrtf(dimensionX * dimensionY) / 10.0f), 5);
+	//given numCities
+	for(int i = 0; i < numCities; i++)
+	{
+		//1. place at sector w/ highest score
+		int[] newPos = getHighScore();
+		int radius = new Random().nextInt(maxRadius);
+		adjustScores(newPos, radius);
+		City newCity = new City(newPos, radius);
+	}
+
+
+
+	function adjustScores(cityPos, cityRadius)
+	{
+		for(int x = cityPos[0] - cityRadius; x < cityPos[0] + cityRadius; x++){
+
+			for(int y = cityPos[1] - cityRadius; y < cityPos[1] + cityRadius; y++){
+
+				if(x >= 0 && x < dimensionX && y >= 0 && y < dimensionY){
+					d = distance({x,y}, cityPos);
+					if( d < cityRadius){
+						score[x][y] -= 50.0f / ( d * d );
+					}	
+				}
+			}
+		}
+	}
+
+	function int[] getHighScore(){
+		int[] newPos = {0, 0};
+		float maxScore = 0;
+
+		for(int x = 0; x < dimensionX; x++){
+			for(int y = 0; y < dimensionY; y++){
+				if(score[x][y] > maxScore){
+					maxScore = score[x][y];
+					newPos[0] = x;
+					newPos[1] = y;
+				}
+			}
+		}
+
+		return newPos;
+
+	}
+	function float distance(pos1, pos2)
+	{
+		return Math.sqrt((pos1[x] - pos2[x]) ^ 2 + (pos1[y] - pos2[y] ^ 2))
+	}
+
+}

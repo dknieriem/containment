@@ -1,4 +1,8 @@
-return {
+function Name()
+	return "data.names.last";
+end
+function ReturnData()
+	return {
 		"Smith",
 		"Johnson",
 		"Williams",
@@ -1500,3 +1504,4 @@ return {
 		"Ames",
 		"Dodge"
 	}
+end

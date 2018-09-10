@@ -11,7 +11,7 @@ public class PropertySet : MonoBehaviour
 	protected Dictionary<String,Property> properties;
 
 	public Transform InputParent;
-	public GameObject textPrefab, boolPrefab, enumPrefab;
+	public GameObject textPrefab, boolPrefab, enumPrefab, sliderPrefab;
 
 	void Start ()
 	{
@@ -48,7 +48,8 @@ public class PropertySet : MonoBehaviour
 				newToggle.isOn = (bool)currentProp.GetValue ();
 				newToggle.onValueChanged.RemoveAllListeners ();
 				newToggle.onValueChanged.AddListener (delegate {
-					return this.SetValue (localCopy, newToggle.isOn);
+                    this.SetValue(localCopy, newToggle.isOn);
+                    return;
 				});
 				break;
 
@@ -58,8 +59,10 @@ public class PropertySet : MonoBehaviour
 				newInput.text = currentProp.GetValue ().ToString ();
 				newInput.onEndEdit.RemoveAllListeners ();
 				newInput.onEndEdit.AddListener (delegate {
-					return this.SetValue (localCopy, newInput.text);
-				});
+					this.SetValue (localCopy, newInput.text);
+                    return;
+
+                });
 				break;
 			case "System.Enum":
 				EnumProperty enumProp = currentProp as EnumProperty;
@@ -73,11 +76,37 @@ public class PropertySet : MonoBehaviour
 				dropdown.AddOptions (options);
 				dropdown.onValueChanged.RemoveAllListeners ();
 				dropdown.onValueChanged.AddListener (delegate {
-					return this.SetValue (localCopy, dropdown.value);
-				});
+					this.SetValue (localCopy, dropdown.value);
+                    return;
+
+                });
 				//}
 				break;
-			default:
+            case "System.Int32":
+                    IntegerProperty intProp = currentProp as IntegerProperty;
+                    newField = Instantiate(sliderPrefab);
+                    Slider newSlider = newField.GetComponent<Slider>();
+                    newSlider.maxValue = intProp.maxValue;
+                    newSlider.minValue = intProp.minValue;
+                    newSlider.direction = Slider.Direction.LeftToRight;
+                    newSlider.value = (int) currentProp.GetValue();
+
+                    Text valueObj = newSlider.transform.Find("Text").GetComponent<Text>();
+                    valueObj.text = ((int)newSlider.value).ToString();
+
+                    newSlider.wholeNumbers = true;
+                    newSlider.onValueChanged.RemoveAllListeners();
+                    newSlider.onValueChanged.AddListener(delegate {
+                       Text valObj = newSlider.transform.Find("Text").GetComponent<Text>();
+                        valObj.text = ((int) newSlider.value).ToString();
+
+                        this.SetValue(localCopy, (int) newSlider.value);
+                        //Debug.Log(this.name + " set to " + this.GetIntValue());
+                        return;
+
+                    });
+                    break;
+                default:
 				newField = new GameObject ();
 				break;
 			}
@@ -88,7 +117,7 @@ public class PropertySet : MonoBehaviour
 			}
 			newField.name = currentName + " Field";
 			newField.transform.SetParent (InputParent);
-
+            newField.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
 
 		}
 	}
@@ -120,14 +149,14 @@ public class PropertySet : MonoBehaviour
 		Property received;
 		bool found = properties.TryGetValue (propertyName, out received);
 		if (!found)
-			return 0;
+			return -1;
 
 		string type = received.GetPropTypeString ();
 
 		if (type == "System.Int32")
 			return (int)received.GetValue ();
 		else
-			return 0;
+			return -1;
 
 	}
 

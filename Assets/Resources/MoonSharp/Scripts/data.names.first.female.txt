@@ -1,4 +1,8 @@
-return {"Mary",
+function Name()
+	return "data.names.first.female";
+end
+function ReturnData()
+	return {"Mary",
 		"Patricia",
 		"Linda",
 		"Barbara",
@@ -1427,3 +1431,4 @@ return {"Mary",
 		"Kia",
 		"Kesha"
 		}
+end
