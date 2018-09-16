@@ -1,0 +1,54 @@
+Stats: vital signs
+- Health
+- Mental Stability
+
+Attributes: physical/mental abilities
+-Loyalty
+-
+
+Skills: trainable abilities 
+
+Role:
+- None 
+    - relationship mod with all other group members: -25% ("They're not supporting the group")
+    - group leader relationship mod with all other group members: -5% ("You're not being fair")
+
+Current Job:
+- Rest
+- Travel
+- Defend
+- Clear
+
+Mission: list of jobs to complete until either:
+-all jobs in mission complete and return home
+-mental stability below threshhold (based on their attributes)
+
+Mission.cs:
+
+List<Job> missionJobs
+Float progress //0 - 1
+
+
+TODO: Perks:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

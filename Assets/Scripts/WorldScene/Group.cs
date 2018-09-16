@@ -13,7 +13,7 @@ public class Group : MonoBehaviour
 
     public bool IsPlayerGroup;
 	public Sector HomeSector;
-	public int HomeSectorLocationX, HomeSectorLocationY;
+	//public int HomeSectorLocationX, HomeSectorLocationY;
 	public List<Person> GroupMembers;
     public List<Party> Parties;
 	public Person GroupLeader;
@@ -85,10 +85,10 @@ public class Group : MonoBehaviour
 	//updated each game hour
 	public void DoNextUpdate ()
 	{
+        groupInfoDirty = false;
 		UpdateGroupMembers ();
 		UpdateGroupMemberCounts ();
 		UpdateGroupStats ();
-
 	}
 
 	void UpdateGroupStats ()
@@ -154,7 +154,7 @@ public class Group : MonoBehaviour
         //}
 
         SectorGroupMembers [HomeSector.LocationX, HomeSector.LocationY] = TotalGroupMembers;
-		HomeSector.PlayerGroupCount = TotalGroupMembers;
+        HomeSector.PlayerGroupCount = TotalGroupMembers;
 		HomeSector.IsVisible = true;
 		HomeSector.IsVisited = true;
 	}
@@ -162,8 +162,9 @@ public class Group : MonoBehaviour
 	public void SetHomeSector (Sector newLocation)
 	{
 		HomeSector = newLocation;
-		HomeSectorLocationX = HomeSector.LocationX;
-		HomeSectorLocationY = HomeSector.LocationY;
+        groupInfoDirty = true;
+        //HomeSectorLocationX = HomeSector.LocationX;
+		//HomeSectorLocationY = HomeSector.LocationY;
 	}
 
 	public float GetDoctorSkillInSector (Sector currentSector)
@@ -188,7 +189,8 @@ public class Group : MonoBehaviour
             {
                 Person two = GroupMembers.ElementAt<Person>(j);
                 float baseScore = UnityEngine.Random.Range(10.0f, 20.0f);
-                Relationship newRelationship = new Relationship(one, two, baseScore);
+                //Relationship newRelationship = 
+                new Relationship(one, two, baseScore);
             }
         }
 		//	RelationshipStrengths = new float[TotalGroupMembers][];

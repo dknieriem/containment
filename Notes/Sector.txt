@@ -1,0 +1,18 @@
+Sector:
+
+bool hasRoadNorth, hasRoadEast, hasRoadSouth, hasRoadWest
+float Height (feet above sea level)
+float deltaHeightN, E, S, W
+int civLevel
+int numBuildings
+
+
+static float defaultSectorTravelSpeed = 3.0f; //(walking mph) 
+travelSpeedNorth, E,S,W 
+
+
+set each sector height based on worldgen,
+get deltaHeight between sectors
+get road connections between sectors
+travelspeed between two sectors =
+default * ( 1 - deltaHeight / 1000)  * ( 1 + hasRoad * 0.05)

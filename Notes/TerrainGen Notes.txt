@@ -1,0 +1,5 @@
+Find error giving infinite height in slope() and cone()?
+
+
+Replace d3 voronoi with https://github.com/jceipek/Unity-delaunay
+

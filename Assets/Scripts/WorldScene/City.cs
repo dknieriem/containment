@@ -4,14 +4,14 @@ using UnityEngine;
 
 public class City : MonoBehaviour {
 
-    string Name;
-    List<Sector> Sectors;
-    int[] Center;
-    int zedPop;
+    public string Name;
+    public List<Sector> Sectors;
+    public int[] Center;
+    public int zedPop;
 
-    bool isCleared;
-    bool isVisible;
-    bool isVisited;
+    public bool isCleared;
+    public bool isVisible;
+    public bool isVisited;
 
     public World world;
     City(int[] center, int radius)

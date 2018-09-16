@@ -1,0 +1,36 @@
+public class City {
+	string Name;
+	List<Sector> Sectors;
+	int[] Center;
+	int zedPop;
+
+	bool isCleared;
+	bool isVisible;
+	bool isVisited;
+
+	City(int[] center; int radius)
+	{
+		Center = center;
+		Sectors = new List<Sector>();
+		addSectors(center, radius);
+	}
+
+	function addSectors(int[] center, int radius){
+
+		for(int x = center[0] - radius; x < center[0] + radius; x++){
+
+			for(int y = center[1] - radius; y < center[1] + radius; y++){
+
+				if(x >= 0 && x < dimensionX && y >= 0 && y < dimensionY){
+					d = distance({x,y}, center);
+					if( d < radius){
+						Sector toAdd = World.GetSector(x,y);
+						Sectors.Add(toAdd);
+					}	
+				}
+			}
+		}
+	}
+
+	
+}

@@ -26,8 +26,8 @@ public partial class Person : IEquatable<Person>
 	public int LifetimeZedKills;
 	public int LifetimeHumanKills;
 
-    public bool locationChangedLastTick = false;
-
+    public bool infoChangedLastTick = false;
+    public bool isHome;
 
     public static string[] DataNamesFirstMale;
 	public static string[] DataNamesFirstFemale;
@@ -75,6 +75,7 @@ public partial class Person : IEquatable<Person>
 		x.CurrentSector = myGroup.HomeSector;
 		x.LocationX = x.CurrentSector.LocationX;
 		x.LocationY = x.CurrentSector.LocationY;
+        x.isHome = true;
 		x.FirstName = DataNamesFirstMale [UnityEngine.Random.Range (1, DataNamesFirstMale.Length) - 1];
 		x.LastName = DataNamesLast [UnityEngine.Random.Range (1, DataNamesLast.Length) - 1];
 
@@ -104,6 +105,7 @@ public partial class Person : IEquatable<Person>
             x.CurrentSector = myGroup.HomeSector;
             x.LocationX = x.CurrentSector.LocationX;
             x.LocationY = x.CurrentSector.LocationY;
+            x.isHome = true;
         }
 
         x.FirstName = characterProperties.GetStringValue("First Name");
@@ -170,7 +172,6 @@ public partial class Person : IEquatable<Person>
             Relationships.Add(relationship);
         }
 
-        
     }
 
     public void AddRelationship(Person person, float baseStrength)
@@ -190,12 +191,26 @@ public partial class Person : IEquatable<Person>
 
 	public void DoNextUpdate ()
 	{
+        infoChangedLastTick = false;
+        UpdateLocation();
 		UpdateAttributes ();
 		UpdateSkills ();
 		UpdateStats ();
         UpdateRelationships();
 		
 	}
+
+    void UpdateLocation()
+    {
+        
+        if(CurrentSector == MyGroup.HomeSector)
+        {
+            isHome = true;
+        } else
+        {
+            isHome = false;
+        }
+    }
 
 	void UpdateAttributes ()
 	{
@@ -223,65 +238,6 @@ public partial class Person : IEquatable<Person>
             relationship.Update();
         }
     }
-
-	void UpdateStatsNone ()
-	{
-		CurrentStats [(int)Stats.InjuryRate] = BaseStats [(int)Stats.InjuryRate] / (Skills [(int)Skill.MeleeStrength] + Skills [(int)Skill.FirearmStrength]); 		
-		CurrentStats [(int)Stats.Health] -= 0; //TODO: adjust based on current location in sector (safe or not?)
-		CurrentStats [(int)Stats.Stamina] += 0; //TODO: adjust based on food level + rationing
-		CurrentStats [(int)Stats.KillRate] = 0;
-	}
-
-	void UpdateStatsPatient ()
-	{
-		CurrentStats [(int)Stats.InjuryRate] = BaseStats [(int)Stats.InjuryRate] / (Skills [(int)Skill.MeleeStrength] + Skills [(int)Skill.FirearmStrength]); 
-		//if a patient, injury rate will be modified by the doctor's skill 
-		CurrentStats [(int)Stats.InjuryRate] -= MyGroup.GetDoctorSkillInSector (CurrentSector);
-		CurrentStats [(int)Stats.Health] -= CurrentStats [(int)Stats.InjuryRate];
-		CurrentStats [(int)Stats.Stamina] -= CurrentStats [(int)Stats.KillRate];
-		CurrentStats [(int)Stats.KillRate] = 0;
-	}
-
-	void UpdateStatsDoctor ()
-	{
-		CurrentStats [(int)Stats.InjuryRate] = BaseStats [(int)Stats.InjuryRate] / (Skills [(int)Skill.MeleeStrength] + Skills [(int)Skill.FirearmStrength]); 
-		CurrentStats [(int)Stats.Health] -= CurrentStats [(int)Stats.InjuryRate];
-		CurrentStats [(int)Stats.Stamina] -= CurrentStats [(int)Stats.KillRate];
-		CurrentStats [(int)Stats.KillRate] = 0;
-	}
-
-	void UpdateStatBuilder ()
-	{
-		CurrentStats [(int)Stats.InjuryRate] = BaseStats [(int)Stats.InjuryRate] / (Skills [(int)Skill.MeleeStrength] + Skills [(int)Skill.FirearmStrength]); 
-		CurrentStats [(int)Stats.BuildRate] = BaseStats [(int)Stats.BuildRate] * (CurrentStats [(int)Stats.Stamina] / BaseStats [(int)Stats.Stamina]);
-		CurrentStats [(int)Stats.Health] -= CurrentStats [(int)Stats.InjuryRate];
-		CurrentStats [(int)Stats.Stamina] -= CurrentStats [(int)Stats.KillRate];
-		CurrentStats [(int)Stats.KillRate] = 0;
-	}
-
-	void UpdateStatsGuard ()
-	{
-		CurrentStats [(int)Stats.InjuryRate] = BaseStats [(int)Stats.InjuryRate] / (Skills [(int)Skill.MeleeStrength] + Skills [(int)Skill.FirearmStrength]); 
-		CurrentStats [(int)Stats.Health] -= CurrentStats [(int)Stats.InjuryRate];
-		CurrentStats [(int)Stats.Stamina] -= CurrentStats [(int)Stats.KillRate];
-		CurrentStats [(int)Stats.KillRate] = BaseStats [(int)Stats.KillRate] * (CurrentStats [(int)Stats.Stamina] / BaseStats [(int)Stats.Stamina]);
-	}
-
-	void UpdateStatsScout ()
-	{
-		CurrentStats [(int)Stats.InjuryRate] = BaseStats [(int)Stats.InjuryRate] / (Skills [(int)Skill.MeleeStrength] + Skills [(int)Skill.FirearmStrength]); 
-		CurrentStats [(int)Stats.Health] -= CurrentStats [(int)Stats.InjuryRate];
-		CurrentStats [(int)Stats.Stamina] -= CurrentStats [(int)Stats.KillRate];
-		CurrentStats [(int)Stats.KillRate] = BaseStats [(int)Stats.KillRate] * (CurrentStats [(int)Stats.Stamina] / BaseStats [(int)Stats.Stamina]);
-	}
-
-	void UpdateStatsLooter ()
-	{
-		CurrentStats [(int)Stats.InjuryRate] = BaseStats [(int)Stats.InjuryRate] / (Skills [(int)Skill.MeleeStrength] + Skills [(int)Skill.FirearmStrength]); 
-		CurrentStats [(int)Stats.Health] -= CurrentStats [(int)Stats.InjuryRate];
-		CurrentStats [(int)Stats.Stamina] -= CurrentStats [(int)Stats.KillRate];
-		CurrentStats [(int)Stats.KillRate] = BaseStats [(int)Stats.KillRate] * (CurrentStats [(int)Stats.Stamina] / BaseStats [(int)Stats.Stamina]);
-	}
 
 	public void AddZedKills (int numZedsKilled)
 	{
@@ -360,7 +316,7 @@ public partial class Person : IEquatable<Person>
             CurrentSector = newSector;
             LocationX = sectorX;
             LocationY = sectorY;
-            locationChangedLastTick = true;
+            infoChangedLastTick = true;
             return true;
             
         } catch(System.ArgumentOutOfRangeException e)

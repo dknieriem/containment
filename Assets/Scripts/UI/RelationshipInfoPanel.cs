@@ -107,7 +107,7 @@ public class RelationshipInfoPanel : MonoBehaviour {
 
     private void SetRelationshipNameTwoButton()
     {
-        if (relationship.personTwo.locationChangedLastTick)
+        if (relationship.personTwo.infoChangedLastTick)
         {
             RelationshipNameTwoButton.SetPerson(relationship.personTwo);
         }
@@ -116,7 +116,7 @@ public class RelationshipInfoPanel : MonoBehaviour {
 
     private void SetRelationshipNameOneButton()
     {
-        if (relationship.personTwo.locationChangedLastTick)
+        if (relationship.personTwo.infoChangedLastTick)
         {
             RelationshipNameOneButton.SetPerson(relationship.personOne);
         }
