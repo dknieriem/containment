@@ -36,6 +36,11 @@ namespace Delaunay
 			get { return _plotBounds;}
 		}
 		
+        public List<Site> getSites()
+        {
+            return _sites.getSites();
+        }
+
 		public void Dispose ()
 		{
 			int i, n;

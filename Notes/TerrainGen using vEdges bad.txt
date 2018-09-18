@@ -68,7 +68,7 @@ public class TerrainGen : MonoBehaviour {
         //public List<List<int>> adjId;
         public Dictionary<int, List<int>> adjId;
         public List<Vector2[]> edges;
-        public List<List<int>> tris;
+        public List<List<Vector2>> tris;
         public float extentX;
         public float extentY;
 
@@ -89,7 +89,7 @@ public class TerrainGen : MonoBehaviour {
             return output;
         }
 
-        public Mesh(float[][] inpts, Delaunay.Voronoi invor, List<Vector2> invxs, Dictionary<Vector2, int> invxids, Dictionary<Vector2, List<Vector2>> inadj, Dictionary<int, List<int>> inadjIds, List<List<int>> intris, List<Vector2[]> inedges, float inextentX, float inextentY)
+        public Mesh(float[][] inpts, Delaunay.Voronoi invor, List<Vector2> invxs, Dictionary<Vector2, int> invxids, Dictionary<Vector2, List<Vector2>> inadj, Dictionary<int, List<int>> inadjIds, List<List<Vector2>> intris, List<Vector2[]> inedges, float inextentX, float inextentY)
         {
             pts = inpts;
             voronoi = invor;
@@ -161,13 +161,6 @@ public class TerrainGen : MonoBehaviour {
     {
         Params p = defaultParams;
 
-		p.extentX = extentX;
-		p.extentY = extentY;
-		p.generator = generator;
-		p.npts = npts;
-		p.ncities = ncities;
-		p.nterrs = nterrs;
-
         MapAndMesh h = generateCoast(p);
         ConvertMesh(h, mesh);
     }
@@ -214,24 +207,7 @@ public class TerrainGen : MonoBehaviour {
 
         mesh.Clear();
         mesh.vertices = vertices;
-
-
-        List<int> triangles = new List<int>();
-        for(int i = 0; i < h.mesh.tris.Count; i++)
-        {
-            List<int> tri = h.mesh.tris[i];
-            //Debug.Log(string.Format("got a tri length {0}", tri.Count));
-            if(tri.Count == 3)
-            {
-                for (int j = 0; j < 3; j++)
-                {
-                    triangles.Add(tri[j]);
-                }
-            }
-            
-        }
-
-        mesh.triangles = triangles.ToArray();
+        //mesh.triangles = h.mesh.tris;
     }
 
     private float runif(float lo, float hi) {
@@ -261,6 +237,8 @@ public class TerrainGen : MonoBehaviour {
         return vec;
     }
 
+
+
     public float[][] generatePoints(int n, float extentX = defaultExtentX, float extentY = defaultExtentY)
     {
 
@@ -272,6 +250,18 @@ public class TerrainGen : MonoBehaviour {
 
         return pts;
     }
+
+    //private float[] centroid( float[][] pts) {
+    //    float x = 0;
+    //    float y = 0;
+    //    for (int i = 0; i < pts.Length; i++) {
+    //        x += pts[i][0];
+    //        y += pts[i][1];
+    //    }
+
+    //    float[] vec = { x / pts.Length, y / pts.Length };
+    //    return vec;
+    //}
 
     private float[][] improvePoints(float[][] pts, int n = 1, float extentX  = defaultExtentX, float extentY = defaultExtentY) {
         float epsilon = 1.0e-6f;
@@ -394,157 +384,137 @@ public class TerrainGen : MonoBehaviour {
         List<Vector2> Vecpts = new List<Vector2>(numPts);
         Vecpts = pts.Select(x => new Vector2(x[0], x[1])).ToList();
         List<uint> colors = new List<uint>(new uint[numPts]);
-
-        Rect bounds = new Rect(-extentX * 0.5f, -extentY * 0.5f, extentX, extentY);
-
-        Delaunay.Voronoi voronoi = new Delaunay.Voronoi(Vecpts, colors, bounds);
-
-        //data from Voronoi:
-
-        //list of sites, each with a coord (Vec2 corresponding to pt) and a polygon (list of edges that are really line segments inside bounds)
+        Delaunay.Voronoi voronoi = new Delaunay.Voronoi(Vecpts, colors, new Rect(-extentX, -extentY, extentX * 2, extentY * 2));
         List<Delaunay.Site> sites = voronoi.getSites(); // List<Delaunay.Site>(numPts);
-
-        List<Vector2> siteCoords = new List<Vector2>();
-        List<List<Vector2>> siteRegions = new List<List<Vector2>>();
-        List<List<Vector2>> allEdges = new List<List<Vector2>>();
-        //List<List<Vector2>> rawTriangles = new List<List<Vector2>>();
-
-        //helper counting variables
-        int totalEdges = 0;
-        int totalVerts = 0;
-        int totalFaces = 0;
-
-        //data to give to makeMesh():
-        List<Vector2> vxs = new List<Vector2>(totalVerts);
-        Dictionary<Vector2, int> vxids = new Dictionary<Vector2, int>(totalVerts);
-        Dictionary<Vector2, List<Vector2>> adj = new Dictionary<Vector2, List<Vector2>>(totalEdges);
-        Dictionary<int, List<int>> adjId = new Dictionary<int, List<int>>(totalEdges);
-        List<Vector2[]> edges = new List<Vector2[]>(new Vector2[totalEdges][]);
-        List<List<int>> tris = new List<List<int>>(new List<int>[totalFaces]);
-        Dictionary<Vector2, List<int>> sitePolyIds = new Dictionary<Vector2, List<int>>(sites.Count); //for each site, a list of vert IDs to build a poly to highlight it
-        Dictionary<List<Vector2>, List<Vector2>> edgeSites = new Dictionary<List<Vector2>, List<Vector2>>();
-
-        //first, assign int IDs to all verts (including site coord)
-        for (int i = 0; i < sites.Count; i++)
-        {
-            Vector2 coord = sites[i].Coord;
-            siteCoords.Add(coord);
-            vxs.Add(coord);
-            int siteId = totalVerts++;
-            vxids.Add(coord, siteId);
-            sitePolyIds.Add(coord, new List<int>());
-
-            adj.Add(coord, new List<Vector2>(3));
-            adjId.Add(siteId, new List<int>(3));
-
-            List<Vector2> poly = sites[i].Region(bounds);
-            siteRegions.Add(poly);
-
-            for (int j = 0; j < poly.Count; j++)
-            {
-                if (!vxs.Contains(poly[j]))
-                {
-                    vxs.Add(poly[j]);
-                    int thisId = totalVerts++;
-                    vxids.Add(poly[j], thisId);
-                    sitePolyIds[coord].Add(thisId);
-                    adj.Add(poly[j], new List<Vector2>(3));
-                    adjId.Add(thisId, new List<int>(3));
-                } else
-                {
-                    int thisId = vxids[poly[j]];
-                    sitePolyIds[coord].Add(thisId);
-                }
-            }
-
-        }
-
-        for (int i = 0; i < sites.Count; i++)
-        {
-            Vector2 coord = sites[i].Coord;
-            List<Vector2> poly = sites[i].Region(bounds);
-            
-            for (int j = 0; j < poly.Count; j++) //for each 'edge' in the poly, associate it with this site's coord for later mapping purposes
-            {
-                totalFaces++;
-                totalEdges++;
-                List<Vector2> edge = new List<Vector2>(2);
-                List<int> tri = new List<int>(3);
-                Vector2 edge0 = poly[j];
-                Vector2 edge1;
-                if (j < poly.Count - 1)
-                {
-                    edge1 = poly[j + 1];
-                } else
-                {
-                    edge1 = poly[0];
-                }
-
-                int e0id = vxids[edge0];
-                int e1id = vxids[edge1];
-                int coordid = vxids[coord];
-
-                //Debug.Log(string.Format("New Tri: [{0}, {1}, {2}]", e0id, e1id, coordid));
-                edge.Add(edge0);
-                edge.Add(edge1);
-
-                adj[edge0].Add(edge1);
-                adj[edge1].Add(edge0);
-                adj[edge0].Add(coord);
-                adj[edge1].Add(coord);
-                adj[coord].Add(edge0);
-                adj[coord].Add(edge1);
-
-                adjId[e0id].Add(e1id);
-                adjId[e1id].Add(e0id);
-                adjId[e0id].Add(coordid);
-                adjId[e1id].Add(coordid);
-                adjId[coordid].Add(e1id);
-                adjId[coordid].Add(e0id);
-
-                tri.Add(e0id);
-                tri.Add(e1id);
-                tri.Add(coordid);
-
-                tris.Add(tri);
-
-                if (edgeSites.ContainsKey(edge))
-                {
-                    edgeSites[edge].Add(coord);
-                } else
-                {
-                    //new edge in the system!
-                    totalEdges++;
-
-                    //add it to the dictionary
-                    List<Vector2> val = new List<Vector2>();
-                    val.Add(coord);
-                    edgeSites.Add(edge,val);
-
-                    //also add it to the list of edges
-                    allEdges.Add(edge);
-                }
         
+        List<List<Vector2>> polys = voronoi.Regions();
+        List<Delaunay.Triangle> vTris = voronoi.Triangles();
+        List<Delaunay.Edge> vEdges = voronoi.Edges();
+        
+        int numVertices = 2 + vEdges.Count - vTris.Count;
+
+        int n = pts.Length;
+        List<Vector2> vxs = new List<Vector2>(numVertices);//new Vector2[numVertices]);
+        Dictionary<Vector2, int> vxids = new Dictionary<Vector2, int>(numVertices);
+        Dictionary<Vector2, List<Vector2>> adj = new Dictionary<Vector2, List<Vector2>>(vEdges.Count);
+        Dictionary<int, List<int>> adjId = new Dictionary<int, List<int>>(vEdges.Count);
+        //List<List<int>> adjId = new List<List<int>>(new List<int>[vEdges.Count]);
+        List<Vector2[]> edges = new List<Vector2[]>(new Vector2[vEdges.Count][]); 
+        List<List<Vector2>> tris = new List<List<Vector2>>(new List<Vector2>[vTris.Count]);
+
+        for (int i = 0; i < vEdges.Count; i++) {
+            Delaunay.Edge e = vEdges[i]; //edge from leftVertex to rightVertex, the two points in pts it connects are leftSite and rightSite
+            //Debug.Log("e: " + e.ToString());
+            //if(e.rightVertex != null)
+                //Debug.Log(", " + e.rightVertex.ToString());
+            //Debug.Log("adjId[].Length: " + adjId.Count);
+            if (e == null)
+            {
+                continue;
+            }
+            Vector2 e0 = Vector2.negativeInfinity;
+
+            if(e.leftVertex != null)
+                e0 = new Vector2(e.leftVertex.x, e.leftVertex.y);
+
+            Vector2 e1 = Vector2.negativeInfinity;
+
+            if (e.rightVertex != null)
+                e1 = new Vector2(e.rightVertex.x, e.rightVertex.y);
+
+            Vector2 leftSite = Vector2.negativeInfinity;
+
+            if(e.leftSite != null)
+                leftSite = new Vector2(e.leftSite.x, e.leftSite.y);
+
+            Vector2 rightSite = Vector2.negativeInfinity;
+            
+            if(e.rightSite != null)
+                rightSite = new Vector2(e.rightSite.x, e.rightSite.y);
+
+            int e0id;
+            if (vxids.ContainsKey(e0))
+            {
+                vxids.TryGetValue(e0, out e0id);
+            } else
+            {
+                e0id = vxs.Count;
+                vxids.Add(e0, e0id);
+                vxs.Add(e0);
+                adjId.Add(e0id, new List<int>());
+                adj.Add(e0, new List<Vector2>());
             }
 
-        }
+            int e1id;
+            if (vxids.ContainsKey(e1)) // != null)
+            {
+                vxids.TryGetValue(e1, out e1id);//e1id = vxids[e1];
+            } else
+            {
+                e1id = vxs.Count;
+                vxids.Add(e1, e1id);
+                vxs.Add(e1);
+                adjId.Add(e1id, new List<int>());
+                adj.Add(e1, new List<Vector2>());
+            }
 
-        //todo: calc site adjacency by:
-        // for each site, get edges
-        // for each edge in edges, find edgeSites
-        // for each site in edgeSites that isn't the current site, add to siteAdjacency
+            //Debug.Log("checking adjId[" + e0id + "]");
+            //Debug.Log("adjId.Count = " + adjId.Count);
+            //Debug.Log("vxs.Count = " + vxs.Count);
 
-        // now we have a list of edges, we know which site(s) (1 or 2) they correspond to, 
-        // and we have Vector2 coordinates for all of these. let's make some triangles.
+            //if(e0id < adjId.Count )
 
-        //we'll have to add the site coords to the vert list, and make edges to complete the tris
+            if (!adjId[e0id].Contains(e1id))
+            {
+                adjId[e0id].Add(e1id);
+            }
 
-        //f faces = # of tris, = total length of polys
-        //e edges = length of edge dictionary ( # of poly edges + # of sites)
+            //Debug.Log("checking adjId[" + e1id + "]");
+            //Debug.Log("adjId.Count = " + adjId.Count);
 
-        //totalVerts = totalEdges - totalFaces + 2; // or just # of sites + 2
+            if (!adjId[e1id].Contains(e0id))
+            {
+                adjId[e1id].Add(e0id);
+            }
 
-        Debug.Log(string.Format("{0} sites, {1} edges, {2} faces, {3} verts", sites.Count, totalEdges, totalFaces, totalVerts));
+            //add each edge to adj of other
+            if (!adj[e0].Contains(e1)){
+                adj[e0].Add(e1);
+            }
+
+            if (!adj[e1].Contains(e0))
+            {
+                adj[e1].Add(e0);
+            }
+            
+            Vector2[] newEdge = new Vector2[2];
+            newEdge[0] = e0;
+            newEdge[1] = e1;
+            edges.Add(newEdge);
+
+            while (tris.Count <= e0id || tris.Count <= e1id)
+            {
+                tris.Add(new List<Vector2>(3));
+            }
+
+            //Debug.Log("checking tris[" + e0id +" and " + e1id + "]");
+            //Debug.Log("tris.Count = " + tris.Count);
+            //Debug.Log("tris[e0id]: " + tris[e0id]);
+
+            if (!tris.ElementAt(e0id).Contains(leftSite)) {
+                tris.ElementAt(e0id).Add(leftSite);
+            }
+            if (e.rightSite != null && !tris.ElementAt(e0id).Contains(rightSite)) {
+                tris.ElementAt(e0id).Add(rightSite);
+            }
+                
+            if (!tris.ElementAt(e1id).Contains(leftSite)) {
+                tris.ElementAt(e1id).Add(leftSite);
+            }
+            if (e.rightSite != null && !tris.ElementAt(e1id).Contains(rightSite)) {
+                tris.ElementAt(e1id).Add(rightSite);
+            }
+        } //end for (int i = 0; i < voronoi.edges.Count(); i++) {
 
         Mesh mesh = new Mesh(pts, voronoi, vxs, vxids, adj, adjId, tris, edges, extentX, extentY);
 
@@ -571,7 +541,7 @@ public class TerrainGen : MonoBehaviour {
         }
     }
 
-    void printH(float[] h, bool showAll = false)
+    void printH(float[] h)
     {
         if (h == null)
             return;
@@ -579,9 +549,7 @@ public class TerrainGen : MonoBehaviour {
         Debug.Log("H:");
         for (int i = 0; i < h.Length; i++)
         {
-            float h1 = h[i];
-            if (showAll || h1 == Mathf.Infinity || h1 == Mathf.NegativeInfinity || float.IsNaN(h1)) //Math.Abs(h1) > 1 ||
-                Debug.Log(string.Format("h[{0}]: {1}", i, h[i]));
+            Debug.Log(string.Format("{0}: {1}", i, h[i]));
         }
     }
 
@@ -616,13 +584,12 @@ public class TerrainGen : MonoBehaviour {
             {
                 nbs.Add(onbs[i]);
             }
+        } else
+        {
+            Debug.Log("neighbours(): " + mesh.ToString());
+            Debug.Log("Looking for adjId[" + index + "]");
+            Debug.Log("Not Found!");
         }
-		//else
-        //{
-            //Debug.Log("neighbours(): " + mesh.ToString());
-            //Debug.Log("Looking for adjId[" + index + "]");
-            //Debug.Log("Not Found!");
-        //}
         
         return nbs;
     }
@@ -694,7 +661,7 @@ public class TerrainGen : MonoBehaviour {
 
             if (Math.Abs(h1) > 1 || h1 == Mathf.Infinity || h1 == Mathf.NegativeInfinity || float.IsNaN(h1))
             {
-                //Debug.Log(string.Format("slope->dir {0}, {1} h[{2}] = {3}", direction[0], direction[1], mesh.vxs.IndexOf(v), h1));
+                Debug.Log(string.Format("slope->dir {0}, {1} h[{2}] = {3}", direction[0], direction[1], mesh.vxs.IndexOf(v), h1));
             }
             return h1; // v.x * direction[0] + v.y * direction[1];
         }).ToArray();
@@ -714,10 +681,10 @@ public class TerrainGen : MonoBehaviour {
         float[] height = h.h;
         height = vxs.Select(v => {
             float h1 = v.x * direction.x + v.y * direction.y;
-            if ( h1 == Mathf.Infinity || h1 == Mathf.NegativeInfinity || float.IsNaN(h1)) //Math.Abs(h1) > 1 ||
+            if (Math.Abs(h1) > 1 ||  h1 == Mathf.Infinity || h1 == Mathf.NegativeInfinity || float.IsNaN(h1))
             {
-                //Debug.Log(string.Format("slope->dir {0}, {1} h[{2}] ({3},{4}) = {5}", direction.x, direction.y, mesh.vxs.IndexOf(v), v.x, v.y, h1));
-                //Debug.Log("v = " +v.ToString());
+                Debug.Log(string.Format("slope->dir {0}, {1} h[{2}] ({3},{4}) = {5}", direction.x, direction.y, mesh.vxs.IndexOf(v), v.x, v.y, h1));
+                Debug.Log("v = " +v.ToString());
             }
             return h1; // v.x * direction.x + v.y * direction.y;
         }).ToArray();
@@ -741,23 +708,16 @@ public class TerrainGen : MonoBehaviour {
         return h;
     }
 
+    //dynamic map(h, f) {
+    //    var newh = h.map(f);
+    //    newh.mesh = h.mesh;
+    //    return newh;
+    //}
+
     private float[] normalize(float[] h) {
-        //Debug.Log("normalize() before:");
-        printH(h, true);
         float lo = h.Min();
         float hi = h.Max() - lo;
-
-        //Debug.Log(string.Format("lo: {0}, hi: {1}", lo, hi));
-
-        float[] newH = new float[h.Length];
-        for(int i = 0; i < h.Length; i++)
-        {
-            newH[i] = (h[i] - lo) / hi;
-        }
-
-        //Debug.Log("normalize() after:");
-        //printH(newH, true);
-        return newH; //h.Select( k => { return (k - lo) / hi ; }).ToArray();
+        return h.Select( k => { return (k - lo) / hi ; }).ToArray();
     }
 
     private MapAndMesh peaky(MapAndMesh h) {
@@ -775,8 +735,8 @@ public class TerrainGen : MonoBehaviour {
 
         for (int j = 0; j < maps.Length; j++)
         {
-            //Debug.Log(j + ": " + maps[j].h.Length);
-            //printH(maps[j].h);
+            Debug.Log(j + ": " + maps[j].h.Length);
+            printH(maps[j].h);
         }
             int n = maps[0].h.Count();
         MapAndMesh newvals = zero(maps[0].mesh);
@@ -810,21 +770,17 @@ public class TerrainGen : MonoBehaviour {
         return m;
     }
 
-    private MapAndMesh relax(MapAndMesh old) {
+    private MapAndMesh relax(MapAndMesh h) {
 
-        MapAndMesh m = zero(old.mesh);
+        MapAndMesh m = zero(h.mesh);
 
         for (int i = 0; i < m.h.Length; i++) {
-            List<int> nbs = neighbours(old.mesh, i);
-            //Debug.Log(string.Format("neighbours({0} #{1}", i, nbs.Count));
-            //Debug.Log(string.Format("and h.mesh.adjId[{0}]", h.mesh.adjId[i].Count));
-            if (nbs.Count < 3) {
-				//Debug.Log("skipped "+i);
+            List<int> nbs = neighbours(h.mesh, i);
+            if (nbs.Count() < 3) {
                 m.h[i] = 0;
                 continue;
             }
-            m.h[i] = nbs.Select( j => { return old.h[j]; }).Average();
-			//Debug.Log(string.Format("New h[{0}] = {1}", i, m.h[i]);
+            m.h[i] = nbs.Select( j => { return m.h[j]; }).Average();
         }
         return m;
     }
@@ -857,7 +813,6 @@ public class TerrainGen : MonoBehaviour {
         }
         return best;
     }
-
     private void findSinks(MapAndMesh h) {
         int[] dh = downhill(h);
         int[] sinks = new int[dh.Length];
@@ -880,42 +835,40 @@ public class TerrainGen : MonoBehaviour {
     private MapAndMesh fillSinks(MapAndMesh h, float epsilon = 1e-5f) {
 
         Debug.Log("fillSinks()");
-		float infinity = 999999; // Mathf.Infinity;
+        float infinity = Mathf.Infinity;
         MapAndMesh newh = zero(h.mesh);
         for (int i = 0; i < h.h.Length; i++) {
             if (isnearedge(h.mesh, i)) {
-                //Debug.Log(string.Format("h[{0}] = {1} near edge", i, h.h[i]));
+                Debug.Log(string.Format("h[{0}] = {1} near edge", i, h.h[i]));
                 newh.h[i] = h.h[i];
             } else {
-                //Debug.Log(string.Format("h[{0}] = {1} not near edge", i, h.h[i]));
+                Debug.Log(string.Format("h[{0}] = {1} not near edge", i, h.h[i]));
                 newh.h[i] = infinity;
             }
         }
-        while (true) { //repeat until no vx heights change
+        while (true) {
             bool changed = false;
             for (int i = 0; i < h.h.Length; i++) {
                 if (newh.h[i] == h.h[i])
                 {
-                    continue; //it didn't change, skip it
+                    continue;
                 }
                 List<int> nbs = neighbours(h.mesh, i);
-                //Debug.Log(string.Format("h[{0}].nbs = {1}", i,  nbs.Count));
+                Debug.Log(string.Format("h[{0}].nbs = {1}", i,  nbs.Count));
                 for (int j = 0; j < nbs.Count; j++) {
                     if (h.h[i] >= newh.h[nbs[j]] + epsilon) {
-						//Debug.Log(string.Format("(h.h[{0}] = {1} >= newh.h[nbs[{2}] = {3}] = {4} + eps", i, h.h[i], j, nbs[j], newh.h[nbs[j]]));
                         newh.h[i] = h.h[i];
                         changed = true;
                         break;
                     }
                     float oh = newh.h[nbs[j]] + epsilon;
                     if ((newh.h[i] > oh) && (oh > h.h[i])) {
-						//Debug.Log(string.Format("(newh.h[{0}] = {1}> oh = {2}) && ( oh = {2} > h.h[{0}] = {3})", i, newh.h[i], oh, h.h[i]));
-						newh.h[i] = oh;
+                        newh.h[i] = oh;
                         changed = true;
                     }
                 }
             }
-            if (!changed) return newh; //when no vx heights change, return the result
+            if (!changed) return newh;
         }
     }
 
@@ -1085,7 +1038,7 @@ public class TerrainGen : MonoBehaviour {
                 (-x2 * h1 + x1 * h2) / det };
         if(Math.Abs(ret[0] + ret[1]) > 10)
         {
-            //Debug.Log(string.Format("vxs[{0}].ret = ({1}, {2})", i, ret[0], ret[1]));
+            Debug.Log(string.Format("vxs[{0}].ret = ({1}, {2})", i, ret[0], ret[1]));
         }
 
         return ret; 
@@ -1110,7 +1063,6 @@ public class TerrainGen : MonoBehaviour {
         }
         return score;
     }
-
     private void placeCity(Render render) {
 
         if (render.cities == null)
@@ -1273,41 +1225,38 @@ public class TerrainGen : MonoBehaviour {
         Mesh mesh = generateGoodMesh(p.npts, p.extentX, p.extentY);
         MapAndMesh step1 = slope(mesh, UnityEngine.Random.insideUnitCircle.normalized * 4); // randomVector(4));
         Debug.Log("Step 1:");
-        //printH(step1.h);
+        printH(step1.h);
         
         MapAndMesh step2 = cone(mesh, runif(-1, -1));
         Debug.Log("Step 2:");
-        //printH(step2.h);
+        printH(step2.h);
         MapAndMesh step3 = mountains(mesh, 50);
         Debug.Log("Step 3:");
-        //printH(step3.h);
+        printH(step3.h);
         MapAndMesh[] steps = { step1, step2, step3 };
 
         MapAndMesh h = add(steps);
         Debug.Log("Added:");
-        //printH(h.h); //, true);
-        Debug.ClearDeveloperConsole();
+        printH(h.h);
+
         for (int i = 0; i < 10; i++) {
             h = relax(h);
-            //Debug.Log("Relax # " + i);
-            //printH(h.h, true);
         }
-        
         h = peaky(h);
         Debug.Log("Peaky:");
-        //printH(h.h);
+        printH(h.h);
         h = doErosion(h, runif(0, 0.1f), 5);
         Debug.Log("doErosion:");
-        //printH(h.h);
+        printH(h.h);
         h = setSeaLevel(h, runif(0.2f, 0.6f));
         Debug.Log("setSeaLevel:");
-        //printH(h.h);
+        printH(h.h);
         h = fillSinks(h);
         Debug.Log("fillSinks:");
-        //printH(h.h);
+        printH(h.h);
         h = cleanCoast(h, 3);
         Debug.Log("cleanCoast:");
-        //printH(h.h);
+        printH(h.h);
 
         return h;
     }

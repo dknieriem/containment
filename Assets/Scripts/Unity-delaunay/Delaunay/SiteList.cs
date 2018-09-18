@@ -19,6 +19,11 @@ namespace Delaunay
 			_sites = new List<Site> ();
 			_sorted = false;
 		}
+
+        public List<Site> getSites()
+        {
+            return _sites;
+        }
 		
 		public void Dispose ()
 		{
