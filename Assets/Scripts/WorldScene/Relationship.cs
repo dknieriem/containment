@@ -8,6 +8,7 @@ public class Relationship
 
     const float minScore = -100.0f;
     const float maxScore = 100.0f;
+	const float epsilon = 0.001f;
 
     public Person personOne;
     public Person personTwo;

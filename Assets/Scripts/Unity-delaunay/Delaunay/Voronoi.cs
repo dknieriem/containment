@@ -317,7 +317,7 @@ namespace Delaunay
 					topSite = FortunesAlgorithm_rightRegion (rbnd);
 					// these three sites define a Delaunay triangle
 					// (not actually using these for anything...)
-					//_triangles.push(new Triangle(bottomSite, topSite, rightRegion(lbnd)));
+					_triangles.Add(new Triangle(bottomSite, topSite, FortunesAlgorithm_rightRegion(lbnd)));
 					
 					v = lbnd.vertex;
 					v.SetIndex ();

@@ -76,6 +76,11 @@ namespace Delaunay
 		
 		private uint _siteIndex;
 		
+		public uint getIndex()
+		{
+			return _siteIndex;
+		}
+
 		// the edges that define this Site's Voronoi region:
 		private List<Edge> _edges;
 		internal List<Edge> edges {
