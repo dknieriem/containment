@@ -21,16 +21,16 @@ public class UIWindowScript : MonoBehaviour, IDragHandler
         m_transform.anchorMin = new Vector2(0.5f, 0.5f);
         m_transform.anchoredPosition = new Vector2(0.0f, 0.0f);
 
+        if (CloseButton != null)
+		{
+			CloseButton.onClick.RemoveAllListeners();
+			CloseButton.onClick.AddListener(this.ClosePanel);
+		}
 
-
-        if (CloseButton == null)
-			return;
-
-		CloseButton.onClick.RemoveAllListeners ();
-		CloseButton.onClick.AddListener (this.ClosePanel);
-
-        if (!this.isEnabled)
-            this.ClosePanel();
+		if (!this.isEnabled)
+		{
+			this.ClosePanel();
+		}
 	}
 
 	public void OnDrag (PointerEventData eventData)
