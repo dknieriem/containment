@@ -37,12 +37,20 @@ public class Sector : MonoBehaviour
 		"North Central",
 		"North East",
 	};
-		
+
+	//attributes created by MapGenerator
+	public Vector2 position; //position on map
+	public List<Vector2> mapPoly;
+	public int height; //altitude
+	public float[] NeighborSectorDistance;
+	public float[] NeighborSectorTravelTime;
+	public uint[] NeighborSectorIds;
+	public int used = 0;
+	//old WorldBuilder attributes
 	public SectorType SecType;
 	public int LocationX, LocationY;
 	//public static int MaxPopulation = 1000;
-
-	public Sector[] NeighboringSectors;
+		public Sector[] NeighboringSectors;
 	public SectorType[] NeighboringSectorTypes;
 
 	public World world;

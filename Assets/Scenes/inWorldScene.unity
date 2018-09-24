@@ -6836,6 +6836,7 @@ GameObject:
   - component: {fileID: 1314931509}
   - component: {fileID: 1314931508}
   - component: {fileID: 1314931512}
+  - component: {fileID: 1314931510}
   m_Layer: 0
   m_Name: World Builder
   m_TagString: Untagged
@@ -6878,6 +6879,24 @@ Transform:
   m_Father: {fileID: 212386797}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1314931510
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1314931507}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4da3dc458652b854a98fca45639fd6ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  graphWidth: 32
+  graphHeight: 32
+  numCities: 15
+  minSectors: 1024
+  world: {fileID: 790421416}
+  seed: 0
+  graphSize: 1
 --- !u!114 &1314931512
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9486,7 +9505,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1766633991}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 8, y: 8, z: 10}
+  m_LocalPosition: {x: 0, y: 0, z: 10}
   m_LocalScale: {x: 8, y: 8, z: 1}
   m_Children:
   - {fileID: 858377830}
@@ -9762,7 +9781,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1874594730}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 16, y: 16, z: -20}
+  m_LocalPosition: {x: 8, y: 8, z: -20}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}

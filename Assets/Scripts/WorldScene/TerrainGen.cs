@@ -117,6 +117,7 @@ public class TerrainGen : MonoBehaviour {
 		public List<int[]> rivers;
 		public List<int> regions;
 		public Dictionary<int, List<int>> regionNeighbors;
+		public Dictionary<int, List<Vector2>> regionPolys;
 
 		//
 
@@ -153,6 +154,13 @@ public class TerrainGen : MonoBehaviour {
 				output += "Rivers = null: " + n;
 			}
 			return output;
+		}
+
+		public void getRegions()
+		{
+			Delaunay.Voronoi v = h.mesh.voronoi;
+
+
 		}
 	}
 
@@ -205,7 +213,7 @@ public class TerrainGen : MonoBehaviour {
 		Gizmos.color = Color.black;
 		for (int i = 0; i < vertexBuffer.Count; i++)
 		{
-			Gizmos.DrawSphere(vertexBuffer[i], 0.1f);
+			Gizmos.DrawSphere(vertexBuffer[i], 0.05f);
 		}
 
 		Gizmos.color = Color.black;
@@ -254,6 +262,7 @@ public class TerrainGen : MonoBehaviour {
 
 		render = new Render();
         render = generateCoast(p);
+
 		//render.h = h;
 
 		Debug.Log(render.ToString());
@@ -1360,6 +1369,8 @@ public class TerrainGen : MonoBehaviour {
             if (h.h[i] > 0) above++;
         }
         limit *= above / h.h.Length;
+		Debug.Log("new limit: " + limit);
+
         for (int i = 0; i < dh.Length; i++) {
             if (isnearedge(h.mesh, i)) continue;
             if (flux.h[i] > limit && h.h[i] > 0 && dh[i] >= 0) {

@@ -8,6 +8,7 @@ public class World : MonoBehaviour
 {
 
 	public GameObject SectorPrefab;
+	public Dictionary<int, Sector> Sectors;
 	public Sector[,] WorldSectors;
 	public int DimensionsX, DimensionsY;
 	public int NumGroups = 0;
