@@ -163,15 +163,18 @@ public class MapGenerator : MonoBehaviour {
 
 		voronoi = new Delaunay.Voronoi(pts, colors(pts.Count), new Rect(0, 0, graphWidth, graphHeight));
 
-		sites = voronoi.getSites();
-		polygons = new Dictionary<uint, List<Vector2>>(sites.Count);
+		List<Delaunay.Site> vSites = voronoi.getSites();
+		sites = new List<Delaunay.Site>(new Delaunay.Site[vSites.Count]);
+		polygons = new Dictionary<uint, List<Vector2>>(vSites.Count);
 
-		for(int i = 0; i < sites.Count; i++)
+		for(int i = 0; i < vSites.Count; i++)
 		{
-			uint index = sites[i].getIndex();
+			Delaunay.Site site = vSites[i];
+			uint index = vSites[i].getIndex();
 			polygons.Add(index, sites[i].Region(voronoi.plotBounds));
 			siteCoordsById.Add(index, sites[i].Coord);
 			siteIdsByCoord.Add(sites[i].Coord, index);
+			sites[(int)index] = site;
 		}
 
 		time = Time.time - time;
@@ -195,7 +198,7 @@ public class MapGenerator : MonoBehaviour {
 		Debug.Log("detectNeighbors");
 		float time = Time.time;
 
-		sectors = new List<Sector>(sites.Count);
+		sectors = new List<Sector>(new Sector[sites.Count]);
 
 		for (int i = 0; i < sites.Count; i++)
 		{
@@ -237,8 +240,10 @@ public class MapGenerator : MonoBehaviour {
 			newSector.height = 0;
 			newSector.NeighborSectorDistance = null;
 			newSector.NeighborSectorTravelTime = null;
+			newSector.type = type;
 			newSector.NeighborSectorIds = neighborIds.ToArray();
-			sectors.Add(newSector);
+			sectors[(int)sectorId] = newSector;
+			//sectors.Add(newSector);
 		}
 
 
@@ -286,8 +291,8 @@ public class MapGenerator : MonoBehaviour {
 	void templateVolcano()
 	{
 		addMountain();
-		modifyHeights("all", 10, 1);
-		addHill(5, 0.35);
+		modifyHeights("all", 10, 1.0f);
+		addHill(5, 0.35f);
 		addRange(3);
 		addRange(-4);
 	}
@@ -296,39 +301,39 @@ public class MapGenerator : MonoBehaviour {
 	void templateHighIsland()
 	{
 		addMountain();
-		modifyHeights("all", 10, 1);
+		modifyHeights("all", 10, 1.0f);
 		addRange(6);
-		addHill(12, 0.25);
+		addHill(12, 0.25f);
 		addRange(-3);
-		modifyHeights("land", 0, 0.75);
+		modifyHeights("land", 0, 0.75f);
 		addPit(1);
-		addHill(3, 0.15);
+		addHill(3, 0.15f);
 	}
 
 	// Heighmap Template: Low Island
 	void templateLowIsland()
 	{
 		addMountain();
-		modifyHeights("all", 10, 1);
+		modifyHeights("all", 10, 1.0f);
 		smoothHeights(2);
 		addRange(2);
-		addHill(4, 0.4);
-		addHill(12, 0.2);
+		addHill(4, 0.4f);
+		addHill(12, 0.2f);
 		addRange(-8);
-		modifyHeights("land", 0, 0.35);
+		modifyHeights("land", 0, 0.35f);
 	}
 
 	// Heighmap Template: Continents
 	void templateContinents()
 	{
 		addMountain();
-		modifyHeights("all", 10, 1);
-		addHill(30, 0.25);
+		modifyHeights("all", 10, 1.0f);
+		addHill(30, 0.25f);
 		int count = Mathf.CeilToInt(UnityEngine.Random.value * 4 + 4);
 		addStrait(count);
 		addPit(10);
 		addRange(-10);
-		modifyHeights("land", 0, 0.6);
+		modifyHeights("land", 0, 0.6f);
 		smoothHeights(2);
 		addRange(3);
 	}
@@ -337,14 +342,14 @@ public class MapGenerator : MonoBehaviour {
 	void templateArchipelago()
 	{
 		addMountain();
-		modifyHeights("all", 10, 1);
-		addHill(12, 0.15);
+		modifyHeights("all", 10, 1.0f);
+		addHill(12, 0.15f);
 		addRange(8);
 		int count = Mathf.CeilToInt(UnityEngine.Random.value * 2 + 2);
 		addStrait(count);
 		addRange(-15);
 		addPit(10);
-		modifyHeights("land", -5, 0.7);
+		modifyHeights("land", -5, 0.7f);
 		smoothHeights(3);
 	}
 
@@ -352,24 +357,24 @@ public class MapGenerator : MonoBehaviour {
 	void templateAtoll()
 	{
 		addMountain();
-		modifyHeights("all", 10, 1);
-		addHill(2, 0.35);
+		modifyHeights("all", 10, 1.0f);
+		addHill(2, 0.35f);
 		addRange(2);
 		smoothHeights(1);
-		modifyHeights("27-100", 0, 0.1);
+		modifyHeights("27-100", 0, 0.1f);
 	}
 
 	// Heighmap Template: Mainland
 	void templateMainland()
 	{
 		addMountain();
-		modifyHeights("all", 10, 1);
-		addHill(30, 0.2);
+		modifyHeights("all", 10, 1.0f);
+		addHill(30, 0.2f);
 		addRange(10);
 		addPit(20);
-		addHill(10, 0.15);
+		addHill(10, 0.15f);
 		addRange(-10);
-		modifyHeights("land", 0, 0.4);
+		modifyHeights("land", 0, 0.4f);
 		addRange(10);
 		smoothHeights(3);
 	}
@@ -378,7 +383,7 @@ public class MapGenerator : MonoBehaviour {
 	void templatePeninsulas()
 	{
 		addMountain();
-		modifyHeights("all", 15, 1);
+		modifyHeights("all", 15, 1.0f);
 		addHill(30, 0);
 		addRange(5);
 		addPit(15);
@@ -386,7 +391,7 @@ public class MapGenerator : MonoBehaviour {
 		addStrait(count);
 	}
 
-	void addMountain()
+	private void addMountain()
 	{
 		float x = UnityEngine.Random.value * graphWidth / 3 + graphWidth / 3;
 		float y = UnityEngine.Random.value * graphHeight * 0.2f + graphHeight * 0.4f;
@@ -404,6 +409,29 @@ public class MapGenerator : MonoBehaviour {
 
 	}
 
+	// place with shift 0-0.5
+	private void addHill(int count, float shift)
+	{
+		for (int c = 0; c < count; c++)
+		{
+			int limit = 0;
+			uint cell;
+			float height;
+
+			do
+			{
+				height = UnityEngine.Random.value * 40 + 10; // 10-50
+				float x = Mathf.Floor(UnityEngine.Random.value * graphWidth * (1 - shift * 2) + graphWidth * shift);
+				float y = Mathf.Floor(UnityEngine.Random.value * graphHeight * (1 - shift * 2) + graphHeight * shift);
+				Vector2 siteCoord = (Vector2) voronoi.NearestSitePoint(x, y);
+				cell = siteIdsByCoord[siteCoord]; 
+				limit++;
+			} while (heights[(int) cell] + height > 90 && limit < 100);
+	
+			add(cell, "hill", height);
+		}
+	}
+
 	void add(uint start, string type, float height)
 	{
 		int session = Mathf.CeilToInt(UnityEngine.Random.value * (float)1e5);
@@ -417,22 +445,328 @@ public class MapGenerator : MonoBehaviour {
 		}
 		radius = type == "mountain" ? mRadius : hRadius;
 		List<uint> queue = new List<uint>(new uint[] { start });
-		if (type == "mountain") heights[(int)start] = height;
+		if (type == "mountain")
+		{
+			heights[(int)start] = height;
+		}
 		for (int i = 0; i < queue.Count && height >= 1; i++)
 		{
-			if (type == "mountain") { height = heights[(int)queue[i]] * radius - height / 100; }
+			if (type == "mountain") {
+				height = heights[(int)queue[i]] * radius - height / 100;
+			}
 			else { height *= radius; }
 
 			uint[] neighbors = sectors[(int)queue[i]].NeighborSectorIds;
 			for(int j = 0; j < neighbors.Length; j++){
 				int e = (int) neighbors[j];
-				if (sectors[e].used == session) return;
+				if (sectors[e].used == session)
+				{
+					break;
+				}
+
 				float mod = UnityEngine.Random.value * 0.2f + 0.9f; // 0.9-1.1 random factor
 				heights[e] += height * mod;
-				if (heights[e] > 100) heights[(int)e] = 100;
+				if (heights[e] > 100)
+				{
+					heights[(int)e] = 100;
+				}
 				sectors[e].used = session;
 				queue.Add((uint)e);
 			}
+		}
+	}
+
+	private List<int> addRange(int mod, float height = -1, int from = -1, int to = -1)
+	{
+		int session = Mathf.CeilToInt(UnityEngine.Random.value * 100000);
+		int count = Math.Abs(mod);
+		List<int> range = new List<int>();
+		for (int c = 0; c < count; c++)
+		{
+			range.Clear();
+			range = new List<int>();
+			float diff = 0;
+			int start = from;
+			int end = to;
+
+			if (start == -1 || end == -1)
+			{
+				do
+				{
+					float xf = Mathf.Floor(UnityEngine.Random.value * (graphWidth * 0.7f)) + graphWidth * 0.15f;
+					float yf = Mathf.Floor(UnityEngine.Random.value * (graphHeight * 0.6f)) + graphHeight * 0.2f;
+					Vector2 startCoord = (Vector2)voronoi.NearestSitePoint(xf, yf);
+					start = (int)siteIdsByCoord[startCoord];
+					float xt = Mathf.Floor(UnityEngine.Random.value * (graphWidth * 0.7f)) + graphWidth * 0.15f;
+					float yt = Mathf.Floor(UnityEngine.Random.value * (graphHeight * 0.6f)) + graphHeight * 0.2f;
+					Vector2 endCoord = (Vector2)voronoi.NearestSitePoint(xt, yt);
+					end = (int)siteIdsByCoord[endCoord];
+					diff = Vector2.Distance(startCoord, endCoord);
+
+				} while (diff < 150 / graphSize || diff > 300 / graphSize);
+	  
+			}
+
+			if (start!= -1 && end != -1)
+			{
+				for (int l = 0; start != end && l < 10000; l++)
+				{
+					float min = 10000;
+					uint[] neighbors = sectors[start].NeighborSectorIds;
+					for(int j = 0; j < neighbors.Length; j++)
+					{
+						Sector e = sectors[(int)neighbors[j]];
+						diff = Vector2.Distance(sectors[end].position, e.position);
+						if (UnityEngine.Random.value > 0.8f)
+						{
+							diff = diff / 2;
+						}
+
+						if( diff < min)
+						{
+							min = diff;
+							start = (int) neighbors[j];
+						}
+					}
+
+					//cells[start].neighbors.forEach(function(e) {
+					//	diff = Math.hypot(cells[end].data[0] - cells[e].data[0], cells[end].data[1] - cells[e].data[1]);
+					//	if (Math.random() > 0.8) diff = diff / 2;
+					//	if (diff < min) { min = diff, start = e; }
+					//});
+					range.Add(start);
+				}
+			}
+
+			float change = height != -1 ? height : UnityEngine.Random.Range(10.0f, 20.0f);
+			for (int ri = 0; ri < range.Count; ri++)
+			{
+				int r = range[ri];
+				float rnd = UnityEngine.Random.Range(0.4f, 1.2f);
+				if (mod > 0)
+				{
+					heights[r] += change * rnd;
+				}
+				else if (heights[r] >= 10)
+				{
+					heights[r] -= change * rnd;
+				}
+
+				uint[] neighbors = sectors[start].NeighborSectorIds;
+				for (int j = 0; j < neighbors.Length; j++)
+				{
+					Sector e = sectors[(int)neighbors[j]];
+					if (e.used == session)
+					{
+						break;
+					}
+
+					e.used = session;
+					rnd = UnityEngine.Random.Range(0.4f, 1.2f);
+					float ch = change / 2 * rnd;
+
+					if (mod > 0)
+					{
+						heights[(int)neighbors[j]] += ch;
+					}
+					else if (heights[(int)neighbors[j]] >= 10)
+					{
+						heights[(int)neighbors[j]] -= ch;
+					}
+
+					if (heights[(int)neighbors[j]] > 100) heights[(int)neighbors[j]] = mod > 0 ? 100 : 5;
+				}
+
+				if (heights[r] > 100) heights[r] = mod > 0 ? 100 : 5;
+			}
+				//	range.map(function(r) {
+				//	let rnd = Math.random() * 0.4 + 0.8;
+				//	if (mod > 0) heights[r] += change* rnd;
+				//	else if (heights[r] >= 10) {heights[r] -= change* rnd;}
+				//	cells[r].neighbors.forEach(function(e) {
+				//		if (cells[e].used === session) return;
+				//		cells[e].used = session;
+				//		rnd = Math.random() * 0.4 + 0.8;
+				//		const ch = change / 2 * rnd;
+				//		if (mod > 0) {heights[e] += ch;} else if (heights[e] >= 10) {heights[e] -= ch;}
+				//		 if (heights[e] > 100) heights[e] = mod > 0 ? 100 : 5;
+				//	});
+				//	if (heights[r] > 100) heights[r] = mod > 0 ? 100 : 5;
+				//});
+		}
+
+		return range;
+	}
+
+	private void addStrait(int width)
+	{
+		int session = Mathf.CeilToInt(UnityEngine.Random.value * 100000);
+		float top = Mathf.Floor(UnityEngine.Random.value * graphWidth * 0.35f + graphWidth * 0.3f);
+		float bottom = Mathf.Floor((graphWidth - top) - (graphWidth * 0.1f) + (UnityEngine.Random.value * graphWidth * 0.2f));
+		Vector2 startCoord = (Vector2) voronoi.NearestSitePoint(top, graphHeight * 0.1f);
+		int start = (int) siteIdsByCoord[startCoord];
+
+		Vector2 endCoord = (Vector2)voronoi.NearestSitePoint(bottom, graphHeight * 0.9f);
+		int end = (int) siteIdsByCoord[endCoord];
+		
+		List<int> range = new List<int>();
+		for (int l = 0; start != end && l < 1000; l++)
+		{
+			float min = 10000; // dummy value
+
+			uint[] neighbors = sectors[start].NeighborSectorIds;
+			for (int j = 0; j < neighbors.Length; j++)
+			{
+				Sector e = sectors[(int)neighbors[j]];
+				float diff = Vector2.Distance(e.position, sectors[end].position);
+
+				if (UnityEngine.Random.value > 0.8f)
+				{
+					diff = diff / 2;
+				}
+
+				if (diff < min)
+				{
+					min = diff;
+					start = (int)neighbors[j];
+				}
+			}
+
+			range.Add(start);
+		}
+
+		List<int> query = new List<int>();
+
+		for(; width > 0; width--)
+		{
+
+			range.ForEach(r => );
+			for (int ri = 0; ri < range.Count; ri++)
+			{
+				int r = range[ri];
+				uint[] neighbors = sectors[r].NeighborSectorIds;
+
+				for(int ni = 0; ni < neighbors.Length; ni++)
+				{
+					uint n = neighbors[ni];
+					Sector neighbor = sectors[n];
+					if(neighbor.used == session)
+					{
+						break;
+					}
+
+					neighbor.used = session;
+					query.Add((int)n);
+					heights[(int)n] *= 0.23f;
+
+					if(heights[(int)n] > 100 || heights[(int)n] < 5)
+					{
+						heights[(int)n] = 5;
+					}
+				}
+
+				range = query;
+			}
+		
+		}
+
+	}
+
+	private void addPit(int count, float height = -1, int cell = -1)
+	{
+		int session = Mathf.CeilToInt(UnityEngine.Random.value * 100000);
+
+		for (int c = 0; c < count; c++)
+		{
+			float change = height != -1 ? height + 10 : UnityEngine.Random.Range(10.0f, 30.0f);
+			int start = cell;
+			if (start == - 1)
+			{
+				//get all index where heights[i] >= 20 const lowlands = $.grep(cells, function(e) { return (heights[e.index] >= 20);});
+				List<float> lowlands = heights.ToArray().Where(x => x >= 20).ToList();
+				if (lowlands.Count == 0) return;
+				int rnd = Mathf.FloorToInt(UnityEngine.Random.value * lowlands.Count);
+				start = lowlands[rnd].index; //TODO: eh?
+	}
+			List<int> query = new List<int>(new int[] { start });
+			List<int> newQuery = new List<int>();
+
+	// depress pit center
+	heights[start] -= change;
+      if (heights[start] < 5 || heights[start] > 100) heights[start] = 5;
+      cells[start].used = session;
+      for (let i = 1; i< 10000; i++) {
+        const rnd = Math.random() * 0.4 + 0.8;
+	change -= i / 0.6 * rnd;
+        if (change< 1) break;
+        query.map(function(p) {
+          cells[p].neighbors.forEach(function(e) {
+            if (cells[e].used === session) return;
+            cells[e].used = session;
+            if (Math.random() > 0.8) return;
+            newQuery.push(e);
+            heights[e] -= change;
+            if (heights[e] < 5 || heights[e] > 100) heights[e] = 5;
+          });
+        });
+        query = newQuery.slice();
+        newQuery = [];
+      }
+    }
+  }
+
+	private void modifyHeights(string range, float add, float mult)
+	{
+		int limMin = range == "land" ? 20 : range == "all" ? 0 : Int32.Parse(range.Split('-')[0]);
+		int limMax = range == "land" || range == "all" ? 100 : Int32.Parse(range.Split('-')[1]);
+
+		for (int i = 0; i < heights.Count; i++)
+		{
+			if (heights[i] < limMin || heights[i] > limMax) continue;
+			heights[i] = modify(range, add, mult, heights[i]);
+		}
+	}
+
+	private float modify(string range, float add, float mult, float v)
+	{
+		if (add != 0) v += add;
+		if (mult != 1)
+		{
+			//if (mult === "^2") mult = (v - 20) / 100;
+			//if (mult === "^3") mult = ((v - 20) * (v - 20)) / 100;
+			if (range == "land") { v = 20 + (v - 20) * mult; }
+			else { v *= mult; }
+		}
+		if (v < 0) v = 0.0f;
+		if (v > 100) v = 100.0f;
+		return v;
+	}
+
+	// Smooth heights using mean of neighbors
+	private void smoothHeights(int fraction = 2)
+	{
+		for (int i = 0; i < heights.Count; i++)
+		{
+			List<float> nHeights = new List<float>();
+			nHeights.Add(heights[i]);
+			for(int j = 0; j < sectors[i].NeighborSectorIds.Length; j++)
+			{
+				nHeights.Add(heights[j]);
+			}
+
+			//cells[i].neighbors.forEach(function(e) { nHeights.push(heights[e]); });
+			heights[i] = (heights[i] * (fraction - 1) + nHeights.Average()) / (float) fraction;
+		}
+	}
+
+	// Randomize heights a bit
+	private void disruptHeights()
+	{
+		for (int i = 0; i < heights.Count; i++)
+		{
+			if (heights[i] < 18) continue;
+			if (UnityEngine.Random.value < 0.5) continue;
+			heights[i] += UnityEngine.Random.Range(-2.0f, 2.0f);
 		}
 	}
 

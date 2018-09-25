@@ -46,6 +46,8 @@ public class Sector : MonoBehaviour
 	public float[] NeighborSectorTravelTime;
 	public uint[] NeighborSectorIds;
 	public int used = 0;
+	public string type = "";
+
 	//old WorldBuilder attributes
 	public SectorType SecType;
 	public int LocationX, LocationY;
