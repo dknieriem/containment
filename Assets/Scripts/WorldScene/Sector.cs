@@ -39,14 +39,22 @@ public class Sector : MonoBehaviour
 	};
 
 	//attributes created by MapGenerator
+	public uint Id;
 	public Vector2 position; //position on map
 	public List<Vector2> mapPoly;
-	public int height; //altitude
+	public float height; //altitude
 	public float[] NeighborSectorDistance;
 	public float[] NeighborSectorTravelTime;
 	public uint[] NeighborSectorIds;
 	public int used = 0;
 	public string type = "";
+	public int featureNumber = -1;
+	public int cType;
+	public int? harbor;
+	public int? pit;
+	public int? lake;
+	public float area; //area in square graph distance units (km?)
+	public float flux; //water flow
 
 	//old WorldBuilder attributes
 	public SectorType SecType;

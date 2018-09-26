@@ -12,6 +12,8 @@ public class MapGenerator : MonoBehaviour {
 	public int numCities = 15;
 	public int minSectors = 32 * 32; //map needs to have enough sectors to keep it interesting
 
+	[Range(0,25)]
+	public int precInput = 5; 
 	public World world;
 
 	public enum MapTemplates
@@ -41,6 +43,7 @@ public class MapGenerator : MonoBehaviour {
 	List<Vector2> points;
 	List<Sector> sectors; //was cells in Azgaar's
 	List<float> heights;
+	List<Feature> features;
 
 	// Common variables
 	public int graphSize = 1;
@@ -53,6 +56,19 @@ public class MapGenerator : MonoBehaviour {
 
 	}
 
+	struct Feature
+	{
+		public int i;
+		public bool border;
+		public bool land;
+
+		public Feature(int i, bool border, bool land)
+		{
+			this.i = i;
+			this.border = border;
+			this.land = land;
+		}
+	}
 	// Use this for initialization
 	void Start () {
 		
@@ -235,9 +251,10 @@ public class MapGenerator : MonoBehaviour {
 				}
 			}
 			Sector newSector = new Sector();
+			newSector.Id = sectorId;
 			newSector.position = position;
 			newSector.mapPoly = site.Region(new Rect(0, 0, graphWidth, graphHeight));
-			newSector.height = 0;
+			//newSector.height = 0;
 			newSector.NeighborSectorDistance = null;
 			newSector.NeighborSectorTravelTime = null;
 			newSector.type = type;
@@ -529,11 +546,6 @@ public class MapGenerator : MonoBehaviour {
 						}
 					}
 
-					//cells[start].neighbors.forEach(function(e) {
-					//	diff = Math.hypot(cells[end].data[0] - cells[e].data[0], cells[end].data[1] - cells[e].data[1]);
-					//	if (Math.random() > 0.8) diff = diff / 2;
-					//	if (diff < min) { min = diff, start = e; }
-					//});
 					range.Add(start);
 				}
 			}
@@ -579,20 +591,7 @@ public class MapGenerator : MonoBehaviour {
 
 				if (heights[r] > 100) heights[r] = mod > 0 ? 100 : 5;
 			}
-				//	range.map(function(r) {
-				//	let rnd = Math.random() * 0.4 + 0.8;
-				//	if (mod > 0) heights[r] += change* rnd;
-				//	else if (heights[r] >= 10) {heights[r] -= change* rnd;}
-				//	cells[r].neighbors.forEach(function(e) {
-				//		if (cells[e].used === session) return;
-				//		cells[e].used = session;
-				//		rnd = Math.random() * 0.4 + 0.8;
-				//		const ch = change / 2 * rnd;
-				//		if (mod > 0) {heights[e] += ch;} else if (heights[e] >= 10) {heights[e] -= ch;}
-				//		 if (heights[e] > 100) heights[e] = mod > 0 ? 100 : 5;
-				//	});
-				//	if (heights[r] > 100) heights[r] = mod > 0 ? 100 : 5;
-				//});
+			
 		}
 
 		return range;
@@ -640,16 +639,16 @@ public class MapGenerator : MonoBehaviour {
 		for(; width > 0; width--)
 		{
 
-			range.ForEach(r => );
-			for (int ri = 0; ri < range.Count; ri++)
+			range.ForEach(r => 
+			//for (int ri = 0; ri < range.Count; ri++)
 			{
-				int r = range[ri];
+			//	int r = range[ri];
 				uint[] neighbors = sectors[r].NeighborSectorIds;
 
 				for(int ni = 0; ni < neighbors.Length; ni++)
 				{
 					uint n = neighbors[ni];
-					Sector neighbor = sectors[n];
+					Sector neighbor = sectors[(int)n];
 					if(neighbor.used == session)
 					{
 						break;
@@ -667,7 +666,7 @@ public class MapGenerator : MonoBehaviour {
 
 				range = query;
 			}
-		
+			);
 		}
 
 	}
@@ -683,37 +682,48 @@ public class MapGenerator : MonoBehaviour {
 			if (start == - 1)
 			{
 				//get all index where heights[i] >= 20 const lowlands = $.grep(cells, function(e) { return (heights[e.index] >= 20);});
-				List<float> lowlands = heights.ToArray().Where(x => x >= 20).ToList();
+				List<int> lowlands = heights.ToArray().Select((x, index) => index).Where(x => x >= 20).ToList();
 				if (lowlands.Count == 0) return;
 				int rnd = Mathf.FloorToInt(UnityEngine.Random.value * lowlands.Count);
-				start = lowlands[rnd].index; //TODO: eh?
-	}
+				start = lowlands[rnd];
+			}
+
 			List<int> query = new List<int>(new int[] { start });
 			List<int> newQuery = new List<int>();
 
-	// depress pit center
-	heights[start] -= change;
-      if (heights[start] < 5 || heights[start] > 100) heights[start] = 5;
-      cells[start].used = session;
-      for (let i = 1; i< 10000; i++) {
-        const rnd = Math.random() * 0.4 + 0.8;
-	change -= i / 0.6 * rnd;
-        if (change< 1) break;
-        query.map(function(p) {
-          cells[p].neighbors.forEach(function(e) {
-            if (cells[e].used === session) return;
-            cells[e].used = session;
-            if (Math.random() > 0.8) return;
-            newQuery.push(e);
-            heights[e] -= change;
-            if (heights[e] < 5 || heights[e] > 100) heights[e] = 5;
-          });
-        });
-        query = newQuery.slice();
-        newQuery = [];
-      }
-    }
-  }
+			// depress pit center
+			heights[start] -= change;
+			if (heights[start] < 5 || heights[start] > 100) {
+				heights[start] = 5;
+			}
+
+			sectors[start].used = session;
+
+			for (int i = 1; i< 10000; i++) {
+				float rnd = UnityEngine.Random.Range(0.4f, 1.2f);
+				change -= i / 0.6f * rnd;
+				if (change < 1) {
+					break;
+				}
+				foreach( int p in query) {
+					uint[] neighbors = sectors[p].NeighborSectorIds;
+					foreach( uint e in neighbors) {
+						if (sectors[(int)e].used == session) break;
+						sectors[(int)e].used = session;
+						if (UnityEngine.Random.value > 0.8f) break;
+						newQuery.Add((int)e);
+						heights[(int)e] -= change;
+						if (heights[(int)e] < 5 || heights[(int)e] > 100)
+						{
+							heights[(int)e] = 5;
+						}
+					}
+				}
+				query = newQuery;
+				newQuery = new List<int>();
+			}
+		}
+	}
 
 	private void modifyHeights(string range, float add, float mult)
 	{
@@ -755,7 +765,7 @@ public class MapGenerator : MonoBehaviour {
 			}
 
 			//cells[i].neighbors.forEach(function(e) { nHeights.push(heights[e]); });
-			heights[i] = (heights[i] * (fraction - 1) + nHeights.Average()) / (float) fraction;
+			heights[i] = (heights[i] * (fraction - 1) + nHeights.Average()) / fraction;
 		}
 	}
 
@@ -770,70 +780,432 @@ public class MapGenerator : MonoBehaviour {
 		}
 	}
 
-	private void cleanData()
+	private void markFeatures()
 	{
-		throw new NotImplementedException();
+		Debug.Log("markFeatures");
+		float time = Time.time;
+
+		UnityEngine.Random.InitState(seed);
+
+		features = new List<Feature>();
+
+		Queue<int> queue = new Queue<int>();
+		queue.Enqueue(0);
+
+		for (int i = 0; queue.Count > 0; i++)
+		{
+			Sector sector = sectors[queue.ElementAt(0)];
+			sector.featureNumber = i;
+			bool isLand = (heights[queue.ElementAt(0)] >= 20);
+			bool isBorder = (sector.type == "border");
+			if(isBorder && isLand)
+			{
+				sector.cType = 2;
+			}
+
+			while(queue.Count > 0)
+			{
+				int q = queue.Dequeue();
+				if(sectors[q].type == "border")
+				{
+					isBorder = true;
+					if (isLand)
+					{
+						sectors[q].cType = 2;
+					}
+				}
+
+				uint[] neighbors = sectors[q].NeighborSectorIds;
+				foreach(uint e in neighbors)
+				{
+					bool eLand = (heights[(int)e] >= 20);
+					if(isLand == eLand && sectors[(int)e].featureNumber == -1)
+					{
+						sectors[(int)e].featureNumber = i;
+						queue.Enqueue((int)e);
+					}
+
+					if(isLand && !eLand)
+					{
+						sectors[q].cType = 2;
+						sectors[(int)e].cType = -1;
+						if( sectors[q].harbor != null)
+						{
+							sectors[q].harbor++;
+						} else
+						{
+							sectors[q].harbor = 1;
+						}
+					}
+				}
+			}
+
+			features.Add(new Feature(i, isBorder, isLand));
+
+			for (int c = 0; c < sectors.Count; c++)
+			{
+				if (sectors[c].featureNumber == -1)
+				{
+					queue.Enqueue(c);
+					break;
+				}
+			}
+		}
+
+		time = Time.time - time;
+		Debug.Log("Time: " + time);
+		Debug.Log("/markFeatures");
 	}
 
-	private void manorsAndRegions()
+	private void drawOcean()
 	{
-		throw new NotImplementedException();
+		Debug.Log("drawOcean");
+		float time = Time.time;
+
+		List<int> limits = new List<int>();
+		float odd = 0.8f; // initial odd for ocean layer is 80%
+
+		// Define type of ocean cells based on cell distance form land
+		//let frontier = $.grep(cells, function(e) { return e.ctype === -1; });
+		List<Sector> frontier = (List<Sector>) sectors.Where(s => s.cType == -1);
+		if (UnityEngine.Random.value < odd) { limits.Add(-1); odd = 0.2f; }
+		for (int c = -2; frontier.Count > 0 && c > -10; c--)
+		{
+			if (UnityEngine.Random.value < odd) { limits.Insert(0, c); odd = 0.2f; } else { odd += 0.2f; }
+			foreach(Sector i in frontier) {
+				uint[] neighbors = i.NeighborSectorIds;
+				foreach(uint e in neighbors){
+					if (sectors[(int)e].cType == null) sectors[(int)e].cType = c;
+				}
+			}
+			//frontier = $.grep(cells, function(e) { return e.ctype === c; });
+			frontier = (List<Sector>)sectors.Where(s => s.cType == c);
+		}
+		//don't draw anything here. We'll set sprites later based on cType
+			   
+		time = Time.time - time;
+		Debug.Log("Time: " + time);
+		Debug.Log("/drawOcean");
 	}
 
-	private void generateCultures()
+	private void elevateLakes()
 	{
-		throw new NotImplementedException();
+		Debug.Log("elevateLakes");
+		float time = Time.time;
+
+		//const lakes = $.grep(cells, function(e, d) { return heights[d] < 20 && !features[e.fn].border; });
+		List<Sector> lakes = sectors.Where(s => heights[(int)s.Id] < 20 && !features[s.featureNumber].border).ToList();
+
+		//lakes.sort(function(a, b) { return heights[b.index] - heights[a.index]; });
+		lakes = lakes.OrderByDescending(l => heights[(int)l.Id]).ToList();
+		for (int i = 0; i < lakes.Count; i++)
+		{
+			List<float> hs = new List<float>();
+			uint id = lakes[i].Id;
+			sectors[(int)id].height = heights[(int)id]; // use height on object level
+			uint[] neighbors = lakes[i].NeighborSectorIds;
+			foreach(uint n in neighbors){
+				float nHeight = sectors[(int)n].height != null ? sectors[(int)n].height : heights[(int)n];
+				if (nHeight >= 20) hs.Add(nHeight);
+			}
+			if (hs.Count > 0) sectors[(int)id].height = hs.Max() - 1;
+			if (sectors[(int)id].height < 20) sectors[(int)id].height = 20;
+			lakes[i].lake = 1;
+		}
+
+		time = Time.time - time;
+		Debug.Log("Time: " + time);
+		Debug.Log("/elevateLakes");
 	}
 
-	private void drawRelief()
+	private void reGraph()
 	{
-		throw new NotImplementedException();
+		Debug.Log("reGraph");
+		float time = Time.time;
+
+		List<Sector> tempCells = new List<Sector>();
+		List<Vector2> newPoints = new List<Vector2>(); // to store new data
+		
+		// get average precipitation based on graph size
+		float avPrec = precInput / 5000;
+		int smallLakesMax = 500;
+		int smallLakes = 0;
+		int evaporation = 2;
+
+		foreach(Sector i in sectors){
+			int d = (int)i.Id;
+			float height = i.height != null ? i.height : heights[d];
+			if (height > 100) height = 100;
+			int? pit = i.pit;
+			int ctype = i.cType;
+			if (ctype != -1 && ctype != -2 && height < 20) break; // exclude all deep ocean points
+			Vector2 coord = i.position;
+			coord.x = rn(coord.x, 2);
+			coord.y = rn(coord.y, 2);
+
+			int featureNumber = i.featureNumber;
+			int? harbor = i.harbor;
+			int? lake = i.lake;
+			// mark potential cells for small lakes to add additional point there
+			if (smallLakes < smallLakesMax && lake == null && pit > evaporation && ctype != 2)
+			{
+				lake = 2;
+				smallLakes++;
+			}
+			//const region = i.region; // handle value for edit heightmap mode only
+			//const culture = i.culture; // handle value for edit heightmap mode only
+			//let copy = $.grep(newPoints, function(e) { return (e[0] == x && e[1] == y); });
+			List<Vector2> copy = newPoints.Where(v => v.x == coord.x && v.y == coord.y).ToList();
+			if (copy.Count == 0)
+			{
+				newPoints.Add(coord);
+
+				//tempCells.push({ index: tempCells.length, data:[x, y], height, pit, ctype, fn, harbor, lake, region, culture});
+				Sector newSector = new Sector();
+				newSector.Id = Convert.ToUInt32(tempCells.Count);
+				newSector.position = coord;
+				newSector.height = height;
+				newSector.pit = pit;
+				newSector.cType = ctype;
+				newSector.featureNumber = featureNumber;
+				newSector.harbor = harbor;
+				newSector.lake = lake;
+				
+				tempCells.Add(newSector);
+			}
+
+			// add additional points for cells along coast
+			if (ctype == 2 || ctype == -1)
+			{
+				if (i.type == "border") break;
+				if (!features[featureNumber].land && !features[featureNumber].border) break;
+
+				uint[] neighbors = i.NeighborSectorIds;
+				foreach(uint e in neighbors) { 
+
+					if (sectors[(int)e].cType == ctype)
+					{
+						float x1 = (coord.x * 2 + sectors[(int)e].position.x) / 3;
+						float y1 = (coord.y * 2 + sectors[(int)e].position.y) / 3;
+						x1 = rn(x1, 1);
+						y1 = rn(y1, 1);
+						//copy = $.grep(newPoints, function(e) { return e[0] === x1 && e[1] === y1; });
+						copy = newPoints.Where(v => v.x == x1 && v.y == y1).ToList();
+						if (copy.Count > 0) break;
+						newPoints.Add( new Vector2(x1, y1));
+
+						//tempCells.push({ index: tempCells.length, data:[x1, y1], height, pit, ctype, fn, harbor, lake, region, culture});
+						Sector newSector = new Sector();
+						newSector.Id = Convert.ToUInt32(tempCells.Count);
+						newSector.position = new Vector2(x1, y1);
+						newSector.height = height;
+						newSector.pit = pit;
+						newSector.cType = ctype;
+						newSector.featureNumber = featureNumber;
+						newSector.harbor = harbor;
+						newSector.lake = lake;
+
+						tempCells.Add(newSector);
+
+					}
+				}
+
+			}
+
+			// add potential small lakes
+			if (lake == 2)
+			{
+				List<Vector2> polys = polygons[i.Id];
+				foreach(Vector2 e in polys){
+					if (UnityEngine.Random.value > 0.8f) break;
+					float rnd = UnityEngine.Random.Range(0.6f, 1.4f);
+					float x1 = rn((e.x * rnd + i.position.x) / (1 + rnd), 2);
+					rnd = UnityEngine.Random.Range(0.6f, 1.4f);
+					float y1 = rn((e.y * rnd + i.position.y) / (1 + rnd), 2);
+
+					//copy = $.grep(newPoints, function(c) { return x1 === c[0] && y1 === c[1]; });
+					copy = newPoints.Where(v => v.x == x1 && v.y == y1).ToList();
+					if (copy.Count > 0) break;
+
+					newPoints.Add(new Vector2(x1, y1));
+					//tempCells.push({ index: tempCells.length, data:[x1, y1], height, pit, ctype, fn, region, culture});
+
+					Sector newSector = new Sector();
+					newSector.Id = Convert.ToUInt32(tempCells.Count);
+					newSector.position = new Vector2(x1, y1);
+					newSector.height = height;
+					newSector.pit = pit;
+					newSector.cType = ctype;
+					newSector.featureNumber = featureNumber;
+					newSector.harbor = harbor;
+					newSector.lake = lake;
+
+					tempCells.Add(newSector);
+				}
+			}
+		} // end of foreach(Sector i in sectors)
+
+		Debug.Log("small lakes candidates: " + smallLakes);
+		sectors = tempCells; // use tempCells as the only cells array
+		calculateVoronoi(newPoints); // recalculate Voronoi diagram using new points
+		
+		//let gridPath = ""; this was for showing the grid outline 
+		//cells.map(function(i, d) {
+		foreach(Sector i in sectors) {
+			uint ud = i.Id;
+			int d = (int)i.Id;
+			if (i.height >= 20)
+			{
+				// calc cell area
+				i.area = rn(Mathf.Abs(GetArea(polygons[ud])), 2);
+				float prec = rn(avPrec * i.area, 2);
+				i.flux = i.lake != null ? prec * 10 : prec;
+			}
+			uint[] neighbors = []; // re-detect neighbors
+			diagram.cells[d].halfedges.forEach(function(e) {
+				const edge = diagram.edges[e];
+				if (edge.left === undefined || edge.right === undefined)
+				{
+					if (i.height >= 20) i.cType = 99; // border cell
+					break;
+				}
+				const ea = edge.left.index === d ? edge.right.index : edge.left.index;
+				neighbors.push(ea);
+				//if (d < ea && i.height >= 20 && i.lake !== 1 && cells[ea].height >= 20 && cells[ea].lake !== 1)
+				//{
+				//	gridPath += "M" + edge[0][0] + "," + edge[0][1] + "L" + edge[1][0] + "," + edge[1][1];
+				//}
+			});
+			i.neighbors = neighbors;
+
+		}
+
+		time = Time.time - time;
+		Debug.Log("Time: " + time);
+		Debug.Log("/reGraph");
+	}
+
+	//from https://stackoverflow.com/questions/17775832/c-sharp-gmap-net-calculate-surface-of-polygon#17775964
+	float GetArea(List<Vector2> points)
+	{
+		float area2 = 0;
+		for (int numPoint = 0; numPoint < points.Count - 1; numPoint++)
+		{
+			Vector2 point = points[numPoint];
+			Vector2 nextPoint = points[numPoint + 1];
+			area2 += point.x * nextPoint.y - point.y * nextPoint.x;
+		}
+		return area2 / 2f;
 	}
 
 	private void drawCoastline()
 	{
 		throw new NotImplementedException();
+
+		Debug.Log("drawOcean");
+		float time = Time.time;
+		time = Time.time - time;
+		Debug.Log("Time: " + time);
+		Debug.Log("/drawOcean");
 	}
+
+	private void cleanData()
+	{
+		throw new NotImplementedException();
+
+		Debug.Log("drawOcean");
+		float time = Time.time;
+		time = Time.time - time;
+		Debug.Log("Time: " + time);
+		Debug.Log("/drawOcean");
+	}
+
+	private void manorsAndRegions()
+	{
+		throw new NotImplementedException();
+
+		Debug.Log("drawOcean");
+		float time = Time.time;
+		time = Time.time - time;
+		Debug.Log("Time: " + time);
+		Debug.Log("/drawOcean");
+	}
+
+	private void generateCultures()
+	{
+		throw new NotImplementedException();
+
+		Debug.Log("drawOcean");
+		float time = Time.time;
+		time = Time.time - time;
+		Debug.Log("Time: " + time);
+		Debug.Log("/drawOcean");
+	}
+
+	private void drawRelief()
+	{
+		throw new NotImplementedException();
+
+		Debug.Log("drawOcean");
+		float time = Time.time;
+		time = Time.time - time;
+		Debug.Log("Time: " + time);
+		Debug.Log("/drawOcean");
+	}
+
+
 
 	private void addLakes()
 	{
 		throw new NotImplementedException();
+
+		Debug.Log("drawOcean");
+		float time = Time.time;
+		time = Time.time - time;
+		Debug.Log("Time: " + time);
+		Debug.Log("/drawOcean");
 	}
 
 	private void flux()
 	{
 		throw new NotImplementedException();
+
+		Debug.Log("drawOcean");
+		float time = Time.time;
+		time = Time.time - time;
+		Debug.Log("Time: " + time);
+		Debug.Log("/drawOcean");
 	}
 
 	private void resolveDepressionsSecondary()
 	{
 		throw new NotImplementedException();
+
+		Debug.Log("drawOcean");
+		float time = Time.time;
+		time = Time.time - time;
+		Debug.Log("Time: " + time);
+		Debug.Log("/drawOcean");
 	}
 
-	private void reGraph()
-	{
-		throw new NotImplementedException();
-	}
+
 
 	private void resolveDepressionsPrimary()
 	{
 		throw new NotImplementedException();
+
+		Debug.Log("drawOcean");
+		float time = Time.time;
+		time = Time.time - time;
+		Debug.Log("Time: " + time);
+		Debug.Log("/drawOcean");
 	}
 
-	private void elevateLakes()
-	{
-		throw new NotImplementedException();
-	}
 
-	private void drawOcean()
-	{
-		throw new NotImplementedException();
-	}
 
-	private void markFeatures()
-	{
-		throw new NotImplementedException();
-	}
+
+
+
 
 
 }
