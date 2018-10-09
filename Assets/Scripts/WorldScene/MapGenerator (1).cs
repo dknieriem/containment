@@ -55,7 +55,8 @@ public class MapGenerator : MonoBehaviour {
 	List<int> land;
 	List<Manor> manors;
 	// Common variables
-	public int graphSize = 1;
+	public int graphSize = 1; //azgaar's density. just ignore it for now.
+
 	//var modules = { }, customization = 0, history = [], historyStage = 0, elSelected, autoResize = true, graphSize,
 	//  cells = [], land = [], riversData = [], manors = [], states = [], features = [],
 	//  queue = [],
@@ -1047,94 +1048,6 @@ public class MapGenerator : MonoBehaviour {
 
 			i.position = coord;
 
-			/*List<Vector2> copy = newPoints.Where(v => v.x == coord.x && v.y == coord.y).ToList();
-			if (copy.Count == 0)
-			{
-				newPoints.Add(coord);
-
-				//tempCells.push({ index: tempCells.length, data:[x, y], height, pit, ctype, fn, harbor, lake, region, culture});
-				Sector newSector = new Sector();
-				newSector.Id = Convert.ToUInt32(tempCells.Count);
-				newSector.position = coord;
-				newSector.height = height;
-				newSector.pit = pit;
-				newSector.cType = ctype;
-				newSector.featureNumber = featureNumber;
-				newSector.harbor = harbor;
-				newSector.lake = lake;
-				
-				tempCells.Add(newSector);
-			}*/
-
-			// add additional points for cells along coast
-			/*if (ctype == 2 || ctype == -1)
-			{
-				if (i.type == "border") break;
-				if (!features[featureNumber].land && !features[featureNumber].border) break;
-
-				uint[] neighbors = i.NeighborSectorIds;
-				foreach(uint e in neighbors) { 
-
-					if (sectors[(int)e].cType == ctype)
-					{
-						float x1 = (coord.x * 2 + sectors[(int)e].position.x) / 3;
-						float y1 = (coord.y * 2 + sectors[(int)e].position.y) / 3;
-						x1 = rn(x1, 1);
-						y1 = rn(y1, 1);
-						//copy = $.grep(newPoints, function(e) { return e[0] === x1 && e[1] === y1; });
-						copy = newPoints.Where(v => v.x == x1 && v.y == y1).ToList();
-						if (copy.Count > 0) break;
-						newPoints.Add( new Vector2(x1, y1));
-
-						//tempCells.push({ index: tempCells.length, data:[x1, y1], height, pit, ctype, fn, harbor, lake, region, culture});
-						Sector newSector = new Sector();
-						newSector.Id = Convert.ToUInt32(tempCells.Count);
-						newSector.position = new Vector2(x1, y1);
-						newSector.height = height;
-						newSector.pit = pit;
-						newSector.cType = ctype;
-						newSector.featureNumber = featureNumber;
-						newSector.harbor = harbor;
-						newSector.lake = lake;
-
-						tempCells.Add(newSector);
-
-					}
-				}
-
-			}*/
-
-			// add potential small lakes
-			/*if (lake == 2)
-			{
-				List<Vector2> polys = polygons[i.Id];
-				foreach(Vector2 e in polys){
-					if (UnityEngine.Random.value > 0.8f) break;
-					float rnd = UnityEngine.Random.Range(0.6f, 1.4f);
-					float x1 = rn((e.x * rnd + i.position.x) / (1 + rnd), 2);
-					rnd = UnityEngine.Random.Range(0.6f, 1.4f);
-					float y1 = rn((e.y * rnd + i.position.y) / (1 + rnd), 2);
-
-					//copy = $.grep(newPoints, function(c) { return x1 === c[0] && y1 === c[1]; });
-					copy = newPoints.Where(v => v.x == x1 && v.y == y1).ToList();
-					if (copy.Count > 0) break;
-
-					newPoints.Add(new Vector2(x1, y1));
-					//tempCells.push({ index: tempCells.length, data:[x1, y1], height, pit, ctype, fn, region, culture});
-
-					Sector newSector = new Sector();
-					newSector.Id = Convert.ToUInt32(tempCells.Count);
-					newSector.position = new Vector2(x1, y1);
-					newSector.height = height;
-					newSector.pit = pit;
-					newSector.cType = ctype;
-					newSector.featureNumber = featureNumber;
-					newSector.harbor = harbor;
-					newSector.lake = lake;
-
-					tempCells.Add(newSector);
-				}
-			}*/
 		} // end of foreach(Sector i in sectors)
 
 		Debug.Log("small lakes candidates: " + smallLakes);
@@ -1159,44 +1072,6 @@ public class MapGenerator : MonoBehaviour {
 				float prec = rn(avPrec * i.area, 2);
 				i.flux = i.lake != null ? prec * 10 : prec;
 			}
-			//uint[] neighbors = []; // re-detect neighbors
-
-			//List<Delaunay.Edge> edges = site.edges;
-			//List<uint> neighborIds = new List<uint>(edges.Count);
-			//List<float> neighborDists = new List<float>(edges.Count);
-			////for(int j = 0; j < neighbors.Count; j++)
-			////{
-			////	neighborIds[j] = neighbors[j].getIndex();
-			////}
-			//for (int j = 0; j < edges.Count; j++)
-			//{
-			//	Delaunay.Edge edge = edges[j];
-			//	if(edge.leftSite != null && edge.rightSite != null)
-			//	{
-			//		if (edge.leftSite.getIndex() == sectorId)
-			//		{
-			//			neighborIds.Add(edge.rightSite.getIndex());
-			//			neighborDists.Add(Vector2.Distance(position, edge.rightSite.Coord));
-			//		} else
-			//		{
-			//			neighborIds.Add(edge.leftSite.getIndex());
-			//			neighborDists.Add(Vector2.Distance(position, edge.leftSite.Coord));
-			//		}
-			//	} else if (i.height >= 20)
-			//	{
-			//		i.cType = 99;
-			//		break;
-			//	}
-			//}
-				
-			//	//if (d < ea && i.height >= 20 && i.lake !== 1 && cells[ea].height >= 20 && cells[ea].lake !== 1)
-			//	//{
-			//	//	gridPath += "M" + edge[0][0] + "," + edge[0][1] + "L" + edge[1][0] + "," + edge[1][1];
-			//	//}
-			
-			//i.neighborIds = neighborId;
-			//i.neighborDists = neighborDists;
-
 
 		} //end foreach (Sector i in sectors)
 
@@ -1613,6 +1488,19 @@ public class MapGenerator : MonoBehaviour {
 
 		Debug.Log("drawOcean");
 		float time = Time.time;
+
+		for(int i = 0; i < sectors.Count; i++){//cells.map(function(c) {
+	      	sector c = sectors[i];
+	      	c.cost = null;
+		    c.used = 0;
+	      	c.height = Mathf.Floor(c.height);
+	      	if (c.height >= 20) c.flux = rn(c.flux, 2);
+    	}
+
+	    // restore layers if they was turned on
+	    //if (!$("#toggleHeight").hasClass("buttonoff") && !terrs.selectAll("path").size()) toggleHeight();
+	    //if (!$("#toggleCultures").hasClass("buttonoff") && !cults.selectAll("path").size()) toggleCultures();
+
 		time = Time.time - time;
 		Debug.Log("Time: " + time);
 		Debug.Log("/drawOcean");
@@ -1766,7 +1654,7 @@ public class MapGenerator : MonoBehaviour {
 				{
 					for (int m = 0; m < d; m++)
 					{
-						List<int> path = findLandPath(manorsOnIsland[d], manorsOnIsland[m], "main");
+						const path = findLandPath(manorsOnIsland[d].index, manorsOnIsland[m].index, "main");
 						restorePath(manorsOnIsland[m].index, manorsOnIsland[d].index, "main", path);
 					}
 				}
@@ -1777,79 +1665,120 @@ public class MapGenerator : MonoBehaviour {
 		Debug.Log("/generateMainRoads");
 	}
 
-	private List<int> findLandPath(int start, int end, string type)
-	{
-		// A* algorithm
-		PriorityQueue queue = new Queue();// PriorityQueue({ comparator: function(a, b) { return a.p - b.p} });
-		List<int> cameFrom = new List<int>();
-		List<float> costTotal = new List<float>();
-		costTotal[start] = 0;
-		queue.Enqueue(.queue({e: start, p: 0});
-    while (queue.length > 0) {
-      var next = queue.dequeue().e;
-      if (next === end) {break;}
-      var pol = cells[next];
-pol.neighbors.forEach(function(e) {
-        if (cells[e].height >= 20) {
-          var cost = cells[e].height / 100 * 2;
-          if (cells[e].path && type === "main") {
-            cost = 0.15;
-          } else {
-            if (typeof e.manor === "undefined") {cost += 0.1;}
-            if (typeof e.river !== "undefined") {cost -= 0.1;}
-            if (cells[e].harbor) {cost *= 0.3;}
-            if (cells[e].path) {cost *= 0.5;}
-            cost += Math.hypot(cells[e].data[0] - pol.data[0], cells[e].data[1] - pol.data[1]) / 30;
-          }
-          var costNew = costTotal[next] + cost;
-          if (!cameFrom[e] || costNew<costTotal[e]) { //
-            costTotal[e] = costNew;
-            cameFrom[e] = next;
-            var dist = Math.hypot(cells[e].data[0] - cells[end].data[0], cells[e].data[1] - cells[end].data[1]) / 15;
-var priority = costNew + dist;
-queue.queue({e, p: priority});
-          }
-        }
-      });
-    }
-    return cameFrom;
-  }
-
-	function restorePath(end, start, type, from)
-	{
-		var path = [], current = end, limit = 1000;
-		var prev = cells[end];
-		if (type === "ocean" || !prev.path) { path.push({ scX: prev.data[0], scY: prev.data[1], i: end}); }
-		if (!prev.path) { prev.path = 1; }
-		for (let i = 0; i < limit; i++)
-		{
-			current = from[current];
-			var cur = cells[current];
-			if (!cur) { break; }
-			if (cur.path)
-			{
-				cur.path += 1;
-				path.push({ scX: cur.data[0], scY: cur.data[1], i: current});
-		prev = cur;
-		drawPath();
-	} else {
-        cur.path = 1;
-        if (prev) {path.push({scX: prev.data[0], scY: prev.data[1], i: prev.index
-});}
-        prev = undefined;
-        path.push({scX: cur.data[0], scY: cur.data[1], i: current});
-      }
-      if (current === start || !from[current]) {break;}
-    }
-    
-  }
-
 private void drawRelief()
 	{
 		throw new NotImplementedException();
 
 		Debug.Log("drawRelief");
 		float time = Time.time;
+
+		let h, count, rnd, cx, cy, swampCount = 0;
+    const hills = terrain.select("#hills");
+    const mounts = terrain.select("#mounts");
+    const swamps = terrain.select("#swamps");
+    const forests = terrain.select("#forests");
+    terrain.selectAll("g").selectAll("g").remove();
+    // sort the land to Draw the top element first (reduce the elements overlapping)
+    land.sort(compareY);
+    for (let i = 0; i < land.length; i++) {
+      if (land[i].river) continue; // no icons on rivers
+      const cell = land[i].index;
+      const p = d3.polygonCentroid(polygons[cell]); // polygon centroid point
+      if (p === undefined) continue; // something is wrong with data
+      const height = land[i].height;
+      const area = land[i].area;
+      if (height >= 70) {
+        // mount icon
+        h = (height - 55) * 0.12;
+        for (let c = 0, a = area; Math.random() < a / 50; c++, a -= 50) {
+          if (polygons[cell][c] === undefined) break;
+          const g = mounts.append("g").attr("data-cell", cell);
+          if (c < 2) {
+            cx = p[0] - h / 100 * (1 - c / 10) - c * 2;
+            cy = p[1] + h / 400 + c;
+          } else {
+            const p2 = polygons[cell][c];
+            cx = (p[0] * 1.2 + p2[0] * 0.8) / 2;
+            cy = (p[1] * 1.2 + p2[1] * 0.8) / 2;
+          }
+          rnd = Math.random() * 0.8 + 0.2;
+          let mount = "M" + cx + "," + cy + " L" + (cx + h / 3 + rnd) + "," + (cy - h / 4 - rnd * 1.2) + " L" + (cx + h / 1.1) + "," + (cy - h) + " L" + (cx + h + rnd) + "," + (cy - h / 1.2 + rnd) + " L" + (cx + h * 2) + "," + cy;
+          let shade = "M" + cx + "," + cy + " L" + (cx + h / 3 + rnd) + "," + (cy - h / 4 - rnd * 1.2) + " L" + (cx + h / 1.1) + "," + (cy - h) + " L" + (cx + h / 1.5) + "," + cy;
+          let dash = "M" + (cx - 0.1) + "," + (cy + 0.3) + " L" + (cx + 2 * h + 0.1) + "," + (cy + 0.3);
+          dash += "M" + (cx + 0.4) + "," + (cy + 0.6) + " L" + (cx + 2 * h - 0.3) + "," + (cy + 0.6);
+          g.append("path").attr("d", round(mount, 1)).attr("stroke", "#5c5c70");
+          g.append("path").attr("d", round(shade, 1)).attr("fill", "#999999");
+          g.append("path").attr("d", round(dash, 1)).attr("class", "strokes");
+        }
+      } else if (height > 50) {
+        // hill icon
+        h = (height - 40) / 10;
+        if (h > 1.7) h = 1.7;
+        for (let c = 0, a = area; Math.random() < a / 30; c++, a -= 30) {
+          if (land[i].ctype === 1 && c > 0) break;
+          if (polygons[cell][c] === undefined) break;
+          const g = hills.append("g").attr("data-cell", cell);
+          if (c < 2) {
+            cx = p[0] - h - c * 1.2;
+            cy = p[1] + h / 4 + c / 1.6;
+          } else {
+            const p2 = polygons[cell][c];
+            cx = (p[0] * 1.2 + p2[0] * 0.8) / 2;
+            cy = (p[1] * 1.2 + p2[1] * 0.8) / 2;
+          }
+          let hill = "M" + cx + "," + cy + " Q" + (cx + h) + "," + (cy - h) + " " + (cx + 2 * h) + "," + cy;
+          let shade = "M" + (cx + 0.6 * h) + "," + (cy + 0.1) + " Q" + (cx + h * 0.95) + "," + (cy - h * 0.91) + " " + (cx + 2 * h * 0.97) + "," + cy;
+          let dash = "M" + (cx - 0.1) + "," + (cy + 0.2) + " L" + (cx + 2 * h + 0.1) + "," + (cy + 0.2);
+          dash += "M" + (cx + 0.4) + "," + (cy + 0.4) + " L" + (cx + 2 * h - 0.3) + "," + (cy + 0.4);
+          g.append("path").attr("d", round(hill, 1)).attr("stroke", "#5c5c70");
+          g.append("path").attr("d", round(shade, 1)).attr("fill", "white");
+          g.append("path").attr("d", round(dash, 1)).attr("class", "strokes");
+        }
+      }
+
+      // swamp icons
+      if (height >= 21 && height < 22 && swampCount < +swampinessInput.value && land[i].used != 1) {
+        const g = swamps.append("g").attr("data-cell", cell);
+        swampCount++;
+        land[i].used = 1;
+        let swamp = drawSwamp(p[0],p[1]);
+        land[i].neighbors.forEach(function(e) {
+          if (cells[e].height >= 20 && cells[e].height < 30 && !cells[e].river && cells[e].used != 1) {
+            cells[e].used = 1;
+            swamp += drawSwamp(cells[e].data[0], cells[e].data[1]);
+          }
+        });
+        g.append("path").attr("d", round(swamp, 1));
+      }
+
+      // forest icons
+      if (Math.random() < height / 100 && height >= 22 && height < 48) {
+        for (let c = 0, a = area; Math.random() < a / 15; c++, a -= 15) {
+          if (land[i].ctype === 1 && c > 0) break;
+          if (polygons[cell][c] === undefined) break;
+          const g = forests.append("g").attr("data-cell", cell);
+          if (c === 0) {
+            cx = rn(p[0] - 1 - Math.random(), 1);
+            cy = p[1] - 2;
+          } else {
+            const p2 = polygons[cell][c];
+            if (c > 1) {
+              const dist = Math.hypot(p2[0] - polygons[cell][c-1][0],p2[1] - polygons[cell][c-1][1]);
+              if (dist < 2) continue;
+            }
+            cx = (p[0] * 0.5 + p2[0] * 1.5) / 2;
+            cy = (p[1] * 0.5 + p2[1] * 1.5) / 2 - 1;
+          }
+          const forest = "M" + cx + "," + cy + " q-1,0.8 -0.05,1.25 v0.75 h0.1 v-0.75 q0.95,-0.47 -0.05,-1.25 z ";
+          const light = "M" + cx + "," + cy + " q-1,0.8 -0.05,1.25 h0.1 q0.95,-0.47 -0.05,-1.25 z ";
+          const shade = "M" + cx + "," + cy + " q-1,0.8 -0.05,1.25 q-0.2,-0.55 0,-1.1 z ";
+          g.append("path").attr("d", forest);
+          g.append("path").attr("d", light).attr("fill", "white").attr("stroke", "none");
+          g.append("path").attr("d", shade).attr("fill", "#999999").attr("stroke", "none");
+        }
+      }
+    }
+
 		time = Time.time - time;
 		Debug.Log("Time: " + time);
 		Debug.Log("/drawRelief");

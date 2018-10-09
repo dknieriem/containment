@@ -52,9 +52,16 @@ public class Sector : MonoBehaviour
 	public int cType;
 	public int? harbor;
 	public int? pit;
-	public int? lake;
+	public int? lake; //id of lake
 	public float area; //area in square graph distance units (km?)
 	public float flux; //water flow
+	public int? river; //id of river 
+	public float? score; //city score
+	public int? confluence;
+	public int? crossroad;
+	public int? port;
+	public int population;
+	public int manor; 
 
 	//old WorldBuilder attributes
 	public SectorType SecType;
