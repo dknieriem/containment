@@ -72,9 +72,9 @@ public partial class Person : IEquatable<Person>
 	{
         Person x = new Person ();
 		x.MyGroup = myGroup;
-		x.CurrentSector = myGroup.HomeSector;
-		x.LocationX = x.CurrentSector.LocationX;
-		x.LocationY = x.CurrentSector.LocationY;
+		//x.CurrentSector = myGroup.HomeSector;
+		//x.LocationX = x.CurrentSector.LocationX;
+		//x.LocationY = x.CurrentSector.LocationY;
         x.isHome = true;
 		x.FirstName = DataNamesFirstMale [UnityEngine.Random.Range (1, DataNamesFirstMale.Length) - 1];
 		x.LastName = DataNamesLast [UnityEngine.Random.Range (1, DataNamesLast.Length) - 1];
@@ -312,8 +312,8 @@ public partial class Person : IEquatable<Person>
 
         try
         {
-            Sector newSector = GameManager.Instance.world.GetSectorFromCoords(sectorX, sectorY);
-            CurrentSector = newSector;
+           // Sector newSector = GameManager.Instance.world.GetSectorFromCoords(sectorX, sectorY);
+           // CurrentSector = newSector;
             LocationX = sectorX;
             LocationY = sectorY;
             infoChangedLastTick = true;

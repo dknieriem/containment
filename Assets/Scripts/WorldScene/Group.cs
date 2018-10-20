@@ -55,7 +55,7 @@ public class Group : MonoBehaviour
 		//Debug.Log ("GroupMember Size: " + SectorGroupMembers.Length);			
 		GroupMembers = new List<Person> (TotalGroupMembers);
 
-        HomeSector = world.GetSectorFromCoords(UnityEngine.Random.Range(0, 10), UnityEngine.Random.Range(0, 10));
+        //HomeSector = world.GetSectorFromCoords(UnityEngine.Random.Range(0, 10), UnityEngine.Random.Range(0, 10));
         StartGroup(TotalGroupMembers, characterProperties);
 
         InitializeHomeSector();
@@ -126,7 +126,7 @@ public class Group : MonoBehaviour
 		World world = gameManager.world;
 		TotalGroupMembers = numMembers;
 		Debug.Log ("Adding " + numMembers + " to (" + homeSectorX + ", " + homeSectorY + ").");
-		HomeSector = world.WorldSectors [homeSectorX, homeSectorY];
+		//HomeSector = world.WorldSectors [homeSectorX, homeSectorY];
 		InitializeHomeSector ();
 
 		for (int i = 0; i < numMembers; i++) {
@@ -143,7 +143,7 @@ public class Group : MonoBehaviour
 	public void InitializeHomeSector ()
     {
 
-        Debug.Log("Initialize Home Sector, home is " + HomeSector.ToString() + ".");
+        //Debug.Log("Initialize Home Sector, home is " + HomeSector.ToString() + ".");
 
         //SetHomeSector (newLocation);
 
@@ -153,10 +153,10 @@ public class Group : MonoBehaviour
         //    member.LocationY = HomeSector.LocationY;
         //}
 
-        SectorGroupMembers [HomeSector.LocationX, HomeSector.LocationY] = TotalGroupMembers;
-        HomeSector.PlayerGroupCount = TotalGroupMembers;
-		HomeSector.IsVisible = true;
-		HomeSector.IsVisited = true;
+        //SectorGroupMembers [HomeSector.LocationX, HomeSector.LocationY] = TotalGroupMembers;
+        //HomeSector.PlayerGroupCount = TotalGroupMembers;
+		//HomeSector.IsVisible = true;
+		//HomeSector.IsVisited = true;
 	}
 
 	public void SetHomeSector (Sector newLocation)

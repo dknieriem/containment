@@ -68,7 +68,7 @@ public class GroupInfoPanel : MonoBehaviour
 		}
 		
 		//GroupMemberNamesText = GroupMemberList.GetComponentsInChildren<Text> ();
-		HomeSectorLocationText.text = "(" + Group.HomeSector.LocationX + "," + Group.HomeSector.LocationY + ")";
+		//HomeSectorLocationText.text = "(" + Group.HomeSector.LocationX + "," + Group.HomeSector.LocationY + ")";
 		GroupMembersText.text = "Members: " + Group.GroupMembers.Count; 		
 
 	}

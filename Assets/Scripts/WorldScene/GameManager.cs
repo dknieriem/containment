@@ -10,9 +10,10 @@ public class GameManager : MonoBehaviour
 
 	public bool IsDebug = false;
 	public bool inGame = false;
-	public bool isPaused = false;
-		
+	public bool isPaused = true;
+
 	public WorldBuilder worldBuilder;
+	public MapGenerator mapGenerator;
 	public World world;
 	public Group playerGroup;
 	public AudioClip MapClickAudio;
@@ -35,9 +36,9 @@ public class GameManager : MonoBehaviour
 			Destroy (gameObject); //Then destroy this. This enforces our singleton pattern, meaning there can only ever be one instance of a GameManager.   
 
 		if (isPaused)
-			Time.timeScale = 1;
-		else
 			Time.timeScale = 0;
+		else
+			Time.timeScale = 1;
 
 		DontDestroyOnLoad (gameObject); //Sets this to not be destroyed when reloading scene
 	}
@@ -47,9 +48,9 @@ public class GameManager : MonoBehaviour
 	{
 		NextHourCountdown = SecondsPerHour;
 		if (isPaused)
-			Time.timeScale = 1;
-		else
 			Time.timeScale = 0;
+		else
+			Time.timeScale = 1;
 	}
 
 	void FixedUpdate ()
@@ -69,11 +70,11 @@ public class GameManager : MonoBehaviour
 		isPaused = !isPaused;
 		
 		if (isPaused) {
-			Debug.Log ("Unpaused");
-			Time.timeScale = 1;
-		} else {
 			Debug.Log ("Paused");
 			Time.timeScale = 0;
+		} else {
+			Debug.Log ("Unpaused");
+			Time.timeScale = 1;
 		}
 	}
 

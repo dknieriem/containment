@@ -7,15 +7,21 @@ using UnityEngine;
 
 public class MapGenerator : MonoBehaviour {
 
-	[Range(16, 128)]
-	public int graphWidth = 32; //km
+	[Range(64, 1024)]
+	public int graphWidth = 128; //km
 
-	[Range(16, 128)]
-	public int graphHeight = 32; //km
+	[Range(64, 1024)]
+	public int graphHeight = 128; //km
+
+	[Range(1,3)]
+	public int graphSize = 1; //azgaar's density. just ignore it for now.
 
 	[Range(0, 150)]
 	public int numCities = 15;
 	public int minSectors = 32 * 32; //map needs to have enough sectors to keep it interesting
+
+	[Range(1, 500)]
+	public int neutralRange = 200;
 
 	[Range(0, 10)]
 	public int numRegions = 5;
@@ -55,10 +61,10 @@ public class MapGenerator : MonoBehaviour {
 	List<int> land;
 	List<Manor> manors;
 	// Common variables
-	public int graphSize = 1;
-	//var modules = { }, customization = 0, history = [], historyStage = 0, elSelected, autoResize = true, graphSize,
-	//  cells = [], land = [], riversData = [], manors = [], states = [], features = [],
-	//  queue = [],
+
+	
+
+
 
 	struct Param
 	{
@@ -93,14 +99,8 @@ public class MapGenerator : MonoBehaviour {
 		public bool border;
 		public bool land;
 		public int? river;
-
-		//public Feature(int i, bool border, bool land)
-		//{
-		//	this.i = i;
-		//	this.border = border;
-		//	this.land = land;
-		//}
 	}
+
 	// Use this for initialization
 	void Start () {
 		
@@ -111,28 +111,32 @@ public class MapGenerator : MonoBehaviour {
 		
 	}
 
-	public float rn(float input, int decimals = 0)
+	public float Round(float input, int decimals = 0)
 	{
 		float m = Mathf.Pow(10, decimals);
-		return Mathf.Round(input * m) / m;
-
+		float result = Mathf.Round(input * m) / m;
+		//Debug.Log(String.Format("input: {0}, dec: {1}, m: {2}, result: {3}", input, decimals, m, result));
+		return result;
 	}
 
 	public void Generate() //translated from Azgaar's fantasy map generator
 	{
 		Debug.Log("Random map");
-		float total = Time.time;
+		float total = Time.realtimeSinceStartup;
+
 		//applyMapSize(); -> use if we wind up creating an image of the map, or to resize a mesh or something
 		//randomizeOptions();
 		if(world == null)
 		{
 			world = GameObject.FindObjectOfType<World>();
 		}
-		
+
+		world.deleteMap();
+
 		placePoints();
 		calculateVoronoi(points);
 		detectNeighbors();
-		//drawScaleBar();
+		//no drawScaleBar();
 		defineHeightmap();
 		markFeatures();
 		drawOcean();
@@ -142,27 +146,48 @@ public class MapGenerator : MonoBehaviour {
 		resolveDepressionsSecondary();
 		flux();
 		addLakes();
-		drawCoastline();
-		drawRelief();
-		generateCultures();
-		manorsAndRegions();
+		//no drawCoastline();
+		//no drawRelief();
+		//generateCultures();
+		//manorsAndRegions();
 		cleanData();
-		total = Time.time - total;
+		setWorldSectors();
+		total = Time.realtimeSinceStartup - total;
 		Debug.Log("Total: " + total);
 		Debug.Log("/Random map");
+
+
+	}
+
+	private void setWorldSectors()
+	{
+		world.DimensionsX = graphWidth;
+		world.DimensionsY = graphHeight;
+		world.Sectors = new Dictionary<int, Sector>(sectors.Count);
+
+		foreach (Sector sector in sectors)
+		{
+			
+			sector.height = heights[(int)sector.Id];
+			sector.resetMesh();
+			sector.transform.parent = world.transform;
+			world.Sectors.Add((int)sector.Id, sector);
+			
+		}
 	}
 
 	// Locate points to calculate Voronoi diagram
 	private void placePoints()
 	{
 		Debug.Log("placePoints");
-		float time = Time.time;
+		float time = Time.realtimeSinceStartup;
 		points = new List<Vector2>();
-		float mod = rn((graphWidth + graphHeight) / 1500, 2); // screen size modifier
-		float spacing = rn(7.5f * mod / graphSize, 2); // space between points before jittering
+		float mod = Round((graphWidth + graphHeight) / 1500.0f, 2); // screen size modifier
+		float spacing = Round(7.5f * mod / (float)graphSize, 2); // space between points before jittering
+		Debug.Log(string.Format("Graph size: {0}x{1}, mod: {2}, spacing: {3}", graphWidth, graphHeight, mod, spacing));
 		points = getJitteredGrid(spacing);
 		heights = new List<float>( new float[points.Count]);
-		time = Time.time - time;
+		time = Time.realtimeSinceStartup - time;
 		Debug.Log("Time: " + time);
 		Debug.Log("/placePoints");
 	}
@@ -170,7 +195,7 @@ public class MapGenerator : MonoBehaviour {
 	private List<Vector2> getJitteredGrid(float spacing)
 	{
 		Debug.Log("getJitteredGrid");
-		float time = Time.time;
+		float time = Time.realtimeSinceStartup;
 
 		float radius = spacing / 2;
 		float jittering = radius * 0.9f;
@@ -178,9 +203,9 @@ public class MapGenerator : MonoBehaviour {
 
 		List<Vector2> pts = new List<Vector2>(); //[n][];
 
-		for (float x = radius - graphWidth * 0.5f; x < graphWidth * 0.5f; x += spacing)
+		for (float x = radius; x < graphWidth; x += spacing)
 		{
-			for (float y = radius - graphHeight * 0.5f; y < graphHeight * 0.5f; y += spacing)
+			for (float y = radius; y < graphHeight; y += spacing)
 			{
 				float xj = (x + jitter(jittering));
 				float yj = (y + jitter(jittering));
@@ -192,9 +217,9 @@ public class MapGenerator : MonoBehaviour {
 
 		Debug.Log("pts: " + pts.Count);
 
-		time = Time.time - time;
+		time = Time.realtimeSinceStartup - time;
 		Debug.Log("Time: " + time);
-		Debug.Log("/placePoints");
+		Debug.Log("/getJitteredGrid");
 
 		return pts;
 	}
@@ -207,25 +232,27 @@ public class MapGenerator : MonoBehaviour {
 	private void calculateVoronoi(List<Vector2> pts)
 	{
 		Debug.Log("calculateVoronoi");
-		float time = Time.time;
+		float time = Time.realtimeSinceStartup;
 
 		voronoi = new Delaunay.Voronoi(pts, colors(pts.Count), new Rect(0, 0, graphWidth, graphHeight));
 
 		List<Delaunay.Site> vSites = voronoi.getSites();
 		sites = new List<Delaunay.Site>(new Delaunay.Site[vSites.Count]);
 		polygons = new Dictionary<uint, List<Vector2>>(vSites.Count);
+		siteCoordsById = new Dictionary<uint, Vector2>(vSites.Count);
+		siteIdsByCoord = new Dictionary<Vector2, uint>(vSites.Count);
 
-		for(int i = 0; i < vSites.Count; i++)
+		for (int i = 0; i < vSites.Count; i++)
 		{
 			Delaunay.Site site = vSites[i];
 			uint index = vSites[i].getIndex();
-			polygons.Add(index, sites[i].Region(voronoi.plotBounds));
-			siteCoordsById.Add(index, sites[i].Coord);
-			siteIdsByCoord.Add(sites[i].Coord, index);
+			polygons.Add(index, vSites[i].Region(voronoi.plotBounds));
+			siteCoordsById.Add(index, vSites[i].Coord);
+			siteIdsByCoord.Add(vSites[i].Coord, index);
 			sites[(int)index] = site;
 		}
 
-		time = Time.time - time;
+		time = Time.realtimeSinceStartup - time;
 		Debug.Log("Time: " + time);
 		Debug.Log("/calculateVoronoi");
 	}
@@ -244,7 +271,7 @@ public class MapGenerator : MonoBehaviour {
 	private void detectNeighbors()
 	{
 		Debug.Log("detectNeighbors");
-		float time = Time.time;
+		float time = Time.realtimeSinceStartup;
 
 		sectors = new List<Sector>(new Sector[sites.Count]);
 
@@ -284,7 +311,7 @@ public class MapGenerator : MonoBehaviour {
 					ctype = 99;
 				}
 			}
-			Sector newSector = new Sector();
+			Sector newSector = (Sector)Instantiate(world.SectorPrefab);
 			newSector.Id = sectorId;
 			newSector.position = position;
 			newSector.mapPoly = site.Region(new Rect(0, 0, graphWidth, graphHeight));
@@ -300,7 +327,7 @@ public class MapGenerator : MonoBehaviour {
 
 
 
-		time = Time.time - time;
+		time = Time.realtimeSinceStartup - time;
 		Debug.Log("Time: " + time);
 		Debug.Log("/detectNeighbors");
 	}
@@ -308,7 +335,7 @@ public class MapGenerator : MonoBehaviour {
 	private void defineHeightmap()
 	{
 		Debug.Log("defineHeightmap");
-		float time = Time.time;
+		float time = Time.realtimeSinceStartup;
 
 		if (mapTemplate == MapTemplates.NONE)
 		{
@@ -323,6 +350,8 @@ public class MapGenerator : MonoBehaviour {
 			else { mapTemplate = MapTemplates.Atoll; }
 		}
 
+		Debug.Log(" template: " + mapTemplate);
+
 		if (mapTemplate == MapTemplates.Volcano) templateVolcano();
 		if (mapTemplate == MapTemplates.HighIsland) templateHighIsland();
 		if (mapTemplate == MapTemplates.LowIsland) templateLowIsland();
@@ -332,9 +361,9 @@ public class MapGenerator : MonoBehaviour {
 		if (mapTemplate == MapTemplates.Mainland) templateMainland();
 		if (mapTemplate == MapTemplates.Peninsulas) templatePeninsulas();
 
-		Debug.Log(" template: " + mapTemplate);
 
-		time = Time.time - time;
+
+		time = Time.realtimeSinceStartup - time;
 		Debug.Log("Time: " + time);
 		Debug.Log("/defineHeightmap");
 	}
@@ -447,18 +476,40 @@ public class MapGenerator : MonoBehaviour {
 	{
 		float x = UnityEngine.Random.value * graphWidth / 3 + graphWidth / 3;
 		float y = UnityEngine.Random.value * graphHeight * 0.2f + graphHeight * 0.4f;
-		Vector2 site = (Vector2) voronoi.NearestSitePoint(x, y);
+		Vector2 site = NearestSitePoint(x, y);
+		Debug.Log(String.Format("addMountain() x: {0}, y: {1}, site: ({2}, {3})", x, y, site.x, site.y));
 		uint cellId;
 		if (siteIdsByCoord.ContainsKey(site))
 		{
 			siteIdsByCoord.TryGetValue(site, out cellId);
 			float height = UnityEngine.Random.value * 10 + 90; // 90-99
+			Debug.Log(string.Format("cellId: {0}, height: {1}", cellId, height));
 			add(cellId, "mountain", height);
 		} else
 		{
 			Debug.Log("CellId for " + site.ToString() + " not found!");
 		}
 
+	}
+
+	private Vector2 NearestSitePoint(float x, float y)
+	{
+		Vector2 search = new Vector2(x, y);
+		Vector2 result = new Vector2();
+
+		float dist = 10000.0f;
+
+		for(int i = 0; i < sites.Count; i++)
+		{
+			float newDist = Vector2.Distance(search, new Vector2(sites[i].x, sites[i].y));
+			if( newDist < dist)
+			{
+				dist = newDist;
+				result = new Vector2(sites[i].x, sites[i].y);
+			}
+		}
+
+		return result;
 	}
 
 	// place with shift 0-0.5
@@ -475,7 +526,7 @@ public class MapGenerator : MonoBehaviour {
 				height = UnityEngine.Random.value * 40 + 10; // 10-50
 				float x = Mathf.Floor(UnityEngine.Random.value * graphWidth * (1 - shift * 2) + graphWidth * shift);
 				float y = Mathf.Floor(UnityEngine.Random.value * graphHeight * (1 - shift * 2) + graphHeight * shift);
-				Vector2 siteCoord = (Vector2) voronoi.NearestSitePoint(x, y);
+				Vector2 siteCoord = NearestSitePoint(x, y);
 				cell = siteIdsByCoord[siteCoord]; 
 				limit++;
 			} while (heights[(int) cell] + height > 90 && limit < 100);
@@ -523,6 +574,7 @@ public class MapGenerator : MonoBehaviour {
 					heights[(int)e] = 100;
 				}
 				sectors[e].used = session;
+				
 				queue.Add((uint)e);
 			}
 		}
@@ -532,6 +584,7 @@ public class MapGenerator : MonoBehaviour {
 	{
 		int session = Mathf.CeilToInt(UnityEngine.Random.value * 100000);
 		int count = Math.Abs(mod);
+		float diffMin = Mathf.Min(graphWidth, graphHeight) / 2.0f;
 		List<int> range = new List<int>();
 		for (int c = 0; c < count; c++)
 		{
@@ -547,15 +600,23 @@ public class MapGenerator : MonoBehaviour {
 				{
 					float xf = Mathf.Floor(UnityEngine.Random.value * (graphWidth * 0.7f)) + graphWidth * 0.15f;
 					float yf = Mathf.Floor(UnityEngine.Random.value * (graphHeight * 0.6f)) + graphHeight * 0.2f;
-					Vector2 startCoord = (Vector2)voronoi.NearestSitePoint(xf, yf);
+					Vector2 startCoord = NearestSitePoint(xf, yf);
 					start = (int)siteIdsByCoord[startCoord];
+
+					//Debug.Log(String.Format("start = {0},{1}, {2}", startCoord.x, startCoord.y, start));
+
 					float xt = Mathf.Floor(UnityEngine.Random.value * (graphWidth * 0.7f)) + graphWidth * 0.15f;
 					float yt = Mathf.Floor(UnityEngine.Random.value * (graphHeight * 0.6f)) + graphHeight * 0.2f;
-					Vector2 endCoord = (Vector2)voronoi.NearestSitePoint(xt, yt);
+					Vector2 endCoord = NearestSitePoint(xt, yt);
 					end = (int)siteIdsByCoord[endCoord];
+
+					//Debug.Log(String.Format("end = {0},{1}, {2}", endCoord.x, endCoord.y, end));
+
 					diff = Vector2.Distance(startCoord, endCoord);
 
-				} while (diff < 150 / graphSize || diff > 300 / graphSize);
+					//Debug.Log("Diff: " + diff);
+
+				} while (diff < diffMin / graphSize || diff > diffMin * 2 / graphSize);
 	  
 			}
 
@@ -637,10 +698,10 @@ public class MapGenerator : MonoBehaviour {
 		int session = Mathf.CeilToInt(UnityEngine.Random.value * 100000);
 		float top = Mathf.Floor(UnityEngine.Random.value * graphWidth * 0.35f + graphWidth * 0.3f);
 		float bottom = Mathf.Floor((graphWidth - top) - (graphWidth * 0.1f) + (UnityEngine.Random.value * graphWidth * 0.2f));
-		Vector2 startCoord = (Vector2) voronoi.NearestSitePoint(top, graphHeight * 0.1f);
+		Vector2 startCoord = NearestSitePoint(top, graphHeight * 0.1f);
 		int start = (int) siteIdsByCoord[startCoord];
 
-		Vector2 endCoord = (Vector2)voronoi.NearestSitePoint(bottom, graphHeight * 0.9f);
+		Vector2 endCoord = NearestSitePoint(bottom, graphHeight * 0.9f);
 		int end = (int) siteIdsByCoord[endCoord];
 		
 		List<int> range = new List<int>();
@@ -818,7 +879,7 @@ public class MapGenerator : MonoBehaviour {
 	private void markFeatures()
 	{
 		Debug.Log("markFeatures");
-		float time = Time.time;
+		float time = Time.realtimeSinceStartup;
 
 		UnityEngine.Random.InitState(seed);
 
@@ -891,7 +952,7 @@ public class MapGenerator : MonoBehaviour {
 			}
 		}
 
-		time = Time.time - time;
+		time = Time.realtimeSinceStartup - time;
 		Debug.Log("Time: " + time);
 		Debug.Log("/markFeatures");
 	}
@@ -899,14 +960,14 @@ public class MapGenerator : MonoBehaviour {
 	private void drawOcean()
 	{
 		Debug.Log("drawOcean");
-		float time = Time.time;
+		float time = Time.realtimeSinceStartup;
 
 		List<int> limits = new List<int>();
 		float odd = 0.8f; // initial odd for ocean layer is 80%
 
 		// Define type of ocean cells based on cell distance form land
 		//let frontier = $.grep(cells, function(e) { return e.ctype === -1; });
-		List<Sector> frontier = (List<Sector>) sectors.Where(s => s.cType == -1);
+		List<Sector> frontier = sectors.Where(s => s.cType == -1).ToList();
 		if (UnityEngine.Random.value < odd) { limits.Add(-1); odd = 0.2f; }
 		for (int c = -2; frontier.Count > 0 && c > -10; c--)
 		{
@@ -918,11 +979,11 @@ public class MapGenerator : MonoBehaviour {
 				}
 			}
 			//frontier = $.grep(cells, function(e) { return e.ctype === c; });
-			frontier = (List<Sector>)sectors.Where(s => s.cType == c);
+			frontier = sectors.Where(s => s.cType == c).ToList();
 		}
 		//don't draw anything here. We'll set sprites later based on cType
 			   
-		time = Time.time - time;
+		time = Time.realtimeSinceStartup - time;
 		Debug.Log("Time: " + time);
 		Debug.Log("/drawOcean");
 	}
@@ -930,7 +991,7 @@ public class MapGenerator : MonoBehaviour {
 	private void elevateLakes()
 	{
 		Debug.Log("elevateLakes");
-		float time = Time.time;
+		float time = Time.realtimeSinceStartup;
 
 		//const lakes = $.grep(cells, function(e, d) { return heights[d] < 20 && !features[e.fn].border; });
 		List<Sector> lakes = sectors.Where(s => heights[(int)s.Id] < 20 && !features[s.featureNumber].border).ToList();
@@ -952,7 +1013,7 @@ public class MapGenerator : MonoBehaviour {
 			lakes[i].lake = 1;
 		}
 
-		time = Time.time - time;
+		time = Time.realtimeSinceStartup - time;
 		Debug.Log("Time: " + time);
 		Debug.Log("/elevateLakes");
 	}
@@ -961,7 +1022,7 @@ public class MapGenerator : MonoBehaviour {
 	{
 
 		Debug.Log("resolveDepressionsPrimary");
-		float time = Time.time;
+		float time = Time.realtimeSinceStartup;
 
 
 		land = sectors.Select( s => (int)s.Id ).Where(s => heights[s] >= 20).ToList();
@@ -987,7 +1048,7 @@ public class MapGenerator : MonoBehaviour {
 		      if (l == 0) Debug.Log(" depressions init: " + depression);
 		    }
 
-		time = Time.time - time;
+		time = Time.realtimeSinceStartup - time;
 		Debug.Log("Time: " + time);
 		Debug.Log("/resolveDepressionsPrimary");
 	}
@@ -1008,7 +1069,7 @@ public class MapGenerator : MonoBehaviour {
 	private void reGraph()
 	{
 		Debug.Log("reGraph");
-		float time = Time.time;
+		float time = Time.realtimeSinceStartup;
 
 		//List<Sector> tempCells = new List<Sector>();
 		//List<Vector2> newPoints = new List<Vector2>(); // to store new data
@@ -1026,12 +1087,9 @@ public class MapGenerator : MonoBehaviour {
 			int? pit = i.pit;
 			int ctype = i.cType;
 			if (ctype != -1 && ctype != -2 && height < 20) break; // exclude all deep ocean points
-			Vector2 coord = i.position;
-			coord.x = rn(coord.x, 2);
-			coord.y = rn(coord.y, 2);
 
-			int featureNumber = i.featureNumber;
-			int? harbor = i.harbor;
+			//int featureNumber = i.featureNumber;
+			//int? harbor = i.harbor;
 			int? lake = i.lake;
 			// mark potential cells for small lakes to add additional point there
 			if (smallLakes < smallLakesMax && lake == null && pit > evaporation && ctype != 2)
@@ -1039,102 +1097,9 @@ public class MapGenerator : MonoBehaviour {
 				i.lake = 2;
 				smallLakes++;
 			}
-			//const region = i.region; // handle value for edit heightmap mode only
-			//const culture = i.culture; // handle value for edit heightmap mode only
-			//let copy = $.grep(newPoints, function(e) { return (e[0] == x && e[1] == y); });
 			
 			//NOTE: skip creating new sectors along coasts. just update existing sector's coord
 
-			i.position = coord;
-
-			/*List<Vector2> copy = newPoints.Where(v => v.x == coord.x && v.y == coord.y).ToList();
-			if (copy.Count == 0)
-			{
-				newPoints.Add(coord);
-
-				//tempCells.push({ index: tempCells.length, data:[x, y], height, pit, ctype, fn, harbor, lake, region, culture});
-				Sector newSector = new Sector();
-				newSector.Id = Convert.ToUInt32(tempCells.Count);
-				newSector.position = coord;
-				newSector.height = height;
-				newSector.pit = pit;
-				newSector.cType = ctype;
-				newSector.featureNumber = featureNumber;
-				newSector.harbor = harbor;
-				newSector.lake = lake;
-				
-				tempCells.Add(newSector);
-			}*/
-
-			// add additional points for cells along coast
-			/*if (ctype == 2 || ctype == -1)
-			{
-				if (i.type == "border") break;
-				if (!features[featureNumber].land && !features[featureNumber].border) break;
-
-				uint[] neighbors = i.NeighborSectorIds;
-				foreach(uint e in neighbors) { 
-
-					if (sectors[(int)e].cType == ctype)
-					{
-						float x1 = (coord.x * 2 + sectors[(int)e].position.x) / 3;
-						float y1 = (coord.y * 2 + sectors[(int)e].position.y) / 3;
-						x1 = rn(x1, 1);
-						y1 = rn(y1, 1);
-						//copy = $.grep(newPoints, function(e) { return e[0] === x1 && e[1] === y1; });
-						copy = newPoints.Where(v => v.x == x1 && v.y == y1).ToList();
-						if (copy.Count > 0) break;
-						newPoints.Add( new Vector2(x1, y1));
-
-						//tempCells.push({ index: tempCells.length, data:[x1, y1], height, pit, ctype, fn, harbor, lake, region, culture});
-						Sector newSector = new Sector();
-						newSector.Id = Convert.ToUInt32(tempCells.Count);
-						newSector.position = new Vector2(x1, y1);
-						newSector.height = height;
-						newSector.pit = pit;
-						newSector.cType = ctype;
-						newSector.featureNumber = featureNumber;
-						newSector.harbor = harbor;
-						newSector.lake = lake;
-
-						tempCells.Add(newSector);
-
-					}
-				}
-
-			}*/
-
-			// add potential small lakes
-			/*if (lake == 2)
-			{
-				List<Vector2> polys = polygons[i.Id];
-				foreach(Vector2 e in polys){
-					if (UnityEngine.Random.value > 0.8f) break;
-					float rnd = UnityEngine.Random.Range(0.6f, 1.4f);
-					float x1 = rn((e.x * rnd + i.position.x) / (1 + rnd), 2);
-					rnd = UnityEngine.Random.Range(0.6f, 1.4f);
-					float y1 = rn((e.y * rnd + i.position.y) / (1 + rnd), 2);
-
-					//copy = $.grep(newPoints, function(c) { return x1 === c[0] && y1 === c[1]; });
-					copy = newPoints.Where(v => v.x == x1 && v.y == y1).ToList();
-					if (copy.Count > 0) break;
-
-					newPoints.Add(new Vector2(x1, y1));
-					//tempCells.push({ index: tempCells.length, data:[x1, y1], height, pit, ctype, fn, region, culture});
-
-					Sector newSector = new Sector();
-					newSector.Id = Convert.ToUInt32(tempCells.Count);
-					newSector.position = new Vector2(x1, y1);
-					newSector.height = height;
-					newSector.pit = pit;
-					newSector.cType = ctype;
-					newSector.featureNumber = featureNumber;
-					newSector.harbor = harbor;
-					newSector.lake = lake;
-
-					tempCells.Add(newSector);
-				}
-			}*/
 		} // end of foreach(Sector i in sectors)
 
 		Debug.Log("small lakes candidates: " + smallLakes);
@@ -1144,63 +1109,18 @@ public class MapGenerator : MonoBehaviour {
 		//let gridPath = ""; this was for showing the grid outline 
 		//cells.map(function(i, d) {
 		foreach(Sector i in sectors) {
-			
-			uint siteId = siteIdsByCoord[i.position];
-			Delaunay.Site site = sites[(int)siteId];
 
-			i.mapPoly = polygons[siteId];
-
-			uint ud = i.Id;
-			int d = (int)i.Id;
 			if (i.height >= 20)
 			{
 				// calc cell area
-				i.area = rn(Mathf.Abs(GetArea(i.mapPoly)), 2);
-				float prec = rn(avPrec * i.area, 2);
+				i.area = Round(Mathf.Abs(GetArea(i.mapPoly)), 2);
+				float prec = Round(avPrec * i.area, 2);
 				i.flux = i.lake != null ? prec * 10 : prec;
 			}
-			//uint[] neighbors = []; // re-detect neighbors
-
-			//List<Delaunay.Edge> edges = site.edges;
-			//List<uint> neighborIds = new List<uint>(edges.Count);
-			//List<float> neighborDists = new List<float>(edges.Count);
-			////for(int j = 0; j < neighbors.Count; j++)
-			////{
-			////	neighborIds[j] = neighbors[j].getIndex();
-			////}
-			//for (int j = 0; j < edges.Count; j++)
-			//{
-			//	Delaunay.Edge edge = edges[j];
-			//	if(edge.leftSite != null && edge.rightSite != null)
-			//	{
-			//		if (edge.leftSite.getIndex() == sectorId)
-			//		{
-			//			neighborIds.Add(edge.rightSite.getIndex());
-			//			neighborDists.Add(Vector2.Distance(position, edge.rightSite.Coord));
-			//		} else
-			//		{
-			//			neighborIds.Add(edge.leftSite.getIndex());
-			//			neighborDists.Add(Vector2.Distance(position, edge.leftSite.Coord));
-			//		}
-			//	} else if (i.height >= 20)
-			//	{
-			//		i.cType = 99;
-			//		break;
-			//	}
-			//}
-				
-			//	//if (d < ea && i.height >= 20 && i.lake !== 1 && cells[ea].height >= 20 && cells[ea].lake !== 1)
-			//	//{
-			//	//	gridPath += "M" + edge[0][0] + "," + edge[0][1] + "L" + edge[1][0] + "," + edge[1][1];
-			//	//}
-			
-			//i.neighborIds = neighborId;
-			//i.neighborDists = neighborDists;
-
 
 		} //end foreach (Sector i in sectors)
 
-		time = Time.time - time;
+		time = Time.realtimeSinceStartup - time;
 		Debug.Log("Time: " + time);
 		Debug.Log("/reGraph");
 	}
@@ -1213,7 +1133,7 @@ public class MapGenerator : MonoBehaviour {
 		{
 			Vector2 point = points[numPoint];
 			Vector2 nextPoint = points[numPoint + 1];
-			area2 += point.x * nextPoint.y - point.y * nextPoint.x;
+			area2 += (nextPoint.x - point.x) * (nextPoint.y - point.y);
 		}
 		return area2 / 2f;
 	}
@@ -1221,7 +1141,7 @@ public class MapGenerator : MonoBehaviour {
 	private void resolveDepressionsSecondary()
 	{
 		Debug.Log("resolveDepressionsSecondary");
-		float time = Time.time;
+		float time = Time.realtimeSinceStartup;
 
 		land = sectors.Select(s => (int)s.Id).Where(s => heights[s] >= 20).ToList();
 
@@ -1251,7 +1171,7 @@ public class MapGenerator : MonoBehaviour {
 			if (l == limit - 1) Debug.LogError("Error: resolveDepressions iteration limit");
 		}
 
-		time = Time.time - time;
+		time = Time.realtimeSinceStartup - time;
 		Debug.Log("Time: " + time);
 		Debug.Log("/resolveDepressionsSecondary");
 	}
@@ -1259,7 +1179,7 @@ public class MapGenerator : MonoBehaviour {
 	private void flux()
 	{
 		Debug.Log("flux");
-		float time = Time.time;
+		float time = Time.realtimeSinceStartup;
 
 		List<RiverData> riversData = new List<RiverData>();
 		
@@ -1332,10 +1252,10 @@ public class MapGenerator : MonoBehaviour {
 				{
 					int riverTo = (int)sectors[min].river;
 					//$.grep(riversData, function(e) { return (e.river == land[i].river); });
-					List<RiverData> iRiver = (List<RiverData>)riversData.Where(r => r.river == i.river);
+					List<RiverData> iRiver = riversData.Where(r => r.river == i.river).ToList();
 
 					//$.grep(riversData, function(e) { return (e.river == riverTo); });
-					List<RiverData> minRiver = (List<RiverData>)riversData.Where(r => r.river == riverTo);
+					List<RiverData> minRiver = riversData.Where(r => r.river == riverTo).ToList();
 					int iRiverL = iRiver.Count;
 					int minRiverL = minRiver.Count;
 					// re-assing river nunber if new part is greater
@@ -1404,7 +1324,7 @@ public class MapGenerator : MonoBehaviour {
 			}
 		}
 
-		time = Time.time - time;
+		time = Time.realtimeSinceStartup - time;
 		Debug.Log("Time: " + time);
 		Debug.Log("/flux");
 	}
@@ -1412,7 +1332,7 @@ public class MapGenerator : MonoBehaviour {
 	private void addLakes()
 	{
 		Debug.Log("addLakes");
-		float time = Time.time;
+		float time = Time.realtimeSinceStartup;
 
 		int smallLakes = 0;
 		for (int index = 0; index < land.Count; index++)
@@ -1501,7 +1421,7 @@ public class MapGenerator : MonoBehaviour {
 
 		land = sectors.Select(s => (int)s.Id).Where(s => heights[s] >= 20).ToList();
 
-		time = Time.time - time;
+		time = Time.realtimeSinceStartup - time;
 		Debug.Log("Time: " + time);
 		Debug.Log("/addLakes");
 	}
@@ -1509,9 +1429,9 @@ public class MapGenerator : MonoBehaviour {
 	private void generateCultures()
 	{
 		Debug.Log("generateCultures");
-		float time = Time.time;
+		float time = Time.realtimeSinceStartup;
 
-		time = Time.time - time;
+		time = Time.realtimeSinceStartup - time;
 		Debug.Log("Time: " + time);
 		Debug.Log("/generateCultures");
 	}
@@ -1520,7 +1440,7 @@ public class MapGenerator : MonoBehaviour {
 	private void calculatePopulation()
 	{
 		Debug.Log("calculatePopulation");
-		float time = Time.time;
+		float time = Time.realtimeSinceStartup;
 
 		// neutral population factors < 1 as neutral lands are usually pretty wild
 		//float ruralFactor = 0.5f, 
@@ -1532,7 +1452,7 @@ public class MapGenerator : MonoBehaviour {
 			Manor m = manors[i];
 			Sector s = sectors[m.i];
 			float score = s.score == null ? 0.0f : (float)s.score;
-			if (score <= 0) { score = rn(UnityEngine.Random.value, 2); }
+			if (score <= 0) { score = Round(UnityEngine.Random.value, 2); }
 			if (s.crossroad != null) { score += (int)s.crossroad; } // crossroads
 			if (s.confluence != null) { score += Mathf.Pow((int)s.confluence, 0.3f); } // confluences
 			if (m.i != m.region && s.port != null) { score *= 1.5f; } // ports (not capital)
@@ -1591,7 +1511,7 @@ public class MapGenerator : MonoBehaviour {
   //      ruralPopulation: rn(ruralPopulation, 2), area: rn(area)});
 		//}
 
-		time = Time.time - time;
+		time = Time.realtimeSinceStartup - time;
 		Debug.Log("Time: " + time);
 		Debug.Log("/generateCultures");
 	}
@@ -1601,29 +1521,38 @@ public class MapGenerator : MonoBehaviour {
 		throw new NotImplementedException();
 
 		Debug.Log("drawOcean");
-		float time = Time.time;
-		time = Time.time - time;
+		float time = Time.realtimeSinceStartup;
+		time = Time.realtimeSinceStartup - time;
 		Debug.Log("Time: " + time);
 		Debug.Log("/drawOcean");
 	}
 
 	private void cleanData()
 	{
-		throw new NotImplementedException();
+		Debug.Log("cleanData");
+		float time = Time.realtimeSinceStartup;
 
-		Debug.Log("drawOcean");
-		float time = Time.time;
-		time = Time.time - time;
+		for(int i = 0; i < sectors.Count; i++){//cells.map(function(c) {
+	      	Sector c = sectors[i];
+	      	c.cost = 0;
+		    c.used = 0;
+	      	c.height = Mathf.Floor(c.height);
+	      	if (c.height >= 20) c.flux = Round(c.flux, 2);
+    	}
+
+	    // restore layers if they was turned on
+	    //if (!$("#toggleHeight").hasClass("buttonoff") && !terrs.selectAll("path").size()) toggleHeight();
+	    //if (!$("#toggleCultures").hasClass("buttonoff") && !cults.selectAll("path").size()) toggleCultures();
+
+		time = Time.realtimeSinceStartup - time;
 		Debug.Log("Time: " + time);
-		Debug.Log("/drawOcean");
+		Debug.Log("/cleanData");
 	}
 
 	private void manorsAndRegions()
 	{
-		throw new NotImplementedException();
-
 		Debug.Log("manorsAndRegions");
-		float time = Time.time;
+		float time = Time.realtimeSinceStartup;
 
 	    //calculateChains();
 	    rankPlacesGeography();
@@ -1631,18 +1560,18 @@ public class MapGenerator : MonoBehaviour {
 	    generateMainRoads();
 	    rankPlacesEconomy();
 	    locateTowns();
-	    getNames();
-	    shiftSettlements();
-	    checkAccessibility();
-	    defineRegions("withCultures");
-	    generatePortRoads();
-	    generateSmallRoads();
-	    generateOceanRoutes();
+	    //getNames();
+	    //shiftSettlements();
+	    //checkAccessibility();
+	    //defineRegions("withCultures");
+	    //generatePortRoads();
+	    //generateSmallRoads();
+	    //generateOceanRoutes();
 	    calculatePopulation();
-	    drawManors();
-	    drawRegions();
+	    //drawManors();
+	    //drawRegions();
 
-		time = Time.time - time;
+		time = Time.realtimeSinceStartup - time;
 		Debug.Log("Time: " + time);
 		Debug.Log("/manorsAndRegions");
 	}
@@ -1650,11 +1579,11 @@ public class MapGenerator : MonoBehaviour {
 	// Assess cells geographycal suitability for settlement
   	private void rankPlacesGeography() {
 		Debug.Log("rankPlacesGeography");
-		float time = Time.time;
+		float time = Time.realtimeSinceStartup;
 		foreach (int cId in land) {
 			Sector c = sectors[cId];
 			float score = 0;
-			c.flux = rn(c.flux, 2);
+			c.flux = Round(c.flux, 2);
 			// get base score from height (will be biom)
 			if (c.height <= 40) score = 2;
 			else if (c.height <= 50) score = 1.8f;
@@ -1677,11 +1606,11 @@ public class MapGenerator : MonoBehaviour {
 																					   // if (!isNaN(difEv)) score += difEv * 10 * (1 - c.height / 100); // local height maximums are valued
 			}
 
-			c.score = rn((UnityEngine.Random.value + 1.0f) * score, 3); // add random factor
+			c.score = Round((UnityEngine.Random.value + 1.0f) * score, 3); // add random factor
 		}
 
 		land = land.OrderByDescending(s => heights[s]).ToList();
-		time = Time.time - time;
+		time = Time.realtimeSinceStartup - time;
 		Debug.Log("Time: " + time);
 		Debug.Log("/rankPlacesGeography");
 	}
@@ -1689,8 +1618,8 @@ public class MapGenerator : MonoBehaviour {
 	private void locateCapitals()
 	{
 		Debug.Log("locateCapitals");
-		float time = Time.time;
-		time = Time.time - time;
+		float time = Time.realtimeSinceStartup;
+		time = Time.realtimeSinceStartup - time;
 
 		// min distance detween capitals
 		int count = numRegions;
@@ -1744,11 +1673,12 @@ public class MapGenerator : MonoBehaviour {
 		Debug.Log("/drawRelief");
 	}
 
+	//TODO: add necessary methods
 	private void generateMainRoads()
 	{
 		Debug.Log("generateMainRoads");
-		float time = Time.time;
-		time = Time.time - time;
+		float time = Time.realtimeSinceStartup;
+		time = Time.realtimeSinceStartup - time;
 
 		//lineGen.curve(d3.curveBasis);
 		if (manors.Count < 2) return;
@@ -1766,8 +1696,8 @@ public class MapGenerator : MonoBehaviour {
 				{
 					for (int m = 0; m < d; m++)
 					{
-						List<int> path = findLandPath(manorsOnIsland[d], manorsOnIsland[m], "main");
-						restorePath(manorsOnIsland[m].index, manorsOnIsland[d].index, "main", path);
+						//List<int> path = findLandPath(manorsOnIsland[d].index, manorsOnIsland[m].index, "main");
+						//restorePath(manorsOnIsland[m].index, manorsOnIsland[d].index, "main", path);
 					}
 				}
 			}
@@ -1777,83 +1707,263 @@ public class MapGenerator : MonoBehaviour {
 		Debug.Log("/generateMainRoads");
 	}
 
-	private List<int> findLandPath(int start, int end, string type)
+	// Assess the cells economical suitability for settlement
+	private void rankPlacesEconomy()
 	{
-		// A* algorithm
-		PriorityQueue queue = new Queue();// PriorityQueue({ comparator: function(a, b) { return a.p - b.p} });
-		List<int> cameFrom = new List<int>();
-		List<float> costTotal = new List<float>();
-		costTotal[start] = 0;
-		queue.Enqueue(.queue({e: start, p: 0});
-    while (queue.length > 0) {
-      var next = queue.dequeue().e;
-      if (next === end) {break;}
-      var pol = cells[next];
-pol.neighbors.forEach(function(e) {
-        if (cells[e].height >= 20) {
-          var cost = cells[e].height / 100 * 2;
-          if (cells[e].path && type === "main") {
-            cost = 0.15;
-          } else {
-            if (typeof e.manor === "undefined") {cost += 0.1;}
-            if (typeof e.river !== "undefined") {cost -= 0.1;}
-            if (cells[e].harbor) {cost *= 0.3;}
-            if (cells[e].path) {cost *= 0.5;}
-            cost += Math.hypot(cells[e].data[0] - pol.data[0], cells[e].data[1] - pol.data[1]) / 30;
-          }
-          var costNew = costTotal[next] + cost;
-          if (!cameFrom[e] || costNew<costTotal[e]) { //
-            costTotal[e] = costNew;
-            cameFrom[e] = next;
-            var dist = Math.hypot(cells[e].data[0] - cells[end].data[0], cells[e].data[1] - cells[end].data[1]) / 15;
-var priority = costNew + dist;
-queue.queue({e, p: priority});
-          }
-        }
-      });
-    }
-    return cameFrom;
-  }
+		Debug.Log("rankPlacesEconomy");
+		float time = Time.realtimeSinceStartup;
+		time = Time.realtimeSinceStartup - time;
 
-	function restorePath(end, start, type, from)
-	{
-		var path = [], current = end, limit = 1000;
-		var prev = cells[end];
-		if (type === "ocean" || !prev.path) { path.push({ scX: prev.data[0], scY: prev.data[1], i: end}); }
-		if (!prev.path) { prev.path = 1; }
-		for (let i = 0; i < limit; i++)
+		//land.map(function(c) {
+		for(int i = 0; i < land.Count; i++)
 		{
-			current = from[current];
-			var cur = cells[current];
-			if (!cur) { break; }
-			if (cur.path)
+			Sector c = sectors[land[i]];
+			float score = (float) c.score;
+			int path = c.path; // roads are valued
+			if (path != null)
 			{
-				cur.path += 1;
-				path.push({ scX: cur.data[0], scY: cur.data[1], i: current});
-		prev = cur;
-		drawPath();
-	} else {
-        cur.path = 1;
-        if (prev) {path.push({scX: prev.data[0], scY: prev.data[1], i: prev.index
-});}
-        prev = undefined;
-        path.push({scX: cur.data[0], scY: cur.data[1], i: current});
-      }
-      if (current === start || !from[current]) {break;}
-    }
-    
-  }
+				float pathScore = Mathf.Pow( path, 0.2f);
+				int crossroad = (int) c.crossroad; // crossroads are valued
+				score = score + pathScore + crossroad;
+			}
+			c.score = Round(UnityEngine.Random.value * score + score, 2); // add random factor
+		}
 
-private void drawRelief()
+		//land.sort(function(a, b) { return b.score - a.score; });
+		land = land.OrderByDescending(s => sectors[s].score).ToList();
+
+		time = Time.realtimeSinceStartup - time;
+		Debug.Log("Time: " + time);
+		Debug.Log("/rankPlacesEconomy");
+	}
+
+	private void locateTowns()
+	{
+		Debug.Log("locateTowns");
+		float time = Time.realtimeSinceStartup;
+
+		int count = numCities;
+		int neutral = neutralRange;
+
+		//TODO: rework this?
+		//const manorTree = d3.quadtree();
+		QuadTree<Sector> manorTree = new QuadTree<Sector>(0, 0, graphWidth, graphHeight);
+		//manors.forEach(function(m) { manorTree.add([m.x, m.y]); });
+		for(int m = 0; m < manors.Count; m++)
+		{
+			Sector s = sectors[manors[m].siteId];
+			manorTree.Add(s);
+		}
+		for (int l = 0; manors.Count < count && l < land.Count; l++)
+		{
+			//Vector2 pos = sectors[land[l]].position;
+			//Sector c = manorTree.GetObjects(new Rect(pos.x, pos.y, );
+			//const d = Math.hypot(x - c[0], y - c[1]);
+			//if (d < 6) continue;
+			//const cell = land[l].index;
+			//let region = "neutral", culture = -1, closest = neutral;
+			//for (let c = 0; c < states.length; c++)
+			//{
+			//	let dist = Math.hypot(manors[c].x - x, manors[c].y - y) / states[c].power;
+			//	const cap = manors[c].cell;
+			//	if (cells[cell].fn !== cells[cap].fn) dist *= 3;
+			//	if (dist < closest) { region = c; closest = dist; }
+			//}
+
+			sectors[land[l]].manor = manors.Count;
+			//land[l].culture = culture;
+			//land[l].region = region;
+			Manor manor = new Manor();
+			manor.i = manors.Count;
+			manor.siteId = land[l];
+
+			//manors.push({ i: manors.length, cell, x, y, region, culture});
+			manors.Add(manor);
+
+			//manorTree.add([x, y]);
+			manorTree.Add(sectors[land[l]]);
+		}
+		if (manors.Count<count) {
+			Debug.LogError("Cannot place all burgs. Requested " + count + ", placed " + manors.Count);
+		}
+
+		time = Time.realtimeSinceStartup - time;
+		Debug.Log("Time: " + time);
+		Debug.Log("/locateTowns");
+	}
+
+	private void generatePortRoads()
+	{
+		Debug.Log("generatePortRoads");
+		float time = Time.realtimeSinceStartup;
+
+		//throw new NotImplementedException();
+
+		//if ( manors.Count < 2) return;
+		//List<int> portless = new List<int>();
+		//for (int s = 0; s < manors.Count; s++)
+		//{
+		//	int siteId = manors[s].siteId;
+		//	if (sectors[siteId].port == null) portless.Add(s);
+		//}
+		//for (int l = 0; l < portless.Count; l++)
+		//{
+		//	//$.grep(land, function(l) { return l.port !== undefined && l.region === portless[l];
+		//	List<int> ports = land.Where(s => sectors[s].port != null).ToList();
+	
+		//	if (ports.Count == 0) continue;
+		//	int minDist = 1000, end = -1;
+		//	//ports.map(function(p) {
+		//	//const dist = Math.hypot(e.data[0] - p.data[0], e.data[1] - p.data[1]);
+		//	//if (dist < minDist && dist > 1) { minDist = dist; end = p.index; }
+		//	//});
+
+		//	ports.Select( p => { float dist = Vector2.Distance()})
+		//	if (end != -1)
+		//	{
+		//		const start = manors[portless[l]].cell;
+		//		const path = findLandPath(start, end, "direct");
+		//		restorePath(end, start, "main", path);
+		//	}
+		//}
+
+		time = Time.realtimeSinceStartup - time;
+		Debug.Log("Time: " + time);
+		Debug.Log("/generatePortRoads");
+	}
+
+	private void drawRelief()
 	{
 		throw new NotImplementedException();
 
 		Debug.Log("drawRelief");
-		float time = Time.time;
-		time = Time.time - time;
+		float time = Time.realtimeSinceStartup;
+
+		//let h, count, rnd, cx, cy, swampCount = 0;
+  //  const hills = terrain.select("#hills");
+  //  const mounts = terrain.select("#mounts");
+  //  const swamps = terrain.select("#swamps");
+  //  const forests = terrain.select("#forests");
+  //  terrain.selectAll("g").selectAll("g").remove();
+  //  // sort the land to Draw the top element first (reduce the elements overlapping)
+  //  land.sort(compareY);
+  //  for (let i = 0; i < land.length; i++) {
+  //    if (land[i].river) continue; // no icons on rivers
+  //    const cell = land[i].index;
+  //    const p = d3.polygonCentroid(polygons[cell]); // polygon centroid point
+  //    if (p === undefined) continue; // something is wrong with data
+  //    const height = land[i].height;
+  //    const area = land[i].area;
+  //    if (height >= 70) {
+  //      // mount icon
+  //      h = (height - 55) * 0.12;
+  //      for (let c = 0, a = area; Math.random() < a / 50; c++, a -= 50) {
+  //        if (polygons[cell][c] === undefined) break;
+  //        const g = mounts.append("g").attr("data-cell", cell);
+  //        if (c < 2) {
+  //          cx = p[0] - h / 100 * (1 - c / 10) - c * 2;
+  //          cy = p[1] + h / 400 + c;
+  //        } else {
+  //          const p2 = polygons[cell][c];
+  //          cx = (p[0] * 1.2 + p2[0] * 0.8) / 2;
+  //          cy = (p[1] * 1.2 + p2[1] * 0.8) / 2;
+  //        }
+  //        rnd = Math.random() * 0.8 + 0.2;
+  //        let mount = "M" + cx + "," + cy + " L" + (cx + h / 3 + rnd) + "," + (cy - h / 4 - rnd * 1.2) + " L" + (cx + h / 1.1) + "," + (cy - h) + " L" + (cx + h + rnd) + "," + (cy - h / 1.2 + rnd) + " L" + (cx + h * 2) + "," + cy;
+  //        let shade = "M" + cx + "," + cy + " L" + (cx + h / 3 + rnd) + "," + (cy - h / 4 - rnd * 1.2) + " L" + (cx + h / 1.1) + "," + (cy - h) + " L" + (cx + h / 1.5) + "," + cy;
+  //        let dash = "M" + (cx - 0.1) + "," + (cy + 0.3) + " L" + (cx + 2 * h + 0.1) + "," + (cy + 0.3);
+  //        dash += "M" + (cx + 0.4) + "," + (cy + 0.6) + " L" + (cx + 2 * h - 0.3) + "," + (cy + 0.6);
+  //        g.append("path").attr("d", round(mount, 1)).attr("stroke", "#5c5c70");
+  //        g.append("path").attr("d", round(shade, 1)).attr("fill", "#999999");
+  //        g.append("path").attr("d", round(dash, 1)).attr("class", "strokes");
+  //      }
+  //    } else if (height > 50) {
+  //      // hill icon
+  //      h = (height - 40) / 10;
+  //      if (h > 1.7) h = 1.7;
+  //      for (let c = 0, a = area; Math.random() < a / 30; c++, a -= 30) {
+  //        if (land[i].ctype === 1 && c > 0) break;
+  //        if (polygons[cell][c] === undefined) break;
+  //        const g = hills.append("g").attr("data-cell", cell);
+  //        if (c < 2) {
+  //          cx = p[0] - h - c * 1.2;
+  //          cy = p[1] + h / 4 + c / 1.6;
+  //        } else {
+  //          const p2 = polygons[cell][c];
+  //          cx = (p[0] * 1.2 + p2[0] * 0.8) / 2;
+  //          cy = (p[1] * 1.2 + p2[1] * 0.8) / 2;
+  //        }
+  //        let hill = "M" + cx + "," + cy + " Q" + (cx + h) + "," + (cy - h) + " " + (cx + 2 * h) + "," + cy;
+  //        let shade = "M" + (cx + 0.6 * h) + "," + (cy + 0.1) + " Q" + (cx + h * 0.95) + "," + (cy - h * 0.91) + " " + (cx + 2 * h * 0.97) + "," + cy;
+  //        let dash = "M" + (cx - 0.1) + "," + (cy + 0.2) + " L" + (cx + 2 * h + 0.1) + "," + (cy + 0.2);
+  //        dash += "M" + (cx + 0.4) + "," + (cy + 0.4) + " L" + (cx + 2 * h - 0.3) + "," + (cy + 0.4);
+  //        g.append("path").attr("d", round(hill, 1)).attr("stroke", "#5c5c70");
+  //        g.append("path").attr("d", round(shade, 1)).attr("fill", "white");
+  //        g.append("path").attr("d", round(dash, 1)).attr("class", "strokes");
+  //      }
+  //    }
+
+  //    // swamp icons
+  //    if (height >= 21 && height < 22 && swampCount < +swampinessInput.value && land[i].used != 1) {
+  //      const g = swamps.append("g").attr("data-cell", cell);
+  //      swampCount++;
+  //      land[i].used = 1;
+  //      let swamp = drawSwamp(p[0],p[1]);
+  //      land[i].neighbors.forEach(function(e) {
+  //        if (cells[e].height >= 20 && cells[e].height < 30 && !cells[e].river && cells[e].used != 1) {
+  //          cells[e].used = 1;
+  //          swamp += drawSwamp(cells[e].data[0], cells[e].data[1]);
+  //        }
+  //      //});
+  //      g.append("path").attr("d", round(swamp, 1));
+		//}
+
+  //    // forest icons
+  //    if (Math.random() < height / 100 && height >= 22 && height < 48) {
+  //      for (let c = 0, a = area; Math.random() < a / 15; c++, a -= 15) {
+  //        if (land[i].ctype === 1 && c > 0) break;
+  //        if (polygons[cell][c] === undefined) break;
+  //        const g = forests.append("g").attr("data-cell", cell);
+  //        if (c === 0) {
+  //          cx = rn(p[0] - 1 - Math.random(), 1);
+  //          cy = p[1] - 2;
+  //        } else {
+  //          const p2 = polygons[cell][c];
+  //          if (c > 1) {
+  //            const dist = Math.hypot(p2[0] - polygons[cell][c-1][0],p2[1] - polygons[cell][c-1][1]);
+  //            if (dist < 2) continue;
+  //          }
+  //          cx = (p[0] * 0.5 + p2[0] * 1.5) / 2;
+  //          cy = (p[1] * 0.5 + p2[1] * 1.5) / 2 - 1;
+  //        }
+  //        const forest = "M" + cx + "," + cy + " q-1,0.8 -0.05,1.25 v0.75 h0.1 v-0.75 q0.95,-0.47 -0.05,-1.25 z ";
+  //        const light = "M" + cx + "," + cy + " q-1,0.8 -0.05,1.25 h0.1 q0.95,-0.47 -0.05,-1.25 z ";
+  //        const shade = "M" + cx + "," + cy + " q-1,0.8 -0.05,1.25 q-0.2,-0.55 0,-1.1 z ";
+  //        g.append("path").attr("d", forest);
+  //        g.append("path").attr("d", light).attr("fill", "white").attr("stroke", "none");
+  //        g.append("path").attr("d", shade).attr("fill", "#999999").attr("stroke", "none");
+  //      }
+  //    }
+  //  }
+
+		time = Time.realtimeSinceStartup - time;
 		Debug.Log("Time: " + time);
 		Debug.Log("/drawRelief");
 	}
 
 
 }
+
+//method prototype:
+
+//private void locateTowns()
+//{
+//	Debug.Log("drawRelief");
+//	float time = Time.realtimeSinceStartup;
+
+//	//insert code
+
+//	time = Time.realtimeSinceStartup - time;
+//	Debug.Log("Time: " + time);
+//	Debug.Log("/drawRelief");
+//}

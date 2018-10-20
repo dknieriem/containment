@@ -154,10 +154,10 @@ public class UIHandler : MonoBehaviour
 		Text pauseText = togglePauseButton.GetComponentInChildren<Text> ();
 		gameManager.TogglePause ();
 		if (gameManager.isPaused)
-			pauseText.text = "<color='red'>Pause</color>";
+			pauseText.text = "Unpause"; 
 		else
-			pauseText.text = "Unpause";
-		
+			pauseText.text = "<color='red'>Pause</color>";
+
 	}
 
 	public void ToggleDebug ()

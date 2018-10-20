@@ -48,7 +48,7 @@ public class SectorInfoPanel : MonoBehaviour
 			SectorCoordsText.text = "(" + CursorSector.LocationX + "," + CursorSector.LocationY + ")";		
 			SectorZedsText.text = "Zed Pop: " + CursorSector.ZedCount;
 			SectorPlayerGroupCountText.text = "Group: " + CursorSector.PlayerGroupCount;
-			SectorTypeText.text = CursorSector.SecType.ToString ();
+			SectorTypeText.text = CursorSector.featureNumber.ToString();
 			//sectorInfoPanel.gameObject.SetActive (true);
 		} else {
 			//sectorInfoPanel.gameObject.SetActive (false);
