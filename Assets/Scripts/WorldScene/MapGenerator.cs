@@ -60,11 +60,8 @@ public class MapGenerator : MonoBehaviour {
 	List<Feature> features;
 	List<int> land;
 	List<Manor> manors;
+	List<RiverData> riversData;
 	// Common variables
-
-	
-
-
 
 	struct Param
 	{
@@ -73,24 +70,10 @@ public class MapGenerator : MonoBehaviour {
 
 	struct Manor
 	{
-		public int i;
-		public int region;
-		public int population;
-		public int siteId;
-	}
-
-	struct RiverData
-	{
-		public int river;
-		public int siteId;
-		public Vector2 position;
-
-		public RiverData(int river, int siteId, Vector2 position)
-		{
-			this.river = river;
-			this.siteId = siteId;
-			this.position = position;
-		}
+		public int i; //the manor-specific id
+		public int region; //if we are using regions, the id of the region it is in
+		public int population; //pop for the manor, also the sector it is in
+		public int siteId; //the id of the sector it is in
 	}
 
 	struct Feature
@@ -124,12 +107,14 @@ public class MapGenerator : MonoBehaviour {
 		Debug.Log("Random map");
 		float total = Time.realtimeSinceStartup;
 
-		//applyMapSize(); -> use if we wind up creating an image of the map, or to resize a mesh or something
-		//randomizeOptions();
-		if(world == null)
+		if (world == null)
 		{
 			world = GameObject.FindObjectOfType<World>();
 		}
+
+		applyMapSize();
+		//randomizeOptions();
+
 
 		world.deleteMap();
 
@@ -146,12 +131,14 @@ public class MapGenerator : MonoBehaviour {
 		resolveDepressionsSecondary();
 		flux();
 		addLakes();
+
 		//no drawCoastline();
 		//no drawRelief();
 		//generateCultures();
 		//manorsAndRegions();
 		cleanData();
 		setWorldSectors();
+		setWorldRivers();
 		total = Time.realtimeSinceStartup - total;
 		Debug.Log("Total: " + total);
 		Debug.Log("/Random map");
@@ -159,8 +146,16 @@ public class MapGenerator : MonoBehaviour {
 
 	}
 
+	private void applyMapSize()
+	{
+		world.DimensionsX = graphWidth;
+		world.DimensionsY = graphHeight;
+	}
+
 	private void setWorldSectors()
 	{
+		Debug.Log("setWorldSectors");
+		float time = Time.realtimeSinceStartup;
 		world.DimensionsX = graphWidth;
 		world.DimensionsY = graphHeight;
 		world.Sectors = new Dictionary<int, Sector>(sectors.Count);
@@ -174,6 +169,19 @@ public class MapGenerator : MonoBehaviour {
 			world.Sectors.Add((int)sector.Id, sector);
 			
 		}
+
+		time = Time.realtimeSinceStartup - time;
+		Debug.Log("Time: " + time);
+		Debug.Log("/setWorldSectors");
+	}
+
+	private void setWorldRivers()
+	{
+		Debug.Log("setWorldRivers");
+		float time = Time.realtimeSinceStartup;
+		time = Time.realtimeSinceStartup - time;
+		Debug.Log("Time: " + time);
+		Debug.Log("/setWorldRivers");
 	}
 
 	// Locate points to calculate Voronoi diagram
@@ -1181,7 +1189,8 @@ public class MapGenerator : MonoBehaviour {
 		Debug.Log("flux");
 		float time = Time.realtimeSinceStartup;
 
-		List<RiverData> riversData = new List<RiverData>();
+		//List<RiverData> 
+		riversData = new List<RiverData>();
 		
 		int riverNext = 0;
 
@@ -1670,7 +1679,7 @@ public class MapGenerator : MonoBehaviour {
 		//p.culture = m.culture;
 		//});
 		Debug.Log("Time: " + time);
-		Debug.Log("/drawRelief");
+		Debug.Log("/locateCapitals");
 	}
 
 	//TODO: add necessary methods
@@ -1839,6 +1848,8 @@ public class MapGenerator : MonoBehaviour {
 		Debug.Log("drawRelief");
 		float time = Time.realtimeSinceStartup;
 
+
+		
 		//let h, count, rnd, cx, cy, swampCount = 0;
   //  const hills = terrain.select("#hills");
   //  const mounts = terrain.select("#mounts");
