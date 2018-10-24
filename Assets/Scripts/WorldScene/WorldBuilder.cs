@@ -62,7 +62,7 @@ public class WorldBuilder : MonoBehaviour
 	public World WorkingWith;
  
 	GameManager gameManager;
-	public int DimensionsX, DimensionsY;
+	//public int DimensionsX, DimensionsY;
 	public float[][] WaterNoise, PopulationNoise;
     public float[,] SectorScore;
 	public float[,] HumanDensity, ZedDensity;
@@ -104,19 +104,19 @@ public class WorldBuilder : MonoBehaviour
 		int dimension = 0; // 128;
 		World.WorldSizes.TryGetValue (WorldSizeProp, out dimension);
 		Debug.Log ("World Size: " + dimension);
-		DimensionsX = dimension;
-		DimensionsY = dimension;
-		WorkingWith.DimensionsX = DimensionsX;
-		WorkingWith.DimensionsY = DimensionsY;
+		//DimensionsX = dimension;
+		//DimensionsY = dimension;
+		WorkingWith.DimensionsX = dimension; // DimensionsX;
+		WorkingWith.DimensionsY = dimension; //DimensionsY;
 
-		mapGenerator.graphWidth = DimensionsX;
-		mapGenerator.graphHeight = DimensionsY;
+		mapGenerator.graphWidth = dimension; //DimensionsX;
+		mapGenerator.graphHeight = dimension; // DimensionsY;
 
 		mapGenerator.Generate();
 
 		Debug.Log ("Pop per sector: " + StartingPopulationPerSector);
-		ZedDensity = new float[DimensionsX, DimensionsY];
-		HumanDensity = new float[DimensionsX, DimensionsY];
+		//ZedDensity = new float[DimensionsX, DimensionsY];
+		//HumanDensity = new float[DimensionsX, DimensionsY];
 
 
 		Group playerGroup = gameManager.playerGroup;
@@ -134,9 +134,9 @@ public class WorldBuilder : MonoBehaviour
 
 	void SaveImages ()
 	{
-		MapImage = new float[DimensionsX, DimensionsY, 3];		
-		for (int x = 0; x < DimensionsX; x++) {
-			for (int y = 0; y < DimensionsY; y++) {
+		MapImage = new float[WorkingWith.DimensionsX, WorkingWith.DimensionsY, 3];		
+		for (int x = 0; x < WorkingWith.DimensionsX; x++) {
+			for (int y = 0; y < WorkingWith.DimensionsY; y++) {
 				
 				if (SectorIsWater [x, y]) {
 					MapImage [x, y, 0] = WaterNoise [x] [y];
@@ -171,9 +171,9 @@ public class WorldBuilder : MonoBehaviour
 
 	void SaveImageFromFloat (float[][] data, string filename)
 	{
-		UnityEngine.Texture2D tex = new Texture2D (DimensionsX, DimensionsY);
-		for (int x = 0; x < DimensionsX; x++) {
-			for (int y = 0; y < DimensionsY; y++) {
+		UnityEngine.Texture2D tex = new Texture2D (WorkingWith.DimensionsX, WorkingWith.DimensionsY);
+		for (int x = 0; x < WorkingWith.DimensionsX; x++) {
+			for (int y = 0; y < WorkingWith.DimensionsY; y++) {
 				tex.SetPixel (x, y, new Color (data [x] [y], data [x] [y], data [x] [y]));
 			}
 		}
@@ -183,9 +183,9 @@ public class WorldBuilder : MonoBehaviour
 
 	void SaveImageFromFloat3 (float[,,] data, string filename)
 	{
-		UnityEngine.Texture2D tex = new Texture2D (DimensionsX, DimensionsY);
-		for (int x = 0; x < DimensionsX; x++) {
-			for (int y = 0; y < DimensionsY; y++) {
+		UnityEngine.Texture2D tex = new Texture2D (WorkingWith.DimensionsX, WorkingWith.DimensionsY);
+		for (int x = 0; x < WorkingWith.DimensionsX; x++) {
+			for (int y = 0; y < WorkingWith.DimensionsY; y++) {
 				tex.SetPixel (x, y, new Color (data [x, y, 0], data [x, y, 1], data [x, y, 2]));
 			}
 		}

@@ -179,6 +179,25 @@ public class MapGenerator : MonoBehaviour {
 	{
 		Debug.Log("setWorldRivers");
 		float time = Time.realtimeSinceStartup;
+
+		Debug.Log("Rivers: " + riversData.Count);
+		world.riversData = new List<RiverData>(riversData.Count);
+		foreach(RiverData riverData in riversData)
+		{
+			RiverData newRiver = (RiverData)Instantiate(world.RiverPrefab);
+			newRiver.name = "River data #" + riverData.siteId;
+			newRiver.river = riverData.river;
+			newRiver.siteId = riverData.siteId;
+			newRiver.flowToSiteId = riverData.flowToSiteId;
+			newRiver.position = riverData.position; 
+			newRiver.positionFrom = riverData.positionFrom;
+			newRiver.positionTo = riverData.positionTo;
+
+			newRiver.transform.parent = world.transform;
+			world.riversData.Add(newRiver);
+		}
+
+
 		time = Time.realtimeSinceStartup - time;
 		Debug.Log("Time: " + time);
 		Debug.Log("/setWorldRivers");
@@ -320,6 +339,7 @@ public class MapGenerator : MonoBehaviour {
 				}
 			}
 			Sector newSector = (Sector)Instantiate(world.SectorPrefab);
+			newSector.name = "Sector #" + sectorId;
 			newSector.Id = sectorId;
 			newSector.position = position;
 			newSector.mapPoly = site.Region(new Rect(0, 0, graphWidth, graphHeight));
@@ -983,7 +1003,7 @@ public class MapGenerator : MonoBehaviour {
 			foreach(Sector i in frontier) {
 				uint[] neighbors = i.NeighborSectorIds;
 				foreach(uint e in neighbors){
-					if (sectors[(int)e].cType == null) sectors[(int)e].cType = c;
+					if (sectors[(int)e].cType == -1) sectors[(int)e].cType = c;
 				}
 			}
 			//frontier = $.grep(cells, function(e) { return e.ctype === c; });
@@ -1013,7 +1033,7 @@ public class MapGenerator : MonoBehaviour {
 			sectors[(int)id].height = heights[(int)id]; // use height on object level
 			uint[] neighbors = lakes[i].NeighborSectorIds;
 			foreach(uint n in neighbors){
-				float nHeight = sectors[(int)n].height != null ? sectors[(int)n].height : heights[(int)n];
+				float nHeight = sectors[(int)n].height != -1 ? sectors[(int)n].height : heights[(int)n];
 				if (nHeight >= 20) hs.Add(nHeight);
 			}
 			if (hs.Count > 0) sectors[(int)id].height = hs.Max() - 1;
@@ -1090,7 +1110,7 @@ public class MapGenerator : MonoBehaviour {
 
 		foreach(Sector i in sectors){
 			int d = (int)i.Id;
-			float height = i.height != null ? i.height : heights[d];
+			float height = i.height != -1 ? i.height : heights[d];
 			if (height > 100) height = 100;
 			int? pit = i.pit;
 			int ctype = i.cType;
@@ -1196,23 +1216,28 @@ public class MapGenerator : MonoBehaviour {
 
 		land = land.OrderByDescending(s => heights[s]).ToList();
 
+		//take care of rivers flowing to the edge of a landmass
 		for (int index = 0; index < land.Count; index++)
 		{
 			Sector i = sectors[land[index]];
 			int id = (int)i.Id;
 			Vector2 position = i.position; //sx and xy
 			int featureNumber = i.featureNumber;
-			if (i.cType == 99)
+			if (i.cType == 99) //border cell
 			{
-				if (i.river != null)
+				if (i.river != null) //if the cell has a river
 				{
-					Vector2 pos = new Vector2(0.0f, 0.0f);
+					Vector2 pos = new Vector2();
 					float minP = Mathf.Min(new float[] { position.y, graphHeight - position.y, position.x, graphWidth - position.x });
 					if (minP == position.y) { pos.x = position.x; pos.y = 0; }
 					if (minP == graphHeight - position.y) { pos.x = position.x; pos.y = graphHeight; }
 					if (minP == position.x) { pos.x = 0; pos.y = position.y; }
 					if (minP == graphWidth - position.x) { pos.x = graphWidth; pos.y = position.y; }
-					riversData.Add(new RiverData((int)i.river, id, pos));
+					RiverData r = new RiverData((int)i.river, id, pos);
+					r.positionFrom = i.position;
+					r.positionTo = pos;
+					Debug.Log("Add r at " + i.Id);
+					riversData.Add(r);
 				}
 				continue;
 			}
@@ -1243,21 +1268,27 @@ public class MapGenerator : MonoBehaviour {
 			{
 				if (i.river == null)
 				{
-					// State new River
+					// Start new River
 					i.river = riverNext;
+					i.riverToSector = min;
 					RiverData r = new RiverData();
 					r.river = riverNext;
 					r.siteId = id;
 					r.position = position;
+					r.flowToSiteId = min;
+					r.positionFrom = i.position;
+					r.positionTo = sectors[min].position;
+					Debug.Log("Add r at " + i.Id);
 					riversData.Add(r);
 					riverNext++;
 				}
-				// Assing existing River to the downhill cell
+				// Assign existing River to the downhill cell
 				if (sectors[min].river == null)
 				{
 					sectors[min].river = i.river;
+					
 				}
-				else
+				else //flowing to a sector that already has a river
 				{
 					int riverTo = (int)sectors[min].river;
 					//$.grep(riversData, function(e) { return (e.river == land[i].river); });
@@ -1267,7 +1298,7 @@ public class MapGenerator : MonoBehaviour {
 					List<RiverData> minRiver = riversData.Where(r => r.river == riverTo).ToList();
 					int iRiverL = iRiver.Count;
 					int minRiverL = minRiver.Count;
-					// re-assing river nunber if new part is greater
+					// re-assign river nunber if new part is greater
 					if (iRiverL >= minRiverL)
 					{
 						sectors[min].river = i.river;
@@ -1294,6 +1325,7 @@ public class MapGenerator : MonoBehaviour {
 			sectors[min].flux += i.flux;
 			if (i.river != null)
 			{
+				i.riverToSector = min;
 				//const px = cells[min].data[0];
 				//const py = cells[min].data[1];
 				Vector2 pPos = sectors[min].position;
@@ -1305,8 +1337,12 @@ public class MapGenerator : MonoBehaviour {
 					Vector2 nPos = new Vector2((position.x + pPos.x) / 2, (position.y + pPos.y) / 2);
 					RiverData rNew = new RiverData();
 					rNew.river = (int)i.river;
+					rNew.flowToSiteId = min;
 					rNew.siteId = id;
 					rNew.position = nPos;
+					rNew.positionFrom = i.position;
+					rNew.positionTo = nPos;
+					Debug.Log("Add r at " + i.Id);
 					riversData.Add(rNew); // {river: land[i].river, cell: id, x, y});
 				}
 				else
@@ -1325,8 +1361,12 @@ public class MapGenerator : MonoBehaviour {
 						// add next River segment
 						RiverData rNew = new RiverData();
 						rNew.river = (int)i.river;
+						rNew.flowToSiteId = min;
 						rNew.siteId = id;
 						rNew.position = pPos;
+						rNew.positionFrom = i.position;
+						rNew.positionTo = pPos;
+						Debug.Log("Add r at " + i.Id);
 						riversData.Add(rNew); //{ river: land[i].river, cell: min, x: px, y: py});
 					}
 				}
@@ -1599,7 +1639,7 @@ public class MapGenerator : MonoBehaviour {
 			else if (c.height <= 60) score = 1.6f;
 			else if (c.height <= 80) score = 1.4f;
 			score += (1 - c.height / 100) / 3;
-			if (c.cType != null && UnityEngine.Random.value < 0.8f && c.river == null) {
+			if (c.cType != -1 && UnityEngine.Random.value < 0.8f && c.river == null) {
 				c.score = 0; // ignore 80% of extended cells
 			} else {
 				if (c.harbor != null) {
@@ -1697,7 +1737,7 @@ public class MapGenerator : MonoBehaviour {
 			if (!features[f].land) continue;
 
 			//const manorsOnIsland = $.grep(land, function(e) { return e.manor !== undefined && e.fn === f; });
-			List<int> manorsOnIsland = land.Where(e => sectors[e].manor != null && sectors[e].featureNumber == f).ToList();
+			List<int> manorsOnIsland = land.Where(e => sectors[e].manor != -1 && sectors[e].featureNumber == f).ToList();
 			//List<S> manorsOnIsland = manors.Select()
 			if (manorsOnIsland.Count > 1)
 			{
@@ -1729,7 +1769,7 @@ public class MapGenerator : MonoBehaviour {
 			Sector c = sectors[land[i]];
 			float score = (float) c.score;
 			int path = c.path; // roads are valued
-			if (path != null)
+			if (path != 0)
 			{
 				float pathScore = Mathf.Pow( path, 0.2f);
 				int crossroad = (int) c.crossroad; // crossroads are valued
@@ -1752,7 +1792,7 @@ public class MapGenerator : MonoBehaviour {
 		float time = Time.realtimeSinceStartup;
 
 		int count = numCities;
-		int neutral = neutralRange;
+		//int neutral = neutralRange;
 
 		//TODO: rework this?
 		//const manorTree = d3.quadtree();

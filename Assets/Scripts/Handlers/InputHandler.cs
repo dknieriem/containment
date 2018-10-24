@@ -78,11 +78,16 @@ public class InputHandler : MonoBehaviour
 		//Debug.Log ("Mousewheel: " + zoomDelta);
 		if (!Mathf.Approximately (zoomDelta, 0.0f)) {
 			float newZoom = mainCamera.orthographicSize * (1.0f - zoomDelta); 
-			if (newZoom < 32) {
-				newZoom = 32;
+			if (newZoom < 16) {
+				newZoom = 16;
 			}
-			if (newZoom > 64) {
-				newZoom = 64;
+			float maxZoom;
+			if (world != null && world.DimensionsX > 0)
+				maxZoom = world.DimensionsX / 2;
+			else
+				maxZoom = 16;
+			if (newZoom > maxZoom) {
+				newZoom = maxZoom;
 			}
 			mainCamera.orthographicSize = newZoom;
 		}

@@ -9,8 +9,8 @@ public class WorldPropertySet  : PropertySet
 	{
 		//Debug.Log ("WorldPropertySet.Start()");
 		properties = new Dictionary<string, Property> ();
-		properties.Add ("World Size", new EnumProperty (new string[] { "Tiny", "Small", "Medium", "Large", "Extra Large" }, 2) as Property);
-		properties.Add ("World Type", new EnumProperty (new string[] { "Rural", "Suburban", "Urban" }, 2) as Property);
+		properties.Add ("World Size", new EnumProperty ("World Size", new string[] { "Tiny", "Small", "Medium", "Large", "Extra Large" }, 2) as Property);
+		properties.Add ("World Type", new EnumProperty ("World Type", new string[] { "Rural", "Suburban", "Urban" }, 2) as Property);
 
 		CreatePropertyObjects ();
 	}

@@ -36,33 +36,33 @@ public class Sector : MonoBehaviour, IVector2Storable //
 	public Vector2 position { get; set; } //position on map
 	public List<Vector2> mapPoly;
 	public Mesh mesh;
-	public float height; //altitude
+	public float height = -1; //altitude
 	public float[] NeighborSectorDistance;
 	public float[] NeighborSectorTravelTime;
 	public uint[] NeighborSectorIds;
 	public int used = 0;
 	public string type = "";
 	public int featureNumber = -1;
-	public int cType;
+	public int cType = -1;
 	public int? harbor;
 	public int? pit;
 	public int? lake; //id of lake
 	public float area; //area in square graph distance units (km?)
 	public float flux; //water flow
 	public int? river; //id of river 
+	public int? riverToSector; //id of sector river flows into
 	public float? score; //city score
 	public int? confluence;
 	public int crossroad;
 	public int? port;
 	public int population;
-	public int manor;
+	public int manor = -1;
 	public float cost;
 	public int path = 0;
 
 	//old WorldBuilder attributes
 	public int LocationX, LocationY;
 	//public static int MaxPopulation = 1000;
-		public Sector[] NeighboringSectors;
 
 	public World world;
 	GameObject[] myRegions;
@@ -105,37 +105,6 @@ public class Sector : MonoBehaviour, IVector2Storable //
 		}
 				
 	}
-
-	//public void SetNeighboringSectors ()
-	//{
-	//	NeighboringSectors = new Sector[4];
-	//	if (LocationX > 0) {
-	//		NeighboringSectors [West] = world.WorldSectors [LocationX - 1, LocationY];
-	//		NeighboringSectorTypes [West] = world.WorldSectors [LocationX - 1, LocationY].SecType;
-						
-	//		if (LocationY > 0)
-	//			NeighboringSectorTypes [SouthWest] = world.WorldSectors [LocationX - 1, LocationY - 1].SecType;
-	//		if (LocationY < world.DimensionsY - 1)
-	//			NeighboringSectorTypes [NorthWest] = world.WorldSectors [LocationX - 1, LocationY + 1].SecType;
-	//	}
-	//	if (LocationX < world.DimensionsX - 1) {
-	//		NeighboringSectors [East] = world.WorldSectors [LocationX + 1, LocationY];
-	//		NeighboringSectorTypes [East] = world.WorldSectors [LocationX + 1, LocationY].SecType;
-						
-	//		if (LocationY > 0)
-	//			NeighboringSectorTypes [SouthEast] = world.WorldSectors [LocationX + 1, LocationY - 1].SecType;
-	//		if (LocationY < world.DimensionsY - 1)
-	//			NeighboringSectorTypes [NorthEast] = world.WorldSectors [LocationX + 1, LocationY + 1].SecType;
-	//	}
-	//	if (LocationY > 0) {
-	//		NeighboringSectors [South] = world.WorldSectors [LocationX, LocationY - 1];
-	//		NeighboringSectorTypes [South] = world.WorldSectors [LocationX, LocationY - 1].SecType;
-	//	}
-	//	if (LocationY < world.DimensionsY - 1) {
-	//		NeighboringSectors [North] = world.WorldSectors [LocationX, LocationY + 1];
-	//		NeighboringSectorTypes [North] = world.WorldSectors [LocationX, LocationY + 1].SecType;
-	//	}
-	//}
 	
 	// Update is called once per frame
 	void Update ()

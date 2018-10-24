@@ -165,7 +165,11 @@ public class PropertySet : MonoBehaviour
 		Property received;
 		bool found = properties.TryGetValue (propertyName, out received);
 		if (!found)
+		{
+			Debug.Log(propertyName + " not found!");
 			return -1;
+		}
+			
 
 		string type = received.GetPropTypeString ();
 

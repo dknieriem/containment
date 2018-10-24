@@ -175,8 +175,9 @@ public class EnumProperty : Property
 	public int min = 0;
 	public int max;
 
-	public EnumProperty (string[] possibles, int defaultValue)
+	public EnumProperty (string name, string[] possibles, int defaultValue)
 	{
+		Name = name;
 		possibleValues = possibles;
 		enumValue = defaultValue;
 		max = possibles.Length - 1;
@@ -184,7 +185,12 @@ public class EnumProperty : Property
 
 	public override void SetValue (System.Object newValue)
 	{
+		if (newValue.GetType() != typeof(int))
+			Debug.Log("cannot set " + Name + " to type " + newValue.GetType());//enumValue = false;
+		else
+			enumValue = (int)newValue;
 
+		Debug.Log(this.Name + ": " + enumValue);
 	}
 
 	public override System.Object GetValue ()

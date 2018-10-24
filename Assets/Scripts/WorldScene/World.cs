@@ -8,8 +8,9 @@ public class World : MonoBehaviour
 {
 
 	public Sector SectorPrefab;
+	public RiverData RiverPrefab;
 	public Dictionary<int, Sector> Sectors;
-	public Dictionary<int, RiverData> riversData;
+	public List<RiverData> riversData;
 	//public Sector[,] WorldSectors;
 	public int DimensionsX, DimensionsY;
 	public int NumGroups = 0;
