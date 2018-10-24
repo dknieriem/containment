@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
+using UnityEditor;
 
 public class MapGenerator : MonoBehaviour {
 
@@ -195,9 +196,9 @@ public class MapGenerator : MonoBehaviour {
 
 			newRiver.transform.parent = world.transform;
 			world.riversData.Add(newRiver);
+			GameObject.Destroy(riverData);
 		}
-
-
+		
 		time = Time.realtimeSinceStartup - time;
 		Debug.Log("Time: " + time);
 		Debug.Log("/setWorldRivers");
@@ -224,7 +225,7 @@ public class MapGenerator : MonoBehaviour {
 		Debug.Log("getJitteredGrid");
 		float time = Time.realtimeSinceStartup;
 
-		float radius = spacing / 2;
+		float radius = spacing / 2.0f;
 		float jittering = radius * 0.9f;
 		Debug.Log(string.Format("Spacing: {0}, Radius: {1}, Jittering: {2}", spacing, radius, jittering));
 
@@ -583,7 +584,7 @@ public class MapGenerator : MonoBehaviour {
 		for (int i = 0; i < queue.Count && height >= 1; i++)
 		{
 			if (type == "mountain") {
-				height = heights[(int)queue[i]] * radius - height / 100;
+				height = heights[(int)queue[i]] * radius - height / 100.0f;
 			}
 			else { height *= radius; }
 
@@ -660,7 +661,7 @@ public class MapGenerator : MonoBehaviour {
 						diff = Vector2.Distance(sectors[end].position, e.position);
 						if (UnityEngine.Random.value > 0.8f)
 						{
-							diff = diff / 2;
+							diff = diff / 2.0f;
 						}
 
 						if( diff < min)
@@ -745,7 +746,7 @@ public class MapGenerator : MonoBehaviour {
 
 				if (UnityEngine.Random.value > 0.8f)
 				{
-					diff = diff / 2;
+					diff = diff / 2.0f;
 				}
 
 				if (diff < min)
@@ -889,7 +890,7 @@ public class MapGenerator : MonoBehaviour {
 			}
 
 			//cells[i].neighbors.forEach(function(e) { nHeights.push(heights[e]); });
-			heights[i] = (heights[i] * (fraction - 1) + nHeights.Average()) / fraction;
+			heights[i] = (heights[i] * (fraction - 1) + nHeights.Average()) / (float)fraction;
 		}
 	}
 
@@ -1103,7 +1104,8 @@ public class MapGenerator : MonoBehaviour {
 		//List<Vector2> newPoints = new List<Vector2>(); // to store new data
 		
 		// get average precipitation based on graph size
-		float avPrec = precInput / 5000;
+		float avPrec = precInput / 5000.0f;
+		Debug.Log("avPrec: " + avPrec);
 		int smallLakesMax = 500;
 		int smallLakes = 0;
 		int evaporation = 2;
@@ -1141,9 +1143,10 @@ public class MapGenerator : MonoBehaviour {
 			if (i.height >= 20)
 			{
 				// calc cell area
-				i.area = Round(Mathf.Abs(GetArea(i.mapPoly)), 2);
-				float prec = Round(avPrec * i.area, 2);
+				i.area = Round(Mathf.Abs(GetArea(i.mapPoly)), 6); //, 2
+				float prec = Round(avPrec * i.area * 100.0f, 2);
 				i.flux = i.lake != null ? prec * 10 : prec;
+				//Debug.Log("i.flux = " + i.flux);
 			}
 
 		} //end foreach (Sector i in sectors)
@@ -1156,14 +1159,20 @@ public class MapGenerator : MonoBehaviour {
 	//from https://stackoverflow.com/questions/17775832/c-sharp-gmap-net-calculate-surface-of-polygon#17775964
 	float GetArea(List<Vector2> points)
 	{
-		float area2 = 0;
-		for (int numPoint = 0; numPoint < points.Count - 1; numPoint++)
+		
+		Vector2 point = points[points.Count - 1];
+		Vector2 nextPoint = points[0];
+		float area2 = (point.y * nextPoint.x) - (point.x * nextPoint.y);
+
+		for (int numPoint = 1; numPoint < points.Count; numPoint++)
 		{
-			Vector2 point = points[numPoint];
-			Vector2 nextPoint = points[numPoint + 1];
-			area2 += (nextPoint.x - point.x) * (nextPoint.y - point.y);
+			point = nextPoint;
+			nextPoint = points[numPoint];
+			area2 += (point.y * nextPoint.x) - (point.x * nextPoint.y);
 		}
+
 		return area2 / 2f;
+
 	}
 
 	private void resolveDepressionsSecondary()
@@ -1206,6 +1215,8 @@ public class MapGenerator : MonoBehaviour {
 
 	private void flux()
 	{
+		Debug.ClearDeveloperConsole();
+		
 		Debug.Log("flux");
 		float time = Time.realtimeSinceStartup;
 
@@ -1215,7 +1226,7 @@ public class MapGenerator : MonoBehaviour {
 		int riverNext = 0;
 
 		land = land.OrderByDescending(s => heights[s]).ToList();
-
+		//Debug.Log("land: " + land.Count);
 		//take care of rivers flowing to the edge of a landmass
 		for (int index = 0; index < land.Count; index++)
 		{
@@ -1223,20 +1234,25 @@ public class MapGenerator : MonoBehaviour {
 			int id = (int)i.Id;
 			Vector2 position = i.position; //sx and xy
 			int featureNumber = i.featureNumber;
+			//Debug.Log(string.Format("Sector {0}: ( {1}, {2} ), fn: {3}", id, position.x, position.y, featureNumber));
 			if (i.cType == 99) //border cell
 			{
-				if (i.river != null) //if the cell has a river
+				//Debug.Log("cType == 99");
+				if (i.river != null) //if the cell has a river already
 				{
+					//Debug.Log("river != null");
 					Vector2 pos = new Vector2();
 					float minP = Mathf.Min(new float[] { position.y, graphHeight - position.y, position.x, graphWidth - position.x });
 					if (minP == position.y) { pos.x = position.x; pos.y = 0; }
 					if (minP == graphHeight - position.y) { pos.x = position.x; pos.y = graphHeight; }
 					if (minP == position.x) { pos.x = 0; pos.y = position.y; }
 					if (minP == graphWidth - position.x) { pos.x = graphWidth; pos.y = position.y; }
-					RiverData r = new RiverData((int)i.river, id, pos);
+					RiverData r = (RiverData)GameObject.Instantiate(world.RiverPrefab); //new RiverData((int)i.river, id, pos);
+
 					r.positionFrom = i.position;
 					r.positionTo = pos;
-					Debug.Log("Add r at " + i.Id);
+					//r.flowToSiteId = 
+					//Debug.Log("Add r at " + i.Id);
 					riversData.Add(r);
 				}
 				continue;
@@ -1244,8 +1260,10 @@ public class MapGenerator : MonoBehaviour {
 
 			if (features[featureNumber].river != null)
 			{
+				//Debug.Log("features[featureNumber].river != null");
 				if (i.river != features[featureNumber].river)
 				{
+					//Debug.Log("i.river != features[featureNumber].river");
 					i.river = null;
 					i.flux = 0;
 				}
@@ -1262,34 +1280,38 @@ public class MapGenerator : MonoBehaviour {
 					min = (int)n;
 				}
 			}
-
+			//Debug.Log(string.Format("Sector {0} neighbor #{1} has minHeight {2}", id, min, minHigh));
 			// Define river number
 			if (min != -1 && i.flux > 1)
 			{
+				//Debug.Log("min != -1 && i.flux > 1");
 				if (i.river == null)
 				{
+					//Debug.Log("i.river == null");
 					// Start new River
 					i.river = riverNext;
 					i.riverToSector = min;
-					RiverData r = new RiverData();
+					RiverData r = (RiverData)GameObject.Instantiate(world.RiverPrefab); // new RiverData();
 					r.river = riverNext;
 					r.siteId = id;
 					r.position = position;
 					r.flowToSiteId = min;
 					r.positionFrom = i.position;
 					r.positionTo = sectors[min].position;
-					Debug.Log("Add r at " + i.Id);
+					//Debug.Log("Add r at " + i.Id);
 					riversData.Add(r);
 					riverNext++;
 				}
 				// Assign existing River to the downhill cell
 				if (sectors[min].river == null)
 				{
+					//Debug.Log("sectors[min].river == null");
 					sectors[min].river = i.river;
 					
 				}
 				else //flowing to a sector that already has a river
 				{
+					//Debug.Log("Confluence!");
 					int riverTo = (int)sectors[min].river;
 					//$.grep(riversData, function(e) { return (e.river == land[i].river); });
 					List<RiverData> iRiver = riversData.Where(r => r.river == i.river).ToList();
@@ -1321,52 +1343,57 @@ public class MapGenerator : MonoBehaviour {
 				}
 			}
 
-			//if (sectors[min].flux) 
 			sectors[min].flux += i.flux;
+			//Debug.Log(string.Format("sectors[min ({0})].flux = {1}, i({2}).flux = {3}", min, sectors[min].flux, i, i.flux));
 			if (i.river != null)
 			{
+				//Debug.Log("i.river != null");
 				i.riverToSector = min;
 				//const px = cells[min].data[0];
 				//const py = cells[min].data[1];
 				Vector2 pPos = sectors[min].position;
 				if (sectors[min].height < 20)
 				{
+					//Debug.Log("sectors[min].height <  20");
 					// pour water to the sea
 					//const x = (px + sx) / 2 + (px - sx) / 10;
 					//const y = (py + sy) / 2 + (py - sy) / 10;
-					Vector2 nPos = new Vector2((position.x + pPos.x) / 2, (position.y + pPos.y) / 2);
-					RiverData rNew = new RiverData();
+					Vector2 nPos = new Vector2((position.x + pPos.x) / 2.0f, (position.y + pPos.y) / 2.0f);
+					RiverData rNew = (RiverData)GameObject.Instantiate(world.RiverPrefab); //new RiverData();
 					rNew.river = (int)i.river;
 					rNew.flowToSiteId = min;
 					rNew.siteId = id;
 					rNew.position = nPos;
 					rNew.positionFrom = i.position;
 					rNew.positionTo = nPos;
-					Debug.Log("Add r at " + i.Id);
+					//Debug.Log("Add r at " + i.Id);
 					riversData.Add(rNew); // {river: land[i].river, cell: id, x, y});
 				}
 				else
 				{
+					//Debug.Log("sectors[min].height >=  20");
 					if (sectors[min].lake == 1)
 					{
+						//Debug.Log("sectors[min].lake == 1");
 						featureNumber = sectors[min].featureNumber;
 						Feature f = features[featureNumber];
 
 						if (f.river == null)
 						{
+							//Debug.Log("f.river == null");
 							f.river = i.river;
 							features[featureNumber] = f;
 						}
 
 						// add next River segment
-						RiverData rNew = new RiverData();
+						RiverData rNew = (RiverData)GameObject.Instantiate(world.RiverPrefab); //new RiverData();
 						rNew.river = (int)i.river;
 						rNew.flowToSiteId = min;
 						rNew.siteId = id;
 						rNew.position = pPos;
 						rNew.positionFrom = i.position;
 						rNew.positionTo = pPos;
-						Debug.Log("Add r at " + i.Id);
+						//Debug.Log("Add r at " + i.Id);
 						riversData.Add(rNew); //{ river: land[i].river, cell: min, x: px, y: py});
 					}
 				}
@@ -1518,7 +1545,7 @@ public class MapGenerator : MonoBehaviour {
 		for(int i = 0; i < land.Count; i++){
 			Sector l = sectors[land[i]];
 			int population = 0;
-			float elevationFactor = Mathf.Pow(1 - l.height / 100, 3);
+			float elevationFactor = Mathf.Pow(1 - l.height / 100.0f, 3);
 			population = Mathf.FloorToInt(elevationFactor * l.area * graphSizeAdj);
 			//if (l.region == "neutral") population *= ruralFactor;
 			l.population = population;
@@ -1638,7 +1665,7 @@ public class MapGenerator : MonoBehaviour {
 			else if (c.height <= 50) score = 1.8f;
 			else if (c.height <= 60) score = 1.6f;
 			else if (c.height <= 80) score = 1.4f;
-			score += (1 - c.height / 100) / 3;
+			score += (1 - c.height / 100.0f) / 3.0f;
 			if (c.cType != -1 && UnityEngine.Random.value < 0.8f && c.river == null) {
 				c.score = 0; // ignore 80% of extended cells
 			} else {
@@ -1672,7 +1699,7 @@ public class MapGenerator : MonoBehaviour {
 
 		// min distance detween capitals
 		int count = numRegions;
-		float spacing = (graphWidth + graphHeight) / 2 / count;
+		float spacing = (graphWidth + graphHeight) / 2.0f / (float)count;
 		Debug.Log(" states: " + count);
 
 		for (int l = 0; manors.Count < count; l++)
@@ -1887,116 +1914,6 @@ public class MapGenerator : MonoBehaviour {
 
 		Debug.Log("drawRelief");
 		float time = Time.realtimeSinceStartup;
-
-
-		
-		//let h, count, rnd, cx, cy, swampCount = 0;
-  //  const hills = terrain.select("#hills");
-  //  const mounts = terrain.select("#mounts");
-  //  const swamps = terrain.select("#swamps");
-  //  const forests = terrain.select("#forests");
-  //  terrain.selectAll("g").selectAll("g").remove();
-  //  // sort the land to Draw the top element first (reduce the elements overlapping)
-  //  land.sort(compareY);
-  //  for (let i = 0; i < land.length; i++) {
-  //    if (land[i].river) continue; // no icons on rivers
-  //    const cell = land[i].index;
-  //    const p = d3.polygonCentroid(polygons[cell]); // polygon centroid point
-  //    if (p === undefined) continue; // something is wrong with data
-  //    const height = land[i].height;
-  //    const area = land[i].area;
-  //    if (height >= 70) {
-  //      // mount icon
-  //      h = (height - 55) * 0.12;
-  //      for (let c = 0, a = area; Math.random() < a / 50; c++, a -= 50) {
-  //        if (polygons[cell][c] === undefined) break;
-  //        const g = mounts.append("g").attr("data-cell", cell);
-  //        if (c < 2) {
-  //          cx = p[0] - h / 100 * (1 - c / 10) - c * 2;
-  //          cy = p[1] + h / 400 + c;
-  //        } else {
-  //          const p2 = polygons[cell][c];
-  //          cx = (p[0] * 1.2 + p2[0] * 0.8) / 2;
-  //          cy = (p[1] * 1.2 + p2[1] * 0.8) / 2;
-  //        }
-  //        rnd = Math.random() * 0.8 + 0.2;
-  //        let mount = "M" + cx + "," + cy + " L" + (cx + h / 3 + rnd) + "," + (cy - h / 4 - rnd * 1.2) + " L" + (cx + h / 1.1) + "," + (cy - h) + " L" + (cx + h + rnd) + "," + (cy - h / 1.2 + rnd) + " L" + (cx + h * 2) + "," + cy;
-  //        let shade = "M" + cx + "," + cy + " L" + (cx + h / 3 + rnd) + "," + (cy - h / 4 - rnd * 1.2) + " L" + (cx + h / 1.1) + "," + (cy - h) + " L" + (cx + h / 1.5) + "," + cy;
-  //        let dash = "M" + (cx - 0.1) + "," + (cy + 0.3) + " L" + (cx + 2 * h + 0.1) + "," + (cy + 0.3);
-  //        dash += "M" + (cx + 0.4) + "," + (cy + 0.6) + " L" + (cx + 2 * h - 0.3) + "," + (cy + 0.6);
-  //        g.append("path").attr("d", round(mount, 1)).attr("stroke", "#5c5c70");
-  //        g.append("path").attr("d", round(shade, 1)).attr("fill", "#999999");
-  //        g.append("path").attr("d", round(dash, 1)).attr("class", "strokes");
-  //      }
-  //    } else if (height > 50) {
-  //      // hill icon
-  //      h = (height - 40) / 10;
-  //      if (h > 1.7) h = 1.7;
-  //      for (let c = 0, a = area; Math.random() < a / 30; c++, a -= 30) {
-  //        if (land[i].ctype === 1 && c > 0) break;
-  //        if (polygons[cell][c] === undefined) break;
-  //        const g = hills.append("g").attr("data-cell", cell);
-  //        if (c < 2) {
-  //          cx = p[0] - h - c * 1.2;
-  //          cy = p[1] + h / 4 + c / 1.6;
-  //        } else {
-  //          const p2 = polygons[cell][c];
-  //          cx = (p[0] * 1.2 + p2[0] * 0.8) / 2;
-  //          cy = (p[1] * 1.2 + p2[1] * 0.8) / 2;
-  //        }
-  //        let hill = "M" + cx + "," + cy + " Q" + (cx + h) + "," + (cy - h) + " " + (cx + 2 * h) + "," + cy;
-  //        let shade = "M" + (cx + 0.6 * h) + "," + (cy + 0.1) + " Q" + (cx + h * 0.95) + "," + (cy - h * 0.91) + " " + (cx + 2 * h * 0.97) + "," + cy;
-  //        let dash = "M" + (cx - 0.1) + "," + (cy + 0.2) + " L" + (cx + 2 * h + 0.1) + "," + (cy + 0.2);
-  //        dash += "M" + (cx + 0.4) + "," + (cy + 0.4) + " L" + (cx + 2 * h - 0.3) + "," + (cy + 0.4);
-  //        g.append("path").attr("d", round(hill, 1)).attr("stroke", "#5c5c70");
-  //        g.append("path").attr("d", round(shade, 1)).attr("fill", "white");
-  //        g.append("path").attr("d", round(dash, 1)).attr("class", "strokes");
-  //      }
-  //    }
-
-  //    // swamp icons
-  //    if (height >= 21 && height < 22 && swampCount < +swampinessInput.value && land[i].used != 1) {
-  //      const g = swamps.append("g").attr("data-cell", cell);
-  //      swampCount++;
-  //      land[i].used = 1;
-  //      let swamp = drawSwamp(p[0],p[1]);
-  //      land[i].neighbors.forEach(function(e) {
-  //        if (cells[e].height >= 20 && cells[e].height < 30 && !cells[e].river && cells[e].used != 1) {
-  //          cells[e].used = 1;
-  //          swamp += drawSwamp(cells[e].data[0], cells[e].data[1]);
-  //        }
-  //      //});
-  //      g.append("path").attr("d", round(swamp, 1));
-		//}
-
-  //    // forest icons
-  //    if (Math.random() < height / 100 && height >= 22 && height < 48) {
-  //      for (let c = 0, a = area; Math.random() < a / 15; c++, a -= 15) {
-  //        if (land[i].ctype === 1 && c > 0) break;
-  //        if (polygons[cell][c] === undefined) break;
-  //        const g = forests.append("g").attr("data-cell", cell);
-  //        if (c === 0) {
-  //          cx = rn(p[0] - 1 - Math.random(), 1);
-  //          cy = p[1] - 2;
-  //        } else {
-  //          const p2 = polygons[cell][c];
-  //          if (c > 1) {
-  //            const dist = Math.hypot(p2[0] - polygons[cell][c-1][0],p2[1] - polygons[cell][c-1][1]);
-  //            if (dist < 2) continue;
-  //          }
-  //          cx = (p[0] * 0.5 + p2[0] * 1.5) / 2;
-  //          cy = (p[1] * 0.5 + p2[1] * 1.5) / 2 - 1;
-  //        }
-  //        const forest = "M" + cx + "," + cy + " q-1,0.8 -0.05,1.25 v0.75 h0.1 v-0.75 q0.95,-0.47 -0.05,-1.25 z ";
-  //        const light = "M" + cx + "," + cy + " q-1,0.8 -0.05,1.25 h0.1 q0.95,-0.47 -0.05,-1.25 z ";
-  //        const shade = "M" + cx + "," + cy + " q-1,0.8 -0.05,1.25 q-0.2,-0.55 0,-1.1 z ";
-  //        g.append("path").attr("d", forest);
-  //        g.append("path").attr("d", light).attr("fill", "white").attr("stroke", "none");
-  //        g.append("path").attr("d", shade).attr("fill", "#999999").attr("stroke", "none");
-  //      }
-  //    }
-  //  }
-
 		time = Time.realtimeSinceStartup - time;
 		Debug.Log("Time: " + time);
 		Debug.Log("/drawRelief");

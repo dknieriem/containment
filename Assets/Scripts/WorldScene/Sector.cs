@@ -48,7 +48,7 @@ public class Sector : MonoBehaviour, IVector2Storable //
 	public int? pit;
 	public int? lake; //id of lake
 	public float area; //area in square graph distance units (km?)
-	public float flux; //water flow
+	public float flux = 0; //water flow
 	public int? river; //id of river 
 	public int? riverToSector; //id of sector river flows into
 	public float? score; //city score
