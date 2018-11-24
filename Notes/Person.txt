@@ -1,27 +1,30 @@
-Stats: vital signs
+Stats: vital signs [0-100]
 - Health
 - Mental Stability
+- Attack Rating
+	= Max((Str + End) * Melee * MeleeItem.Attack, FirearmItem.Attack) 
 
-Attributes: physical/mental abilities
--Loyalty
--
+
+Attributes: physical/mental abilities [0-20]
+- Endurance
+- Leadership
+- Loyalty
+- Strength
 
 Skills: trainable abilities 
+
+Traits: personality flags with unique perks/interactions
+
+Item MeleeItem
+	if empty, use Fist, Att = 1, Def = 1
+
+Item FirearmItem
 
 Role:
 - None 
     - relationship mod with all other group members: -25% ("They're not supporting the group")
     - group leader relationship mod with all other group members: -5% ("You're not being fair")
 
-Current Job:
-- Rest
-- Travel
-- Defend
-- Clear
-
-Mission: list of jobs to complete until either:
--all jobs in mission complete and return home
--mental stability below threshhold (based on their attributes)
 
 Mission.cs:
 

@@ -1,0 +1,23 @@
+Each Person:
+------------
+- adjust stats
+	- health- if in combat
+	- health+ if resting
+
+
+Each Party:
+-----------
+- update job
+	-if travel, update TravelTimeRemaining
+- update mission
+- calc att/def 
+- adjust rel. scores between all party members
+- adjust org
+
+Each Group:
+-----------
+
+
+Each Sector:
+------------
+

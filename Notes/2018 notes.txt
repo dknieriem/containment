@@ -30,35 +30,60 @@ Group
 Party
 Relationships
 Stats
+Attributes
+Skills
 
 
 Party
 -----
 Group
+Location
+ Destination
+ TravelTimeRemaining
 Members
 Mission
+Stats:
+	- Def Defense
+		= summ(members def)
+	- Att Attack
+		= sum(members att)
+	- Org Organization
+		-when party formed, = max(members lead) / 20
+	- Coh Cohesion
+		-when party formed, 
+Current Job:
+- Rest
+- Travel
+- Defend
+- Clear
+
+Mission: list of jobs to complete until either:
+-all jobs in mission complete and return home
+-mental stability below threshhold (based on their attributes)
 
 Mission
 -------
 Group
 Target (sector or town)
-Goal: scavenge, clear, rebuild, etc
+Goal: enum { scavenge, clear, rebuild, etc }
 
 Town
 ----
-Sectors
+Sectors[]
 Name
 Zeds
 is clear?
 
 Sector
 ------
-Loc x,y
-Zeds -List
-Owned group
-Inventory
+Vector2 Location
+int Zeds 
+Group ControllingGroup
+Inventory Inventory
 Stats:
 	- Def
+	
+
 Zed
 ---
 Loc x,y
