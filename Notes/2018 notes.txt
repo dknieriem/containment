@@ -19,7 +19,7 @@ home base (sector, must be owned by group)
 group stats
 inventory:
 	- inventory in sectors owned by group
-	- inventory for each group member
+	- inventory for each party
 
 Person
 ------
@@ -36,24 +36,28 @@ Skills
 
 Party
 -----
+Flags
+	- 
 Group
 Location
  Destination
  TravelTimeRemaining
-Members
+Members [1-Group.MaxParty]
+	- memberListUpdatedFlag set to true if list updated last hour
 Mission
-Stats:
-	- Def Defense
+Stats: [0-100]
+	- Def Defense [0-]
 		= summ(members def)
-	- Att Attack
+	- Att Attack [0-]
 		= sum(members att)
-	- Org Organization
+	- Org Organization [0-100]
 		-when party formed, = max(members lead) / 20
 	- Coh Cohesion
-		-when party formed, 
+		-when party formed, = max(members lead) / 
 Current Job:
 - Rest
 - Travel
+- Prepare
 - Defend
 - Clear
 
@@ -84,11 +88,23 @@ Stats:
 	- Def
 	
 
-Zed
----
-Loc x,y
-Stats:
-Health
+##Zed
+##---
+##Loc x,y
+##Stats:
+##Health
+
+
+Controls
+----------
+
+UI
+---------
+
+Persistent Buttons
+------------------
+
+Group Panel Toggle
 
 
 Group panel

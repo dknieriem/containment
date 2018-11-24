@@ -1,10 +1,10 @@
 Each Person:
 ------------
 - adjust stats
-	- health- if in combat
-	- health+ if resting
-
-
+	- health- if job=combat
+	- health+ if job=rest
+	- stamina- if job=combat or travel
+	- stamina+ if job=rest
 Each Party:
 -----------
 - update job
@@ -13,6 +13,10 @@ Each Party:
 - calc att/def 
 - adjust rel. scores between all party members
 - adjust org
+	- org- if job=travel
+	- org- if party list changed
+	- org+ if job=prep,def
+- adjust coh
 
 Each Group:
 -----------
@@ -20,4 +24,6 @@ Each Group:
 
 Each Sector:
 ------------
-
+- set cleared flag
+- set owning group
+- migrate zeds

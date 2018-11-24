@@ -1,9 +1,11 @@
 Stats: vital signs [0-100]
 - Health
 - Mental Stability
+- Stamina
 - Attack Rating
 	= Max((Str + End) * Melee * MeleeItem.Attack, FirearmItem.Attack) 
-
+- Defense Rating
+	= 
 
 Attributes: physical/mental abilities [0-20]
 - Endurance
@@ -12,8 +14,11 @@ Attributes: physical/mental abilities [0-20]
 - Strength
 
 Skills: trainable abilities 
-
+- Melee
+- Firearms
 Traits: personality flags with unique perks/interactions
+
+Flags: temporary modifiers based on specific states
 
 Item MeleeItem
 	if empty, use Fist, Att = 1, Def = 1
