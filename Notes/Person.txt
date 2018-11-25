@@ -25,11 +25,15 @@ Item MeleeItem
 
 Item FirearmItem
 
-Role:
+Role: Always on, whether in party or at a base sector
 - None 
     - relationship mod with all other group members: -25% ("They're not supporting the group")
     - group leader relationship mod with all other group members: -5% ("You're not being fair")
-
+    - healing rate +25%
+    - stamina recovery rate +25%
+- Medic
+- Builder
+- Guard
 
 Mission.cs:
 

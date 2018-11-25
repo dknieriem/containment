@@ -5,10 +5,16 @@ Each Person:
 	- health+ if job=rest
 	- stamina- if job=combat or travel
 	- stamina+ if job=rest
+
 Each Party:
 -----------
+- if member list changed,
+	- set memberListUpdatedFlag = true
+	- else set false
 - update job
-	-if travel, update TravelTimeRemaining
+	- if travel, update TravelTimeRemaining
+	- if TravelTimeRemaining <= 0,
+		- move party to that 
 - update mission
 - calc att/def 
 - adjust rel. scores between all party members

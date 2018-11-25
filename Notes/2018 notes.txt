@@ -52,12 +52,17 @@ Stats: [0-100]
 		= sum(members att)
 	- Org Organization [0-100]
 		-when party formed, = max(members lead) / 20
-	- Coh Cohesion
-		-when party formed, = max(members lead) / 
+	#- Coh Cohesion [0-100]
+	#	-when party formed, = max(members lead) / 
 Current Job:
+	- float TimeRemaining
+	- Sector sector
 - Rest
 - Travel
+	- float TravelTimeRemaining
+	- Sector destination 
 - Prepare
+	- float TimeRemaining
 - Defend
 - Clear
 
