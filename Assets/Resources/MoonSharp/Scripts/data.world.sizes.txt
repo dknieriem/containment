@@ -2,5 +2,6 @@ function Name()
 	return "data.world.sizes";
 end
 function ReturnData()
-	return {32,64,128,250,500}
+	-- {32,64,128,250,500}
+	return {64, 128, 256, 512, 1024} 
 end

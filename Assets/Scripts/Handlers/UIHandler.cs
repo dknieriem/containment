@@ -18,6 +18,8 @@ public class UIHandler : MonoBehaviour
     public GameObject relationshipInfoPanelPrefab;
 	public Button toggleDebugButton;
 	public Button togglePauseButton;
+	public Sprite pauseSprite;
+	public Sprite playSprite;
 
 	private static UIHandler uiHandler;
 
@@ -151,12 +153,15 @@ public class UIHandler : MonoBehaviour
 		if (!gameManager.inGame)
 			return;
 
-		Text pauseText = togglePauseButton.GetComponentInChildren<Text> ();
+		//Text pauseText = togglePauseButton.GetComponentInChildren<Text> ();
+		SVGImage pauseImage = togglePauseButton.GetComponentInChildren<SVGImage>();
 		gameManager.TogglePause ();
 		if (gameManager.isPaused)
-			pauseText.text = "Unpause"; 
+			//pauseText.text = "Unpause";
+			pauseImage.sprite = playSprite;
 		else
-			pauseText.text = "<color='red'>Pause</color>";
+			//pauseText.text = "<color='red'>Pause</color>";
+			pauseImage.sprite = pauseSprite;
 
 	}
 

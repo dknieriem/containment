@@ -24,7 +24,7 @@ public class InputHandler : MonoBehaviour
 		if (Input.GetButtonDown ("Action 1")) {
 			if (EventSystem.current.IsPointerOverGameObject())
             {
-                //Debug.Log ("Clicked an event system object...");
+                Debug.Log ("Clicked an event system object...");
             }
 
             else
@@ -34,7 +34,7 @@ public class InputHandler : MonoBehaviour
 		if (Input.GetButtonDown ("Action 2")) {
 			if (EventSystem.current.IsPointerOverGameObject())
             {
-                //Debug.Log ("Clicked an event system object...");
+                Debug.Log ("Clicked an event system object...");
             }
 
             else
@@ -145,7 +145,7 @@ public class InputHandler : MonoBehaviour
 	void getClick (string action)
 	{
 		Ray ray = mainCamera.ScreenPointToRay (Input.mousePosition);
-		//Debug.Log (action + ", " + ray.origin);
+		Debug.Log ("action: " + action + ", " + ray.origin);
 				
 		if (ray.origin.x > 0 && ray.origin.y > 0 && ray.origin.x < world.DimensionsX && ray.origin.y < world.DimensionsY) {
 			Sector sectorClicked = null; // world.GetSectorAtPosition (ray.origin);

@@ -77,8 +77,6 @@ public class Sector : MonoBehaviour, IVector2Storable //
 
 	public int residentCapacity;
 	public int defenseRating;
-    public int elevation; //meters
-    public int deltaElevation; //total change in elevation relative to neighboring sectors
     public int maxBuildingCount;
     public int BuildingCount;
 

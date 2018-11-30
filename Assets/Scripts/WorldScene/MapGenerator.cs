@@ -196,7 +196,7 @@ public class MapGenerator : MonoBehaviour {
 
 			newRiver.transform.parent = world.transform;
 			world.riversData.Add(newRiver);
-			GameObject.Destroy(riverData);
+			GameObject.Destroy(riverData.gameObject);
 		}
 		
 		time = Time.realtimeSinceStartup - time;
@@ -1144,8 +1144,8 @@ public class MapGenerator : MonoBehaviour {
 			{
 				// calc cell area
 				i.area = Round(Mathf.Abs(GetArea(i.mapPoly)), 6); //, 2
-				float prec = Round(avPrec * i.area * 100.0f, 2);
-				i.flux = i.lake != null ? prec * 10 : prec;
+				float prec = Round(avPrec * i.area * 50.0f, 4);
+				i.flux = i.lake != null ? prec * 10.0f : prec;
 				//Debug.Log("i.flux = " + i.flux);
 			}
 
@@ -1910,10 +1910,31 @@ public class MapGenerator : MonoBehaviour {
 
 	private void drawRelief()
 	{
-		throw new NotImplementedException();
+		//throw new NotImplementedException();
 
 		Debug.Log("drawRelief");
 		float time = Time.realtimeSinceStartup;
+
+		land = land.OrderByDescending(x => heights[x]).ToList();
+
+		foreach(int i in land)
+		{
+			Sector s = sectors[i];
+			if(s.river != null)
+			{
+				continue;
+			}
+
+			float height = s.height;
+			float area = s.area;
+
+			if(height >= 70)
+			{
+				float h = (height - 55) * 0.12f;
+
+			}
+		}
+
 		time = Time.realtimeSinceStartup - time;
 		Debug.Log("Time: " + time);
 		Debug.Log("/drawRelief");
