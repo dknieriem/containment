@@ -20,7 +20,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4884728353049022}
   - component: {fileID: 114690949724218716}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: RiverData
   m_TagString: Untagged
   m_Icon: {fileID: 0}
