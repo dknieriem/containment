@@ -689,7 +689,6 @@
     <Compile Include="Assets\Devdog\InventoryPro\Standard Assets\Characters\ThirdPersonCharacter\Scripts\ThirdPersonCharacter.cs" />
     <Compile Include="Assets\Devdog\InventoryPro\Standard Assets\Characters\ThirdPersonCharacter\Scripts\ThirdPersonUserControl.cs" />
     <Compile Include="Assets\MapImager.cs" />
-    <Compile Include="Assets\Minimap.cs" />
     <Compile Include="Assets\Scripts\Handlers\InputHandler.cs" />
     <Compile Include="Assets\Scripts\Handlers\LuaLoader.cs" />
     <Compile Include="Assets\Scripts\Handlers\MusicControllerInputHandler.cs" />
@@ -697,6 +696,7 @@
     <Compile Include="Assets\Scripts\Handlers\Property.cs" />
     <Compile Include="Assets\Scripts\Handlers\SpriteManager.cs" />
     <Compile Include="Assets\Scripts\Handlers\UIHandler.cs" />
+    <Compile Include="Assets\Scripts\Helper.cs" />
     <Compile Include="Assets\Scripts\Helpers\QuadTree.cs" />
     <Compile Include="Assets\Scripts\Helpers\Unity-delaunay\Delaunay\DelaunayHelpers.cs" />
     <Compile Include="Assets\Scripts\Helpers\Unity-delaunay\Delaunay\Edge.cs" />
