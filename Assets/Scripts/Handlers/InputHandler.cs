@@ -25,6 +25,7 @@ public class InputHandler : MonoBehaviour
 			if (EventSystem.current.IsPointerOverGameObject())
             {
                 Debug.Log ("Clicked an event system object...");
+				EventSystem.current.currentSelectedGameObject.GetComponent<>
             }
 
             else

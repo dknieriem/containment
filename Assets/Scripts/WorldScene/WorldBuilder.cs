@@ -114,6 +114,10 @@ public class WorldBuilder : MonoBehaviour
 
 		mapGenerator.Generate();
 
+		GameObject minimapCam = GameObject.Find("Minimap Camera");
+		MapImager mapImager = minimapCam.GetComponent<MapImager>();
+		mapImager.Capture();
+
 		Debug.Log ("Pop per sector: " + StartingPopulationPerSector);
 		//ZedDensity = new float[DimensionsX, DimensionsY];
 		//HumanDensity = new float[DimensionsX, DimensionsY];
